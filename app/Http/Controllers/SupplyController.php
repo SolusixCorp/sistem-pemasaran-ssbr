@@ -45,7 +45,7 @@ class SupplyController extends Controller
         foreach ($supplies as $sup) {
             $row = array($sup->supply_date, $sup->supplier_name, $sup->barang_name, $sup->qty, rupiah($sup->total, true),
             // '<a href="/supply/edit/' . $sup->supply_id . '" onclick="editForm(' . $sup->supply_id . ')" class="btn btn-success btn-sm btn-block"><i class="far fa-edit"></i> Edit</a>
-            '<a href="#" onclick="detailsView(' . $sup->supply_id . ')" class="btn btn-warning btn-sm btn-block" data-toggle="modal"  data-target="#modal-details"><i class="far fa-eye"></i> Details</a>');
+            '<a href="#" onclick="detailsView(' . $sup->supply_id . ')" class="btn btn-primary btn-sm btn-block" data-toggle="modal"  data-target="#modal-details"><i class="far fa-eye"></i> Details</a>');
             
             array_push($data, $row);
         }

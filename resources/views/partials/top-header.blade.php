@@ -5,7 +5,7 @@
     <div class="headerbar-left">
         <a href="/" class="logo">
             <!-- <img alt="Logo" src="{{ asset('nura-admin/assets/images/logo.png') }}" /> -->
-            <span>APLIKASI KASIR</span>
+            <span>PT.SSBR</span>
         </a>
     </div>
 

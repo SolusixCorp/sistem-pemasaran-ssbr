@@ -44,9 +44,9 @@ class OrderController extends Controller
         foreach ($orders as $order) {
             $no++;
             $row = array($no, $order->order_date, $order->customer_name, rupiah($order->total_with_discount, true),
-            '<a href="'. url("/") .'/sales/edit/' . $order->order_id . '" onclick="editForm(' . $order->order_id . ')" class="btn btn-success btn-sm btn-block"><i class="far fa-edit"></i> Edit</a>
-            <a href="#" onclick="detailsView(' . $order->order_id . ')" class="btn btn-warning btn-sm btn-block" data-toggle="modal"  data-target="#modal-details"><i class="far fa-eye"></i> Details</a>
-            <a href="'. url("/") .'/sales/print-invoice/' . $order->order_id . '" onclick="editForm(' . $order->order_id . ')" class="btn btn-primary btn-sm btn-block"> Cetak Invoice</a>');
+            '<a href="'. url("/") .'/sales/edit/' . $order->order_id . '" onclick="editForm(' . $order->order_id . ')" class="btn btn-warning btn-sm btn-block"><i class="far fa-edit"></i> Edit</a>
+            <a href="#" onclick="detailsView(' . $order->order_id . ')" class="btn btn-primary btn-sm btn-block" data-toggle="modal"  data-target="#modal-details"><i class="far fa-eye"></i> Details</a>
+            <a href="'. url("/") .'/sales/print-invoice/' . $order->order_id . '" onclick="editForm(' . $order->order_id . ')" class="btn btn-dark btn-sm btn-block"> Cetak Invoice</a>');
             
             array_push($data, $row);
         }

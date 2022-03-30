@@ -47,7 +47,7 @@ class CategoryBarangController extends Controller
             $row[] = $no;
             $row[] = $category->category_name;
             $row[] = $category->status;
-            $row[] = '<a onclick="editForm(' . $category->category_id . ')" class="btn btn-success btn-sm btn-block"><i class="far fa-edit"></i> Edit</a>';
+            $row[] = '<a onclick="editForm(' . $category->category_id . ')" class="btn btn-warning btn-sm btn-block"><i class="far fa-edit"></i> Edit</a>';
             $data[] = $row;
         }
 

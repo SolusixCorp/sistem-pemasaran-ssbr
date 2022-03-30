@@ -32,7 +32,7 @@ class SupplierController extends Controller
             $row[] = $supplier->supplier_address;
             $row[] = $supplier->supplier_email;
             $row[] = $supplier->supplier_phone;
-            $row[] = '<a href="#" onclick="editForm(' . $supplier->supplier_id . ')" class="btn btn-success btn-sm btn-block" data-toggle="modal"><i class="far fa-edit"></i> Edit</a>';
+            $row[] = '<a href="#" onclick="editForm(' . $supplier->supplier_id . ')" class="btn btn-warning btn-sm btn-block" data-toggle="modal"><i class="far fa-edit"></i> Edit</a>';
             $data[] = $row;
         }
 

@@ -76,7 +76,7 @@ class DashboardController extends Controller
             $purchaseSum = Income::whereBetween('date', [$startDate, $endtDate])
             ->get()->sum('total');
 
-            $dateRange = tanggal($startDate) . " s/d " . tanggal($endtDate);
+            $dateRange = tanggal($startDate) . " - " . tanggal($endtDate);
         }
 
         $incomeCarts = Income::select(

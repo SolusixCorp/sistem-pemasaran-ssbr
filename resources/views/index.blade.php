@@ -16,7 +16,7 @@
     <div class="row">
 
         <div class="col-xs-12 col-md-6 col-lg-6 col-xl-4">
-            <div class="card-box noradius noborder bg-purple" id="sum">
+            <div class="card-box noradius noborder bg-dark" id="sum">
                 <i class="fas fa-wallet float-right text-white"></i>
                 <h6 class="text-white text-uppercase m-b-20">Total Penjualan</h6>
                 <h2 class="m-b-20 text-white"></h2>
@@ -34,7 +34,7 @@
         </div>
 
         <div class="col-xs-12 col-md-6 col-lg-6 col-xl-4">
-            <div class="card-box noradius noborder bg-info" id="average">
+            <div class="card-box noradius noborder bg-primary" id="average">
                 <i class="fas fa-hand-holding-usd float-right text-white"></i>
                 <h6 class="text-white text-uppercase m-b-20">Rata - rata Penjualan</h6>
                 <h2 class="m-b-20 text-white"></h2>
@@ -49,7 +49,7 @@
         <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-12">
             <div class="card mb-3">
                 <div class="card-header">
-                    <h3><i class="fas fa-chart-bar"></i> Grafik Total Penjualan dan Pendapatan ( {{ tanggal($startDate) }} s/d {{ tanggal($currentDate) }} )</h3>
+                    <h3><i class="fas fa-chart-bar"></i> Grafik Total Penjualan dan Pendapatan ( {{ tanggal($startDate) }} - {{ tanggal($currentDate) }} )</h3>
                 </div>
 
                 <div class="card-body">
@@ -70,7 +70,7 @@
 
 @section('custom_js')
     <script>
-        var start = moment();
+        var start = moment().subtract(6, 'days');
         var end = moment();
         
         $(document).on('ready', function() {
@@ -146,12 +146,12 @@
                 datasets: [{
                         type: 'bar',
                         label: 'Total Penjualan',
-                        backgroundColor: '#663399',
+                        backgroundColor: '#0065c4',
                         data: expense
                     }, {
                         type: 'bar',
                         label: 'Total Pendapatan',
-                        backgroundColor: '#028A0F',
+                        backgroundColor: '#ffd000',
                         data: income
                     }], 
                     borderWidth: 1

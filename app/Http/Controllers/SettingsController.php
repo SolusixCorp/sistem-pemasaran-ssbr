@@ -22,7 +22,7 @@ class SettingsController extends Controller
         $data = array();
         foreach ($settings as $setting) {
             $row = array($setting->company_name, $setting->company_address, $setting->company_email, $setting->company_phone, $setting->invoice_prefix,
-            '<a href="#" onclick="editForm('. $setting->id . ')" class="btn btn-success btn-sm btn-block" data-toggle="modal"><i class="far fa-edit"></i> Edit</a>');
+            '<a href="#" onclick="editForm('. $setting->id . ')" class="btn btn-warning btn-sm btn-block" data-toggle="modal"><i class="far fa-edit"></i> Edit</a>');
             array_push($data, $row);
         }
 

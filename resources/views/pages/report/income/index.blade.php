@@ -10,7 +10,7 @@
             <div class="card mb-3">
                 <div class="card-header">
                     <div class="button-list pull-right">
-                        <span id="download" ><a class="btn btn-danger" ><i class="fas fa-download" aria-hidden="true"></i> Download PDF</a></span> 
+                        <span id="download" ><a class="btn btn-dark" ><i class="fas fa-download" aria-hidden="true"></i> Download PDF</a></span> 
                         <span id="export" ><a class="btn btn-primary" ><i class="fas fa-sign-out-alt" aria-hidden="true"></i> Export PDF</a></span>
                         <!-- <span id="print" ><a class="btn btn-info" ><i class="fas fa-sign-out-alt" aria-hidden="true"></i> Print Receipt</a></span> -->
                     </div>

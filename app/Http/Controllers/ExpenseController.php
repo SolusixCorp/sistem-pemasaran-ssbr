@@ -46,7 +46,7 @@ class ExpenseController extends Controller
             $row[] = $expense->expense_date;
             $row[] = $expense->expense_type;
             $row[] = rupiah($expense->expense_nominal, TRUE);
-            $row[] = '<a onclick="editForm(' . $expense->id . ')" class="btn btn-success btn-sm btn-block"><i class="far fa-edit"></i> Edit</a>
+            $row[] = '<a onclick="editForm(' . $expense->id . ')" class="btn btn-waring btn-sm btn-block"><i class="far fa-edit"></i> Edit</a>
             ';
             $data[] = $row;
         }

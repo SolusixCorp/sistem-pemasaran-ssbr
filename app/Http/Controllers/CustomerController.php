@@ -29,7 +29,7 @@ class CustomerController extends Controller
             $row[] = $no;
             $row[] = $customer->customer_name;
             $row[] = $customer->customer_phone;
-            $row[] = '<a onclick="editForm(' . $customer->id . ')" class="btn btn-success btn-sm btn-block"><i class="far fa-edit"></i> Edit</a>';
+            $row[] = '<a onclick="editForm(' . $customer->id . ')" class="btn btn-warning btn-sm btn-block"><i class="far fa-edit"></i> Edit</a>';
             $data[] = $row;
         }
 

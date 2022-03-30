@@ -83,8 +83,8 @@ class BarangController extends Controller
             $row[] = rupiah($barang->selling_price, TRUE);
             $row[] = rupiah($barang->buying_price, TRUE);
             $row[] = $barang->stock;
-            $row[] = '<a href="#" onclick="editForm(' . $barang->barang_id . ')" class="btn btn-success btn-sm btn-block" data-toggle="modal"><i class="far fa-edit"></i> Edit</a>
-            <a href="#" onclick="detailsView(' . $barang->barang_id . ')" class="btn btn-warning btn-sm btn-block" data-toggle="modal"><i class="far fa-eye"></i> Details</a>';
+            $row[] = '<a href="#" onclick="editForm(' . $barang->barang_id . ')" class="btn btn-warning btn-sm btn-block" data-toggle="modal"><i class="far fa-edit"></i> Edit</a>
+            <a href="#" onclick="detailsView(' . $barang->barang_id . ')" class="btn btn-primary btn-sm btn-block" data-toggle="modal"><i class="far fa-eye"></i> Details</a>';
             $data[] = $row;
         }
 
