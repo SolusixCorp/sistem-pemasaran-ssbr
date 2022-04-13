@@ -40,8 +40,9 @@
                                 <tr>
                                     <th>No</th>
                                     <th>Nama</th>
-                                    <th>Email</th>
-                                    <th width="15%">#</th>
+                                    <th>Username</th>
+                                    <th>Role</th>
+                                    <th width="15%">Aksi</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -50,6 +51,7 @@
                                         <td>{{ $loop->index + 1 }}</td>
                                         <td>{{ $user->name }}</td>
                                         <td>{{ $user->email }}</td>
+                                        <td>Admin Depo</td>
                                         <td>
                                             <!-- {{ url('/') }}/user/delete/{{ $user->id }} -->
                                         <a href="{{ url('/') }}/user/delete/{{ $user->id }}" class="btn btn-secondary btn-sm btn-danger"><i class="far fa-trash-alt"></i> Hapus</a>

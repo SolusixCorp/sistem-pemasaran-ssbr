@@ -26,9 +26,11 @@
     <link href="{{ asset('nura-admin/assets/plugins/datetimepicker/css/daterangepicker.css') }}" rel="stylesheet" />
     <!-- END CSS for this page -->
 
-
+    <!-- BEGIN CSS for this page -->
     <link href="{{ asset('nura-admin/assets/plugins/jquery.filer/css/jquery.filer.css') }}" rel="stylesheet" />
     <link href="{{ asset('nura-admin/assets/plugins/jquery.filer/css/themes/jquery.filer-dragdropbox-theme.css') }}" rel="stylesheet" />
+    <!-- END CSS for this page -->
+
     <link href="{{ asset('css/select2.min.css') }}" rel="stylesheet"/>
     <link href="{{ asset('css/select2-bootstrap4.css') }}" rel="stylesheet"/>
 

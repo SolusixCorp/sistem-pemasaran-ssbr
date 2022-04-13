@@ -3,13 +3,14 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\UserController;
-use App\Http\Controllers\CategoryBarangController;
-use App\Http\Controllers\BarangController;
-use App\Http\Controllers\SupplierController;
-use App\Http\Controllers\CustomerController;
+use App\Http\Controllers\CategoryProductController;
+use App\Http\Controllers\ProductController;
+use App\Http\Controllers\DepoController;
+use App\Http\Controllers\EmployeeController;
 use App\Http\Controllers\ExpenseController;
 use App\Http\Controllers\IncomeController;
-use App\Http\Controllers\OrderController;
+use App\Http\Controllers\StockFlowController;
+use App\Http\Controllers\CashFlowController;
 use App\Http\Controllers\SettingsController;
 use App\Http\Controllers\SupplyController;
 
@@ -46,22 +47,22 @@ Route::middleware(['auth:sanctum', 'verified'])->group(function () {
     Route::get('profile', [UserController::class, 'profile'])->name('profile');
     Route::patch('profile', [UserController::class, 'updateProfile'])->name('profile-update');
 
-    // Barang -> Kategory
-    Route::get('category-barang/data/{status}', [CategoryBarangController::class, 'listData'])->name('category-barang.data');
-    Route::resource('category-barang', CategoryBarangController::class);
+    // Product -> Kategory
+    Route::get('category-product/data/{status}', [CategoryProductController::class, 'listData'])->name('category-product.data');
+    Route::resource('category-product', CategoryProductController::class);
   
-    // Barang -> Data Barang
-    Route::get('data-barang/data/{categoryId}/{supplierId}/{status}', [BarangController::class, 'listData'])->name('data-barang.data');
-    Route::resource('data-barang', BarangController::class);
+    // Product -> Data Product
+    Route::get('data-product/data/{categoryId}/{supplierId}/{status}', [ProductController::class, 'listData'])->name('data-product.data');
+    Route::resource('data-product', ProductController::class);
 
-    // Supplier
-    Route::get('supplier/data', [SupplierController::class, 'listData'])->name('supplier.data');
-    Route::resource('supplier', SupplierController::class);
+    // Depo
+    Route::get('depo/data', [DepoController::class, 'listData'])->name('depo.data');
+    Route::resource('depo', DepoController::class);
 
-    // Customer
-    Route::get('customer/data', [CustomerController::class, 'listData'])->name('customer.data');
-    Route::post('customer/add', [CustomerController::class, 'add'])->name('customer.add');
-    Route::resource('customer', CustomerController::class);
+    // Employyee
+    Route::get('employee/data', [EmployeeController::class, 'listData'])->name('employee.data');
+    Route::post('employee/add', [EmployeeController::class, 'add'])->name('employee.add');
+    Route::resource('employee', EmployeeController::class);
 
     // Report -> Expenses
     Route::get('expense/data', [ExpenseController::class, 'listData'])->name('expense.data');
@@ -77,17 +78,23 @@ Route::middleware(['auth:sanctum', 'verified'])->group(function () {
     Route::get('income/{start}/{end}', [IncomeController::class, 'listData'])->name('income.data-by-date');
     Route::resource('income', IncomeController::class);
 
-    // Transactions -> Sales
-    Route::get('sales', [OrderController::class, 'index'])->name('sales.index');
-    Route::get('sales/data', [OrderController::class, 'getAllData'])->name('sales.data');
-    Route::get('sales/create', [OrderController::class, 'create'])->name('sales.create');
-    Route::get('sales/{id}', [OrderController::class, 'getById'])->name('sales.byid');
-    Route::post('sales/create', [OrderController::class, 'store'])->name('sales.store');
-    Route::get('sales/edit/{id}', [OrderController::class, 'edit'])->name('sales.edit');
-    Route::post('sales/update/{id}', [OrderController::class, 'update'])->name('sales.update');
-    Route::get('sales/print-invoice/{order_id}', [OrderController::class, 'printReceiptHandler'])->name('sales.print');
+    // Stock Flow
+    Route::get('stock', [StockFlowController::class, 'index'])->name('stock.index');
+    Route::get('stock/data', [StockFlowController::class, 'getAllData'])->name('stock.data');
+    Route::get('stock/create', [StockFlowController::class, 'create'])->name('stock.create');
+    Route::get('stock/{id}', [StockFlowController::class, 'getById'])->name('stock.byid');
+    Route::post('stock/create', [StockFlowController::class, 'store'])->name('stock.store');
+    Route::get('stock/edit/{id}', [StockFlowController::class, 'edit'])->name('stock.edit');
+    Route::post('stock/update/{id}', [StockFlowController::class, 'update'])->name('stock.update');
+    Route::get('stock/print-invoice/{order_id}', [StockFlowController::class, 'printReceiptHandler'])->name('stock.print');
     
-    // Transactions -> Sales
+    // Cash Flow
+    Route::get('cashflow', [CashFlowController::class, 'index'])->name('cashflow.index');
+    Route::get('cashflow/data', [CashFlowController::class, 'getAllData'])->name('cashflow.data');
+    Route::get('cashflow/create', [CashFlowController::class, 'create'])->name('cashflow.create');
+    Route::post('cashflow/create', [CashFlowController::class, 'store'])->name('cashflow.store');
+    
+    // Depo
     Route::get('supply', [SupplyController::class, 'index'])->name('supply.index');
     Route::get('supply/data', [SupplyController::class, 'getAllData'])->name('supply.data');
     Route::get('supply/create', [SupplyController::class, 'create'])->name('supply.create');

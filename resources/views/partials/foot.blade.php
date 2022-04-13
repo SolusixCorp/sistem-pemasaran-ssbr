@@ -32,7 +32,6 @@
 
 <!-- Calender -->
 <script src="{{ asset('nura-admin/assets/plugins/datetimepicker/js/daterangepicker.js') }}"></script>
-
 <!-- END Java Script for this page -->
 
 

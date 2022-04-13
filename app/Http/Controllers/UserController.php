@@ -115,7 +115,7 @@ class UserController extends Controller
         $user = User::find($id);
         if (!$user->delete()) {
             return redirect()->route('user.index')
-                ->with('failed_message', 'Data User gagal dihapus !');
+        ->with('failed_message', 'Data User gagal dihapus !');
         }
 
         return redirect()->route('user.index')
