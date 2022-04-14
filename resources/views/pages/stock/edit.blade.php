@@ -36,7 +36,6 @@
                         @csrf
                             <div class="modal-body">
                                 <div class="card-body">
-                            
                                     <div class="form-group" style="margin: 0;">
                                         <label for="trx_date">Tanggal Transaksi</label>       
                                     </div>
@@ -52,13 +51,12 @@
                                             </div>
                                         </div>
                                     </div>
-
+                                    
                                     <div class="form-group">
-                                        <label for="depo_name">Nama Depo</label>
-                                        
-                                        <select id="depo_name" name="depo_name" class="form-control js-example-basic-single">
-                                            @foreach ($customers as $c)
-                                                <option value="{{ $c->id }}" @if($c->id == $order->customer->id) {{ "selected" }} @endif>{{ $c->customer_name }}</option>
+                                        <label for="customer_name">Nama Depo</label>
+                                        <select id="customer_name" name="customer_name" class="form-control js-example-basic-single">
+                                            @foreach ($customers as $customer)
+                                                <option value="{{ $customer->id }}" >{{ $customer->customer_name }}</option>
                                             @endforeach
                                         </select>
                                     </div>
@@ -80,14 +78,14 @@
                                             <option value="return" >Return</option>
                                         </select>
                                     </div>
-
+                                    
                                     <div class="form-group" id="order_items">
-                                        <div class="table-responsive alert-primary">  
-                                            <table class="table table-bordered" id="" cellspacing="0" cellpadding="0" style="border:none; border-collapse: collapse;">  
-                                                <tbody id="dynamic_field">
-                                                    @foreach($order->order_items as $item)
+                                        <!-- <div id="items">   -->
+                                            <div class="table-responsive alert-primary">  
+                                                <table class="table table-bordered" id="" cellspacing="0" cellpadding="0" style="border:none; border-collapse: collapse;">  
+                                                    <tbody id="dynamic_field">
                                                         <tr>  
-                                                            <td width="40%">
+                                                            <td width="50%">
                                                                 <div class="form-group">
                                                                 <label for="item">Item</label>
                                                                     <select id="barang_item_id" name="barang_item_id[]" class="form-control barang_item_id">
@@ -103,51 +101,22 @@
                                                             </td>  
                                                             <td width="10%">
                                                                 <label for="item">Qty</label>
-                                                                <input type="number" name="qty[]" id="qty" value="{{ $item->qty }}" class="form-control" >
+                                                                <input type="number" name="qty[]" id="qty" value="1" class="form-control" >
                                                             </td> 
-                                                            <td></td>
-                                                        </tr>
-                                                    @endforeach  
-                                                </tbody>
-                                                <tfoot>
-                                                    <td><button type="button" name="add" id="add" onclick="" class="btn btn-primary">Tambah Item</button></td>   
-                                                </tfoot>
-                                            </table>  
-                                        </div>  
+                                                            <td>
+                                                                <label for="item">Harga</label>
+                                                                <input type="number" name="price[]" id="price" value="0" class="form-control" >
+                                                            </td>
+                                                        </tr>  
+                                                    </tbody>
+                                                    <!-- <tfoot>
+                                                        <td><button type="button" name="add" id="add" onclick="" class="btn btn-primary">Tambah Item</button></td>  
+                                                    </tfoot> -->
+                                                </table>  
+                                            </div>  
+                                        <!-- </div> -->
                                     </div>
-
-                                    <div class="form-row">
-                                        <div class="form-group col-md-3">
-                                            <label for="discount">Diskon</label>
-                                            <input type="number" min="0" value="<?php if($order->discount_type == 'percentage') { echo (int)$order->discount_percentage; } else { echo (int) $order->discount_rp; } ?>" name="discount" class="form-control" id="discount" required placeholder="50">
-                                        </div>
-                                        <div class="form-group col-md-2">
-                                            <label for="inputDiscType">Tipe</label>
-                                            <select id="inputDiscType" name="discountType" class="form-control">
-                                                <option value="percentage" @if($order->discount_type == "percentage") {{ "selected" }} @endif>%</option>
-                                                <option value="rp" @if($order->discount_type == "rp") {{ "selected" }} @endif>Rupiah</option>
-                                            </select>
-                                        </div>
-                                        <div class="form-group col-md-4">
-                                            <label for="discount_notes">Keterangan Diskon</label>
-                                            <input type="text" value="{{ $order->discount_notes }}" name="discount_notes" class="form-control" id="discount" required placeholder="50">
-                                        </div>
-                                        <div class="form-group col-md-3">
-                                        <label for="customer_name">Total Transaksi</label>
-                                            <input type="text" name="notes_item[]" id="notes_item" placeholder="Total" value="{{ rupiah($order->total_with_discount, TRUE) }}" readonly="true" class="form-control" >
-                                        
-                                            
-                                        </div>
-                                    </div>
-
-
-                                    <div class="form-row">
-                                        <div class="form-group col-md-4">
-                                            <label for="bayar">Uang Bayar </label>
-                                            <input type="number" min="0" name="bayar" value="{{ $order->bayar }}" class="form-control" id="discount" required placeholder="100000">
-                                        </div>
-                                    </div>
-
+                                  
                                 </div>
                             </div>
                             <div class="modal-footer">

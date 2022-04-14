@@ -8,7 +8,7 @@
         <div class="col-12" id="add-order">
             <div class="card mb-3">
                 <div class="card-header">
-                    <h3><i class="fas fa-dolly-flatbed"></i> Cashflow Flow Baru</h3>
+                    <h3><i class="fas fa-balance-scale"></i> Cashflow Flow Baru</h3>
                 </div>
 
                 <div class="card-body">

@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Customer;
+use App\Models\Employee;
 use App\Models\Product;
 use Illuminate\Http\Request;
 use App\Models\Order;
@@ -28,12 +28,12 @@ class CashFlowController extends Controller
     public function create()
     {
         //
-        $barangs = Barang::orderBy('barang_id', 'asc')->get();
-        $customers = Customer::orderBy('id', 'desc')->get();
+        $barangs = Product::orderBy('barang_id', 'asc')->get();
+        $employees = Employee::orderBy('id', 'desc')->get();
 
         return view('pages.cashflow.add', [
             "barangs_item" => $barangs,
-            "customers"  => $customers,   
+            "customers"  => $employees,   
         ]);
     }
 
@@ -68,6 +68,13 @@ class CashFlowController extends Controller
     public function edit($id)
     {
         //
+        $barangs = Product::orderBy('barang_id', 'asc')->get();
+        $employees = Employee::orderBy('id', 'desc')->get();
+
+        return view('pages.cashflow.edit', [
+            "barangs_item" => $barangs,
+            "customers"  => $employees,   
+        ]);
     }
 
     /**
@@ -104,10 +111,16 @@ class CashFlowController extends Controller
         $data = array();
         foreach ($orders as $order) {
             $no++;
-            $row = array($no, $order->order_date, $order->customer_name, 'Pendapatan', 'Penjualan Produk', rupiah(100000000, true),
-            '<a href="'. url("/") .'/stock/edit/' . $order->order_id . '" onclick="editForm(' . $order->order_id . ')" class="btn btn-warning btn-sm"><i class="far fa-edit"></i></a>
+            $row = array();
+            $row[] = $no;
+            $row[] = $order->order_date;
+            $row[] = 'Depo Malang';
+            $row[] = 'Pendapatan';
+            $row[] = 'Penjualan Produk';
+            $row[] = rupiah(100000000, true);
+            $row[] = '<a href="'. url("/") .'/cashflow/edit/' . $order->order_id . '" onclick="editForm(' . $order->order_id . ')" class="btn btn-warning btn-sm"><i class="far fa-edit"></i></a>
             <a href="#" onclick="detailsView(' . $order->order_id . ')" class="btn btn-primary btn-sm" data-toggle="modal"  data-target="#modal-details"><i class="far fa-eye"></i></a>
-            <a href="'. url("/") .'/stock/print-invoice/' . $order->order_id . '" onclick="editForm(' . $order->order_id . ')" class="btn btn-dark btn-sm"><i class="far fa-file"></i></a>');
+            <a href="'. url("/") .'/cashflow/print-invoice/' . $order->order_id . '" onclick="editForm(' . $order->order_id . ')" class="btn btn-dark btn-sm"><i class="far fa-file"></i></a>';
             
             array_push($data, $row);
         }

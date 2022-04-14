@@ -12,6 +12,11 @@
     <nav class="navbar-custom">
 
         <ul class="list-inline float-right mb-0">
+            <li class="list-inline-item dropdown notif">
+                <h6 class="text-white">
+                    Admin Head Office
+                </h6>
+            </li>
             
             <li class="list-inline-item dropdown notif">
                 <a class="nav-link dropdown-toggle nav-user" data-toggle="dropdown" href="#" aria-haspopup="false" aria-expanded="false">
@@ -21,7 +26,7 @@
                     <!-- item-->
                     <div class="dropdown-item noti-title">
                         <h5 class="text-overflow">
-                            <small>Hello, admin</small>
+                            <small>Hello, Admin Head Office</small>
                         </h5>
                     </div>
 

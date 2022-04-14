@@ -43,7 +43,7 @@
                                     <th style="width:2%">No</th>
                                     <th style="width:15%">Tgl Transaksi</th>
                                     <th>Nama Depo</th>
-                                    <th style="width:13%">Tipe</th>
+                                    <th style="width:13%">Tipe Kas</th>
                                     <th style="width:15%">Keterangan</th>
                                     <th style="width:15%">Total</th>
                                     <th style="width:15%">Aksi</th>

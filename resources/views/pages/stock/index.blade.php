@@ -41,9 +41,13 @@
                             <thead>
                                 <tr>
                                     <th style="width:2%">No</th>
-                                    <th>Nama Pembeli</th>
                                     <th>Tanggal Transaksi</th>
-                                    <th>Grand Total</th>
+                                    <th>Nama Depo</th>
+                                    <th>Produk</th>
+                                    <th>Tipe Stok</th>
+                                    <th>Keterangan</th>
+                                    <th>QTY</th>
+                                    <th>Remaining Stok</th>
                                     <th style="width:15%">Aksi</th>
                                 </tr>
                             </thead>
@@ -91,16 +95,16 @@
                     console.log(data)
                     $('#modal-details-barang').modal('show');
                     $('.modal-title').text('Detail Transaksi');
-                    $('#vKodeTransaksi').text("#TRXAPP000" + data.id);
-                    $('#vTanggalTransaksi').text(data.order_date);
-                    $('#vNamaPembeli').text(data.customer.customer_name);
-                    $('#vTotal').text(convertToRupiah(data.total));
-                    $('#vDiscountPercentage').text(data.discount_percentage);
-                    $('#vDiscountRp').text(convertToRupiah(data.discount_rp));
-                    $('#vTotalWithDiscount').text(convertToRupiah(data.total_with_discount));
-                    $('#vBayar').text(convertToRupiah(data.bayar));
-                    $('#vKembalian').text(convertToRupiah(data.kembalian));
-                    $('#vCatatan').text(data.notes);
+                    // $('#vKodeTransaksi').text("#TRXAPP000" + data.id);
+                    // $('#vTanggalTransaksi').text(data.order_date);
+                    // $('#vNamaPembeli').text(data.customer.customer_name);
+                    // $('#vTotal').text(convertToRupiah(data.total));
+                    // $('#vDiscountPercentage').text(data.discount_percentage);
+                    // $('#vDiscountRp').text(convertToRupiah(data.discount_rp));
+                    // $('#vTotalWithDiscount').text(convertToRupiah(data.total_with_discount));
+                    // $('#vBayar').text(convertToRupiah(data.bayar));
+                    // $('#vKembalian').text(convertToRupiah(data.kembalian));
+                    // $('#vCatatan').text(data.notes);
 
                     for(var i = 0; i < data.order_items.length; i++) {
                         $('#data-detail-modal').append('<div class="message-item"><h6 id="vItems" class="message-item-user message-item-date" style="position:initial !important">' + data.order_items[i].barang.name  + ' => ' + data.order_items[i].qty + ' '  + ' x ' + data.order_items[i].barang.selling_price + ' = ' + data.order_items[i].sub_total + '</h6></div>');  

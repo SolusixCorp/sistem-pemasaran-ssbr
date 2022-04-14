@@ -85,7 +85,7 @@
                                                 <table class="table table-bordered" id="" cellspacing="0" cellpadding="0" style="border:none; border-collapse: collapse;">  
                                                     <tbody id="dynamic_field">
                                                         <tr>  
-                                                            <td width="40%">
+                                                            <td width="50%">
                                                                 <div class="form-group">
                                                                 <label for="item">Item</label>
                                                                     <select id="barang_item_id" name="barang_item_id[]" class="form-control barang_item_id">
@@ -103,12 +103,15 @@
                                                                 <label for="item">Qty</label>
                                                                 <input type="number" name="qty[]" id="qty" value="1" class="form-control" >
                                                             </td> 
-                                                            <td></td>
+                                                            <td>
+                                                                <label for="item">Harga</label>
+                                                                <input type="number" name="price[]" id="price" value="0" class="form-control" >
+                                                            </td>
                                                         </tr>  
                                                     </tbody>
-                                                    <tfoot>
+                                                    <!-- <tfoot>
                                                         <td><button type="button" name="add" id="add" onclick="" class="btn btn-primary">Tambah Item</button></td>  
-                                                    </tfoot>
+                                                    </tfoot> -->
                                                 </table>  
                                             </div>  
                                         <!-- </div> -->

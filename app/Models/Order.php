@@ -4,7 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use App\Models\Customer;
+use App\Models\Employee;
 use App\Models\User;
 use App\Models\Income;
 use App\Models\OrderItem;
@@ -18,7 +18,7 @@ class Order extends Model
 
     public function customer()
     {
-        return $this->hasOne(Customer::class, 'id', 'customer_id');
+        return $this->hasOne(Employee::class, 'id', 'customer_id');
     }
 
     public function kasir()

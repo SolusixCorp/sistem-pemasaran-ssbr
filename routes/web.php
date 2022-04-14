@@ -93,6 +93,7 @@ Route::middleware(['auth:sanctum', 'verified'])->group(function () {
     Route::get('cashflow/data', [CashFlowController::class, 'getAllData'])->name('cashflow.data');
     Route::get('cashflow/create', [CashFlowController::class, 'create'])->name('cashflow.create');
     Route::post('cashflow/create', [CashFlowController::class, 'store'])->name('cashflow.store');
+    Route::get('cashflow/edit/{id}', [CashFlowController::class, 'edit'])->name('cashflow.edit');
     
     // Depo
     Route::get('supply', [SupplyController::class, 'index'])->name('supply.index');

@@ -7,7 +7,7 @@ use App\Models\Product;
 use App\Models\Depo;
 use App\Models\Order;
 use App\Models\OrderItem;
-use App\Models\Customer;
+use App\Models\Employee;
 use App\Models\Settings;
 use App\Models\Income;
 use Illuminate\Support\Facades\Auth;
@@ -43,10 +43,18 @@ class StockFlowController extends Controller
         $data = array();
         foreach ($orders as $order) {
             $no++;
-            $row = array($no, $order->order_date, $order->customer_name, rupiah($order->total_with_discount, true),
-            '<a href="'. url("/") .'/stock/edit/' . $order->order_id . '" onclick="editForm(' . $order->order_id . ')" class="btn btn-warning btn-sm"><i class="far fa-edit"></i></a>
+            $row = array();
+            $row[] = $no;
+            $row[] = $order->order_date;
+            $row[] = 'Depo Malang';
+            $row[] = 'Gudang Garang Surya';
+            $row[] = 'IN';
+            $row[] = 'Dropping';
+            $row[] = '1';
+            $row[] = '10';
+            $row[] = '<a href="'. url("/") .'/stock/edit/' . $order->order_id . '" onclick="editForm(' . $order->order_id . ')" class="btn btn-warning btn-sm"><i class="far fa-edit"></i></a>
             <a href="#" onclick="detailsView(' . $order->order_id . ')" class="btn btn-primary btn-sm" data-toggle="modal"  data-target="#modal-details"><i class="far fa-eye"></i></a>
-            <a href="'. url("/") .'/stock/print-invoice/' . $order->order_id . '" onclick="editForm(' . $order->order_id . ')" class="btn btn-dark btn-sm"><i class="far fa-file"></i></a>');
+            <a href="'. url("/") .'/stock/print-invoice/' . $order->order_id . '" onclick="editForm(' . $order->order_id . ')" class="btn btn-dark btn-sm"><i class="far fa-file"></i></a>';
             
             array_push($data, $row);
         }
@@ -70,7 +78,7 @@ class StockFlowController extends Controller
     public function create()
     {
         $barangs = Product::orderBy('barang_id', 'asc')->get();
-        $customers = Customer::orderBy('id', 'desc')->get();
+        $customers = Employee::orderBy('id', 'desc')->get();
         
         return view('pages.stock.add', [
             "barangs_item" => $barangs,
@@ -209,9 +217,12 @@ class StockFlowController extends Controller
         $data = array();
         foreach ($orders as $order) {
             $no++;
-            $row = array($order->customer_name, $order->order_date, $order->total,
-            '<a href="#" onclick="editForm(' . $order->id . ')" class="btn btn-success btn-sm btn-block" data-toggle="modal"><i class="far fa-edit"></i> Edit</a>
-            <a href="#" onclick="detailsView(' . $order->id . ')" class="btn btn-warning btn-sm btn-block" data-toggle="modal"><i class="far fa-eye"></i> Details</a>');
+            $row = array();
+            $row[] = 'Depo Malang';
+            $row[] = $order->order_date;
+            $row[] = $order->total;
+            $row[] = '<a href="#" onclick="editForm(' . $order->id . ')" class="btn btn-success btn-sm btn-block" data-toggle="modal"><i class="far fa-edit"></i> Edit</a>
+            <a href="#" onclick="detailsView(' . $order->id . ')" class="btn btn-warning btn-sm btn-block" data-toggle="modal"><i class="far fa-eye"></i> Details</a>';
             
             array_push($data, $row);
         }
@@ -229,7 +240,7 @@ class StockFlowController extends Controller
     public function edit($id)
     {
         $barangs = Product::orderBy('barang_id', 'asc')->get();
-        $customers = Customer::orderBy('id', 'desc')->get();
+        $customers = Employee::orderBy('id', 'desc')->get();
 
         $order = Order::with(['customer', 'kasir', 'order_items'])
                     ->orderBy('id', 'asc')->where('id', '=', $id)->first();
