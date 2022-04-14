@@ -46,16 +46,172 @@
 
     <div class="row">
 
-        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-12">
+        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-6 col-xl-6">
             <div class="card mb-3">
                 <div class="card-header">
-                    <h3><i class="fas fa-chart-bar"></i> Grafik Total Penjualan dan Pendapatan ( {{ tanggal($startDate) }} - {{ tanggal($currentDate) }} )</h3>
+                    <h3><i class="fas fa-chart-bar"></i> Grafik Cash Flow</h3>
                 </div>
 
                 <div class="card-body">
                     <canvas id="comboBarLineChart"></canvas>
                 </div>
                 <!-- <div class="card-footer small text-muted">Updated yesterday at 11:59 PM</div> -->
+            </div>
+            <!-- end card-->
+        </div>
+
+        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-6 col-xl-6">
+            <div class="card mb-3">
+                <div class="card-header">
+                    <h3><i class="fas fa-chart-bar"></i> Grafik Stock Flow</h3>
+                </div>
+
+                <div class="card-body">
+                    <canvas id="comboBarLineChart2"></canvas>
+                </div>
+                <!-- <div class="card-footer small text-muted">Updated yesterday at 11:59 PM</div> -->
+            </div>
+            <!-- end card-->
+        </div>
+
+    </div>
+
+    <div class="row">
+
+        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-6 col-xl-6">
+            <div class="card mb-3">
+                <div class="card-header">
+                    <h3><i class="fas fa-balance-scale"></i> Cash Flow Terbaru</h3>
+                    Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+                </div>
+
+                <div class="card-body">
+
+                    <div class="widget-messages nicescroll" style="height: 400px;">
+                        <a href="#">
+                            <div class="message-item">
+                                <p class="message-item-user">Depo Malang</p>
+                                <p class="message-item-msg">CASH IN (Rp. 1.000.000,-)</p>
+                                <p class="message-item-date">11:50 PM</p>
+                            </div>
+                        </a>
+
+                        <a href="#">
+                            <div class="message-item">
+                                <p class="message-item-user">Depo Malang</p>
+                                <p class="message-item-msg">CASH IN (Rp. 1.000.000,-)</p>
+                                <p class="message-item-date">11:50 PM</p>
+                            </div>
+                        </a>
+
+                        <a href="#">
+                            <div class="message-item">
+                                <p class="message-item-user">Depo Malang</p>
+                                <p class="message-item-msg">CASH IN (Rp. 1.000.000,-)</p>
+                                <p class="message-item-date">11:50 PM</p>
+                            </div>
+                        </a>
+
+                        <a href="#">
+                            <div class="message-item">
+                                <p class="message-item-user">Depo Malang</p>
+                                <p class="message-item-msg">CASH IN (Rp. 1.000.000,-)</p>
+                                <p class="message-item-date">11:50 PM</p>
+                            </div>
+                        </a>
+                        <a href="#">
+                            <div class="message-item">
+                                <p class="message-item-user">Depo Malang</p>
+                                <p class="message-item-msg">CASH IN (Rp. 1.000.000,-)</p>
+                                <p class="message-item-date">11:50 PM</p>
+                            </div>
+                        </a>
+
+                        <a href="#">
+                            <div class="message-item">
+                                <p class="message-item-user">Depo Malang</p>
+                                <p class="message-item-msg">CASH IN (Rp. 1.000.000,-)</p>
+                                <p class="message-item-date">11:50 PM</p>
+                            </div>
+                        </a>
+                        
+                    </div>
+
+                </div>
+                <div class="card-footer small text-muted">Updated today at 11:59 PM</div>
+            </div>
+            <!-- end card-->
+        </div>
+
+        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-6 col-xl-6">
+            <div class="card mb-3">
+                <div class="card-header">
+                    <h3><i class="fas fa-dolly-flatbed"></i> Stock Flow Terbaru</h3>
+                    Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+                </div>
+
+                <div class="card-body">
+
+                    <div class="widget-messages nicescroll" style="height: 400px;">
+                        <a href="#">
+                            <div class="message-item">
+                                <p class="message-item-user">Depo Malang</p>
+                                <p class="message-item-msg">STOCK IN : Gudang Garam Surya (10 Item)</p>
+                                <p class="message-item-date">11:50 PM</p>
+                            </div>
+                        </a>
+
+                        <a href="#">
+                            <div class="message-item">
+                                <p class="message-item-user">Depo Malang</p>
+                                <p class="message-item-msg">STOCK IN : Gudang Garam Surya (10 Item)</p>
+                                <p class="message-item-date">11:50 PM</p>
+                            </div>
+                        </a>
+
+                        <a href="#">
+                            <div class="message-item">
+                                <p class="message-item-user">Depo Malang</p>
+                                <p class="message-item-msg">STOCK IN : Gudang Garam Surya (10 Item)</p>
+                                <p class="message-item-date">11:50 PM</p>
+                            </div>
+                        </a>
+
+                        <a href="#">
+                            <div class="message-item">
+                                <p class="message-item-user">Depo Malang</p>
+                                <p class="message-item-msg">STOCK IN : Gudang Garam Surya (10 Item)</p>
+                                <p class="message-item-date">11:50 PM</p>
+                            </div>
+                        </a>
+
+                        <a href="#">
+                            <div class="message-item">
+                                <p class="message-item-user">Depo Malang</p>
+                                <p class="message-item-msg">STOCK IN : Gudang Garam Surya (10 Item)</p>
+                                <p class="message-item-date">11:50 PM</p>
+                            </div>
+                        </a>
+
+                        <a href="#">
+                            <div class="message-item">
+                                <p class="message-item-user">Depo Malang</p>
+                                <p class="message-item-msg">STOCK IN : Gudang Garam Surya (10 Item)</p>
+                                <p class="message-item-date">11:50 PM</p>
+                            </div>
+                        </a>
+
+                        <a href="#">
+                            <div class="message-item">
+                                <p class="message-item-user">Depo Malang</p>
+                                <p class="message-item-msg">STOCK IN : Gudang Garam Surya (10 Item)</p>
+                                <p class="message-item-date">11:50 PM</p>
+                            </div>
+                        </a>
+                    </div>
+
+                </div>
+                <div class="card-footer small text-muted">Updated today at 11:59 PM</div>
             </div>
             <!-- end card-->
         </div>
@@ -145,12 +301,45 @@
                 labels: date,
                 datasets: [{
                         type: 'bar',
-                        label: 'Total Penjualan',
+                        label: 'CASH IN',
                         backgroundColor: '#0065c4',
                         data: expense
                     }, {
                         type: 'bar',
-                        label: 'Total Pendapatan',
+                        label: 'CASH OUT',
+                        backgroundColor: '#ffd000',
+                        data: income
+                    }], 
+                    borderWidth: 1
+            },
+            options: {
+                scales: {
+                    yAxes: [{
+                        ticks: {
+                            beginAtZero:true
+                        }
+                    }]
+                }
+            }
+        });
+
+        // comboBarLineChart2
+        var income = <?php echo $incomeCartData; ?>;
+        var expense = <?php echo $purchaseCartData; ?>;
+        var date = <?php echo $dateCartData; ?>;
+        var ctx_combo_bar = document.getElementById("comboBarLineChart2").getContext('2d');
+        var comboBarLineChart = new Chart(ctx_combo_bar, {
+            type: 'bar',
+            data: {
+                labels: date,
+                datasets: [{
+                        type: 'bar',
+                        label: 'STOCK IN',
+                        backgroundColor: '#0065c4',
+                        data: expense
+                    }, {
+                        type: 'bar',
+                        label: 'STOCK OUT',
                         backgroundColor: '#ffd000',
                         data: income
                     }], 
