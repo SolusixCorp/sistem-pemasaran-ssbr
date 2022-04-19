@@ -42,16 +42,6 @@
                     </div>
 
                     <div class="message-item">
-                        <h6 class="message-item-user">Qty</h6>
-                        <h6 id="vNamaPembeli" class="message-item-date">1</h6>
-                    </div>
-
-                    <div class="message-item">
-                        <h6 class="message-item-user">Remaining Stok</h6>
-                        <h6 id="vNamaPembeli" class="message-item-date">10</h6>
-                    </div>
-
-                    <div class="message-item">
                         <h6 class="message-item-user">Tipe Harga</h6>
                         <h6 id="vNamaPembeli" class="message-item-date">Depo</h6>
                     </div>
@@ -65,6 +55,34 @@
                         <h6 class="message-item-user">Dikirim ?</h6>
                         <h6 id="vDiscountPercentage" class="message-item-date">Ya</h6>
                     </div>
+
+                           
+
+                        <table class="table table-responsive-xl table-bordered">
+                            <thead>
+                                <tr>
+                                    <th scope="col" width="5%">#</th>
+                                    <th scope="col" width="50%">Produk</th>
+                                    <th scope="col" width="5%">Qty</th>
+                                    <th scope="col" width="5%">Remaining Stock</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <th scope="row">1</th>
+                                    <td>Gudang Garam Surya</td>
+                                    <td>1</td>
+                                    <td>10</td>
+                                </tr>
+                                <tr>
+                                    <th scope="row">2</th>
+                                    <td>Mark</td>
+                                    <td>1</td>
+                                    <td>10</td>
+                                </tr>
+                            </tbody>
+                        </table>
+
                 </div>
             </div>
         </div>

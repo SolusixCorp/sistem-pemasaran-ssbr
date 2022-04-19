@@ -109,9 +109,9 @@
                                                             </td>
                                                         </tr>  
                                                     </tbody>
-                                                    <!-- <tfoot>
+                                                    <tfoot>
                                                         <td><button type="button" name="add" id="add" onclick="" class="btn btn-primary">Tambah Item</button></td>  
-                                                    </tfoot> -->
+                                                    </tfoot>
                                                 </table>  
                                             </div>  
                                         <!-- </div> -->
@@ -158,8 +158,7 @@
     <script>
         $('#add').click(function(){  
             i++;  
-            $('#dynamic_field').append('<tr id="row'+i+'"><td width="30%"><select id="barang_item_id" name="barang_item_id[]" class="form-control barang_item_id"> @foreach ($barangs_item as $barang) <option value="{{ $barang->barang_id }}" >{{ $barang->name . "(" . rupiah($barang->selling_price, TRUE) . ")" }}</option> @endforeach </select></td>  <td width="40%"><input type="text" name="notes_item[]" id="notes_item" placeholder="Catatan" value="" class="form-control" >  <td width="15%"><input type="number" name="qty[]" id="qty" value="1" class="form-control" ></td>    <td><button type="button" name="remove" id="'+i+'" class="btn btn-danger btn_remove">X</button></td></tr>');  
-       
+            $('#dynamic_field').append('<tr id="row'+i+'"><td width="40%"><select id="barang_item_id" name="barang_item_id[]" class="form-control barang_item_id"> @foreach ($barangs_item as $barang) <option value="{{ $barang->barang_id }}" >{{ $barang->name . " (" . rupiah($b->selling_price, TRUE) . ")" }}</option> @endforeach </select></td>  <td width="15%"><input type="text" name="notes_item[]" id="notes_item" placeholder="0" value="100" class="form-control" >  <td width="10%"><input type="number" name="qty[]" id="qty" value="1" class="form-control" ></td><td><input type="number" name="price[]" id="price" value="0" class="form-control"></td><td><button type="button" name="remove" id="'+i+'" class="btn btn-danger btn_remove">X</button></td></tr>');  
             
             $(document).ready(function(){
                 $('.barang_item_id').select2({

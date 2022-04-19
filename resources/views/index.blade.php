@@ -78,6 +78,71 @@
 
     <div class="row">
 
+        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-6">
+            <div class="card mb-3">
+                <div class="card-header">
+                    <h3><i class="fas fa-chart-pie"></i> Cash In per Depo (%)</h3>
+                </div>
+
+                <div class="card-body">
+                    <canvas id="pieChartCashIn"></canvas>
+                </div>
+                <div class="card-footer small text-muted">Updated yesterday at 11:59 PM</div>
+            </div>
+            <!-- end card-->
+        </div>
+
+        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-6">
+            <div class="card mb-3">
+                <div class="card-header">
+                    <h3><i class="fas fa-chart-pie"></i> Cash Out per Depo (%)</h3>
+                </div>
+
+                <div class="card-body">
+                    <canvas id="pieChartCashOut"></canvas>
+                </div>
+                <div class="card-footer small text-muted">Updated yesterday at 11:59 PM</div>
+            </div>
+            <!-- end card-->
+        </div>
+    </div>
+    <!-- end row -->
+
+    <div class="row">
+
+        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-6">
+            <div class="card mb-3">
+                <div class="card-header">
+                    <h3><i class="fas fa-chart-pie"></i> Stock In per Depo (%)</h3>
+                </div>
+
+                <div class="card-body">
+                    <canvas id="doughnutChartStockIn"></canvas>
+                </div>
+                <div class="card-footer small text-muted">Updated yesterday at 11:59 PM</div>
+            </div>
+            <!-- end card-->
+        </div>
+
+        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-6">
+            <div class="card mb-3">
+                <div class="card-header">
+                    <h3><i class="fas fa-chart-pie"></i> Stock Out per Depo (%)</h3>
+                </div>
+
+                <div class="card-body">
+                    <canvas id="doughnutChartStockOut"></canvas>
+                </div>
+                <div class="card-footer small text-muted">Updated yesterday at 11:59 PM</div>
+            </div>
+            <!-- end card-->
+        </div>
+
+    </div>
+    <!-- end row -->
+
+    <div class="row">
+
         <div class="col-xs-12 col-sm-12 col-md-12 col-lg-6 col-xl-6">
             <div class="card mb-3">
                 <div class="card-header">
@@ -355,6 +420,132 @@
                 }
             }
         });
+
+        // pieChartCashIn
+        var ctx_pie_chart = document.getElementById("pieChartCashIn").getContext('2d');
+        var pieChart = new Chart(ctx_pie_chart, {
+            type: 'pie',
+            data: {
+                    datasets: [{
+                        data: [12, 19, 3, 5, 2, 3],
+                        backgroundColor: [
+                            'rgba(255,99,132,1)',
+                            'rgba(54, 162, 235, 1)',
+                            'rgba(255, 206, 86, 1)',
+                            'rgba(75, 192, 192, 1)',
+                            'rgba(153, 102, 255, 1)',
+                            'rgba(255, 159, 64, 1)'
+                        ],
+                        label: 'Dataset 1'
+                    }],
+                    labels: [
+                        "Red",
+                        "Orange",
+                        "Yellow",
+                        "Green",
+                        "Blue"
+                    ]
+                },
+                options: {
+                    responsive: true
+                }
+        
+        });
+
+
+        // pieChartCashOut
+        var ctx_pie_chart = document.getElementById("pieChartCashOut").getContext('2d');
+        var pieChart = new Chart(ctx_pie_chart, {
+            type: 'pie',
+            data: {
+                    datasets: [{
+                        data: [12, 19, 3, 5, 2, 3],
+                        backgroundColor: [
+                            'rgba(255,99,132,1)',
+                            'rgba(54, 162, 235, 1)',
+                            'rgba(255, 206, 86, 1)',
+                            'rgba(75, 192, 192, 1)',
+                            'rgba(153, 102, 255, 1)',
+                            'rgba(255, 159, 64, 1)'
+                        ],
+                        label: 'Dataset 1'
+                    }],
+                    labels: [
+                        "Red",
+                        "Orange",
+                        "Yellow",
+                        "Green",
+                        "Blue"
+                    ]
+                },
+                options: {
+                    responsive: true
+                }
+        
+        });
+
+        // doughnutChartStockIn
+        var ctx_doughnut_chart = document.getElementById("doughnutChartStockIn").getContext('2d');
+        var doughnutChart = new Chart(ctx_doughnut_chart, {
+            type: 'doughnut',
+            data: {
+                    datasets: [{
+                        data: [12, 19, 3, 5, 2, 3],
+                        backgroundColor: [
+                            'rgba(255,99,132,1)',
+                            'rgba(54, 162, 235, 1)',
+                            'rgba(255, 206, 86, 1)',
+                            'rgba(75, 192, 192, 1)',
+                            'rgba(153, 102, 255, 1)',
+                            'rgba(255, 159, 64, 1)'
+                        ],
+                        label: 'Dataset 1'
+                    }],
+                    labels: [
+                        "Red",
+                        "Orange",
+                        "Yellow",
+                        "Green",
+                        "Blue"
+                    ]
+                },
+                options: {
+                    responsive: true
+                }
+        
+        });
+
+        // doughnutChartStockOut
+        var ctx_doughnut_chart = document.getElementById("doughnutChartStockOut").getContext('2d');
+        var doughnutChart = new Chart(ctx_doughnut_chart, {
+            type: 'doughnut',
+            data: {
+                    datasets: [{
+                        data: [12, 19, 3, 5, 2, 3],
+                        backgroundColor: [
+                            'rgba(255,99,132,1)',
+                            'rgba(54, 162, 235, 1)',
+                            'rgba(255, 206, 86, 1)',
+                            'rgba(75, 192, 192, 1)',
+                            'rgba(153, 102, 255, 1)',
+                            'rgba(255, 159, 64, 1)'
+                        ],
+                        label: 'Dataset 1'
+                    }],
+                    labels: [
+                        "Red",
+                        "Orange",
+                        "Yellow",
+                        "Green",
+                        "Blue"
+                    ]
+                },
+                options: {
+                    responsive: true
+                }
+        
+        });
+
 
     </script>
 @endsection

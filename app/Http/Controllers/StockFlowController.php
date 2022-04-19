@@ -47,11 +47,8 @@ class StockFlowController extends Controller
             $row[] = $no;
             $row[] = $order->order_date;
             $row[] = 'Depo Malang';
-            $row[] = 'Gudang Garang Surya';
             $row[] = 'IN';
             $row[] = 'Dropping';
-            $row[] = '1';
-            $row[] = '10';
             $row[] = '<a href="'. url("/") .'/stock/edit/' . $order->order_id . '" onclick="editForm(' . $order->order_id . ')" class="btn btn-warning btn-sm"><i class="far fa-edit"></i></a>
             <a href="#" onclick="detailsView(' . $order->order_id . ')" class="btn btn-primary btn-sm" data-toggle="modal"  data-target="#modal-details"><i class="far fa-eye"></i></a>
             <a href="'. url("/") .'/stock/print-invoice/' . $order->order_id . '" onclick="editForm(' . $order->order_id . ')" class="btn btn-dark btn-sm"><i class="far fa-file"></i></a>';

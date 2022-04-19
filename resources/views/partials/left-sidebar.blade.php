@@ -64,61 +64,10 @@
                     </a>
                 </li>
 
-                <!-- <li class="submenu">
-                    <a id="tables">
-                        <i class="fas fa-handshake"></i>
-                        <span> Transaksi </span>
-                        <span class="menu-arrow"></span>
-                    </a>
-                    <ul class="list-unstyled">
-                        <li>
-                            <a id="tables" href="{{ url('/sales') }}">
-                                <i class="fas fa-gifts"></i>
-                                <span>Penjualan (Sales)</span>
-                            </a>
-                        </li>
-                        <li>
-                            <a id="tables" href="{{ url('supply') }}">
-                                <i class="fas fa-shopping-bag"></i>
-                                <span>Pembelian (Supply)</span>
-                            </a>
-                        </li>
-                    </ul>
-                </li> -->
-
-                <!-- <li class="submenu">
-                    <a id="tables" href="#">
-                        <i class="fas fa-chart-line"></i>
-                        <span> Laporan </span>
-                        <span class="menu-arrow"></span>
-                    </a>
-                    <ul class="list-unstyled">
-                        <li>
-                            <a id="tables" href="{{ url('/income') }}">
-                                <i class="fas fa-hand-holding-usd"></i>
-                                <span> Pendapatan </span>
-                            </a>
-                        </li>
-                        <li> 
-                         <a id="tables" href="/expense">
-                                <i class="fas fa-upload"></i>
-                                <span> Pengeluaran </span>
-                            </a>
-                        </li> 
-                    </ul>
-                </li> -->
-
                 <li class="submenu">
                     <a href="{{ url('/user') }}">
                         <i class="fas fa-user-circle"></i>
                         <span> Users </span>
-                    </a>
-                </li>
-
-                <li class="submenu">
-                    <a href="{{ url('/settings') }}">
-                        <i class="fas fa-cogs"></i>
-                        <span> Settings </span>
                     </a>
                 </li>
 

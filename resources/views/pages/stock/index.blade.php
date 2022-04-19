@@ -43,11 +43,8 @@
                                     <th style="width:2%">No</th>
                                     <th>Tanggal Transaksi</th>
                                     <th>Nama Depo</th>
-                                    <th>Produk</th>
                                     <th>Tipe Stok</th>
                                     <th>Keterangan</th>
-                                    <th>QTY</th>
-                                    <th>Remaining Stok</th>
                                     <th style="width:15%">Aksi</th>
                                 </tr>
                             </thead>
