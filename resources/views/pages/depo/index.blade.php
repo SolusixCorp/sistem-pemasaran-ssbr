@@ -40,7 +40,8 @@
                             <thead>
                                 <tr>
                                     <th style="width:2%">No</th>
-                                    <th>Nama depo</th>
+                                    <th>Nama Depo</th>
+                                    <th>Tipe</th>
                                     <th style="width:20%">Alamat</th>
                                     <th>Kota</th>
                                     <th>Kontak</th>
@@ -98,10 +99,12 @@
                     $('#modal-edit-depo').modal('show');
                     $('.modal-title').text('Edit Depo');
                     $('#formEdit').attr('action', url);
-                    $('#nameEdit').val(data.depo_name);
-                    $('#addressEdit').val(data.depo_address);
-                    $('#emailEdit').val(data.depo_email);
-                    $('#phoneEdit').val(data.depo_phone);
+                    $('#upUser').val(data.depo_id);
+                    $('#upDepoType').val(data.depo_type);
+                    $('#upDepoAddress').val(data.depo_address);
+                    $('#upDepoCity').val(data.depo_city);
+                    $('#upDepoEmail').val(data.depo_email);
+                    $('#upDepoPhone').val(data.depo_phone);
                 },
                 error: function() {
                     alert('Tidak dapat menampilkan Data');

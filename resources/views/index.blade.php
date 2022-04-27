@@ -356,9 +356,9 @@
         }
     
         // comboBarLineChart
-        var income = <?php echo $incomeCartData; ?>;
-        var expense = <?php echo $purchaseCartData; ?>;
-        var date = <?php echo $dateCartData; ?>;
+        var income = [12, 19, 3, 5, 2, 3];
+        var expense = [12, 19, 3, 5, 2, 3];
+        var date = '100';
         var ctx_combo_bar = document.getElementById("comboBarLineChart").getContext('2d');
         var comboBarLineChart = new Chart(ctx_combo_bar, {
             type: 'bar',
@@ -389,9 +389,10 @@
         });
 
         // comboBarLineChart2
-        var income = <?php echo $incomeCartData; ?>;
-        var expense = <?php echo $purchaseCartData; ?>;
-        var date = <?php echo $dateCartData; ?>;
+        var income = [12, 19, 3, 5, 2, 3];
+        var expense = [12, 19, 3, 5, 2, 3];
+        var date = '100';
+
         var ctx_combo_bar = document.getElementById("comboBarLineChart2").getContext('2d');
         var comboBarLineChart = new Chart(ctx_combo_bar, {
             type: 'bar',

@@ -112,11 +112,11 @@
                 dataType: "JSON",
                 success: function(data) {
                     $('#modal-edit-employee').modal('show');
-                    $('.modal-title').text('Edit Customer');
+                    $('.modal-title').text('Edit Employee');
                     $('#formEdit').attr('action', url);
-                    $('#id').val(data.id);
-                    $('#editCustomerName').val(data.customer_name);
-                    $('#editCustomerPhone').val(data.customer_phone);
+                    $('#upEmployeeName').val(data.employee_name);
+                    $('#upEmployeeNIK').val(data.employee_nik);
+                    $('#upEmployeePosition').val(data.employee_position);
                 },
                 error: function() {
                     alert('Tidak dapat menampilkan Data');

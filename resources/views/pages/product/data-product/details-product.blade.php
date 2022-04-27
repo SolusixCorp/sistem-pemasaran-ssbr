@@ -26,34 +26,24 @@
                             <h6 id="vCategory" class="message-item-date"></h6>
                         </div>
 
-                        <!-- <div class="message-item">
-                            <h6 class="message-item-user">Supplier</h6>
-                            <h6 id="vSupplier" class="message-item-date"></h6>
-                        </div> -->
-
-                        <!-- <div class="message-item">
-                            <h6 class="message-item-user">Merek</h6>
-                            <h6 id="vMerk" class="message-item-date"></h6>
-                        </div> -->
-
                         <div class="message-item">
                             <h6 class="message-item-user">Harga Konsumen</h6>
-                            <h6 id="vBuyingPrice" class="message-item-date"></h6>
+                            <h6 id="vConsumentPrice" class="message-item-date"></h6>
                         </div>
 
                         <div class="message-item">
                             <h6 class="message-item-user">Harga Retail</h6>
-                            <h6 id="vSellingPrice" class="message-item-date"></h6>
+                            <h6 id="vRetailPrice" class="message-item-date"></h6>
                         </div>
 
                         <div class="message-item">
                             <h6 class="message-item-user">Harga Sub Whole</h6>
-                            <h6 id="vSellingPrice" class="message-item-date"></h6>
+                            <h6 id="vSubWholePrice" class="message-item-date"></h6>
                         </div>
                         
                         <div class="message-item">
                             <h6 class="message-item-user">Harga Whole</h6>
-                            <h6 id="vSellingPrice" class="message-item-date"></h6>
+                            <h6 id="vWholePrice" class="message-item-date"></h6>
                         </div>
 
                         <!-- <div class="message-item">

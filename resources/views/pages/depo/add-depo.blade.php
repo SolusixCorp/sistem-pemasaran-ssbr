@@ -14,57 +14,44 @@
                     <div class="card-body">
 
                         <div class="form-group">
-                            <label for="name">Pemilik Depo</label>
-                            <select id="inputSupplier" name="inputSupplier" class="form-control">
-                                <option value="principle" >Alice</option>
-                                <option value="freelance" >Bob</option>
+                            <label for="inUser">Pemilik Depo</label>
+                            <select id="inUser" name="inUser" class="form-control">
+                                @foreach ($users as $user)
+                                <option value="{{ $user->user_id }}" >{{ $user->user_name }}</option>
+                                @endforeach
                             </select>
                         </div>
 
                         <div class="form-group">
-                            <label for="name">Tipe Depo</label>
-                            <select id="inputSupplier" name="inputSupplier" class="form-control">
+                            <label for="inDepoType">Tipe Depo</label>
+                            <select id="inDepoType" name="inDepoType" class="form-control">
                                 <option value="principle" >Principle</option>
                                 <option value="freelance" >Freelance</option>
                             </select>
                         </div>
 
                         <div class="form-group">
-                            <label for="name">Nama Depo</label>
-                            <input name="name" type="text" class="form-control" id="name" placeholder="CV Udang Makmur" autocomplete="off" required>
+                            <label for="inDepoAddress">Alamat</label>
+                            <input name="inDepoAddress" type="text" class="form-control" id="inDepoAddress" placeholder="Gebang Wetan 23 B - Sukolilo, Surabaya, Jawa Timur" autocomplete="off" required>
                             
                         </div>
 
                         <div class="form-group">
-                            <label for="address">Alamat</label>
-                            <input name="address" type="text" class="form-control" id="address" placeholder="Gebang Wetan 23 B - Sukolilo, Surabaya, Jawa Timur" autocomplete="off" required>
+                            <label for="inDepoCity">Kota</label>
+                            <input name="inDepoCity" type="text" class="form-control" id="inDepoCity" placeholder="Surabaya" autocomplete="off" required>
                             
                         </div>
 
                         <div class="form-group">
-                            <label for="address">Kota</label>
-                            <input name="address" type="text" class="form-control" id="address" placeholder="Surabaya" autocomplete="off" required>
-                            
-                        </div>
-
-                        <div class="form-group">
-                            <label for="email">Email</label>
-                            <input name="email" type="text" class="form-control" id="email" placeholder="udangmakmur@gmail.com" autocomplete="off" required>
+                            <label for="inDepoEmail">Email</label>
+                            <input name="inDepoEmail" type="text" class="form-control" id="inDepoEmail" placeholder="admin-depo@gmail.com" autocomplete="off" required>
                             
                         </div>
                         <div class="form-group">
-                            <label for="phone">Nomor Telepon</label>
-                            <input name="phone" type="text" class="form-control" id="phone" placeholder="085111222333" autocomplete="off" required>
+                            <label for="inDepoPhone">Nomor Telepon</label>
+                            <input name="inDepoPhone" type="text" class="form-control" id="inDepoPhone" placeholder="085111222333" autocomplete="off" required>
                             
                         </div>
-                        <!-- <div class="form-group">
-                            <label for="inputStatus">Status</label>
-                            <select id="inputStatus" name="inputStatus" class="form-control">
-                                <option selected>Aktif</option>
-                                <option>Tidak Aktif</option>
-                            </select>
-                        </div> -->
-                            
                         
                     </div>
                 </div>

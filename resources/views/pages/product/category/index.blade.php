@@ -131,7 +131,6 @@
                 $('#modal-edit-category').modal('show');
                 $('.modal-title').text('Edit Kategori');
                 $('#formEdit').attr('action', url);
-                $('#id').val(data.id);
                 $('#editCategoryName').val(data.category_name);
                 $('#editInputStatus').val(data.status);
             },

@@ -14,20 +14,20 @@
                     <div class="card-body">
                         
                         <div class="form-group">
-                            <label for="addCustomerName">Nama Employee</label>
-                            <input name="customerName" type="text" class="form-control" id="addCustomerName" placeholder="Ali Hasan" autocomplete="off" required>
+                            <label for="inEmployeeName">Nama Employee</label>
+                            <input name="inEmployeeName" type="text" class="form-control" id="inEmployeeName" placeholder="Admin Depo" autocomplete="off" required>
                             
                         </div>
 
                         <div class="form-group">
-                            <label for="addCustomerName">NIK</label>
-                            <input name="customerName" type="number" class="form-control" id="addCustomerName" placeholder="321000201020102" autocomplete="off" required>
+                            <label for="inEmployeeNIK">NIK</label>
+                            <input name="inEmployeeNIK" type="number" class="form-control" id="inEmployeeNIK" placeholder="321000201020102" autocomplete="off" required>
                             
                         </div>
 
                         <div class="form-group">
-                            <label for="addCustomerName">Posisi</label>
-                            <input name="customerName" type="text" class="form-control" id="addCustomerName" placeholder="Admin Gudang" autocomplete="off" required>
+                            <label for="inEmployeePosition">Posisi</label>
+                            <input name="inEmployeePosition" type="text" class="form-control" id="inEmployeePosition" placeholder="Admin Gudang" autocomplete="off" required>
                             
                         </div>
                         

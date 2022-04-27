@@ -3,9 +3,8 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
-use Illuminate\Support\Facades\DB;
 
-class CreateCustomerTable extends Migration
+class CreateCategoryProductsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -14,11 +13,11 @@ class CreateCustomerTable extends Migration
      */
     public function up()
     {
-        if (!Schema::hasTable('customer')) {
-            Schema::create('customer', function (Blueprint $table) {
+        if (!Schema::hasTable('category')) {
+            Schema::create('category', function (Blueprint $table) {
                 $table->id();
-                $table->string('customer_name');
-                $table->string('customer_phone')->nullable();
+                $table->string('category_name');
+                $table->string('status');
                 $table->timestamps();
             });
         }
@@ -31,8 +30,6 @@ class CreateCustomerTable extends Migration
      */
     public function down()
     {
-        DB::statement('SET FOREIGN_KEY_CHECKS=0;');
-        Schema::dropIfExists('customer');
-        DB::statement('SET FOREIGN_KEY_CHECKS=1;');
+        Schema::dropIfExists('category');
     }
 }

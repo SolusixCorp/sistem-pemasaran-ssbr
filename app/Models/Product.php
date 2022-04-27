@@ -11,8 +11,8 @@ use App\Models\OrderItem;
 class Product extends Model
 {
     use HasFactory;
-    protected $table = 'barangs';
-    protected $primaryKey = 'barang_id';
+    protected $table = 'products';
+    protected $primaryKey = 'id';
 
     public function supply()
     {

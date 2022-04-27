@@ -172,7 +172,7 @@
         $('.modal-title').text('Tambah product Baru');
     }
 
-    // Form Edit product
+    // Form Edit Product
     function editForm($id) {
         url = "data-product/" + $id;
         $.ajax({
@@ -181,19 +181,17 @@
             dataType: "JSON",
             success: function(data) {
                 $('#modal-edit-product').modal('show');
-                $('.modal-title').text('Edit product');
+                $('.modal-title').text('Edit Product');
                 $('#formEdit').attr('action', url);
-                $('#id').val(data.id);
-                $('#inputSupplierEdit').val(data.supplier_id);
-                $('#productNameEdit').val(data.name);
-                $('#inputCategoryEdit').val(data.category_id);
-                $('#merkEdit').val(data.merk);
-                $('#sellingPriceEdit').val(data.selling_price);
-                $('#buyingPriceEdit').val(data.buying_price);
-                $('#discountEdit').val(data.discount);
-                $('#inputDiscTypeEdit').val(data.discount_type);
-                $('#stockEdit').val(data.stock);
-                $('#inputStatusEdit').val(data.status);
+                $('#upProductName').val(data.product_name);
+                $('#upCategory').val(data.product_category);
+                $('#upDescription').text(data.product_description);
+                $('#upConsumentPrice').val(data.product_price_consument);
+                $('#upRetailPrice').val(data.product_price_retail);
+                $('#upSubWholePrice').val(data.product_price_sub_whole);
+                $('#upWholesalesPrice').val(data.product_price_whole);
+                $('#upStock').val(data.product_stock);
+                $('#upStatus').val(data.product_status);
             },
             error: function() {
                 alert('Tidak dapat menampilkan Data');
@@ -210,15 +208,14 @@
             success: function(data) {
                 $('#modal-details-product').modal('show');
                 $('.modal-title').text('Detil Product');
-                $('#vName').text(data.name);
-                $('#vCategory').text(data.category_name);
-                $('#vSupplier').text(data.supplier_name);
-                $('#vMerk').text(data.merk);
-                $('#vBuyingPrice').text(data.buying_price);
-                $('#vSellingPrice').text(data.selling_price);
-                $('#vDiscount').text(data.discount);
-                $('#vStock').text(data.stock);
-                $('#vStatus').text(data.status);
+                $('#vName').text(data.product_name);
+                $('#vCategory').text(data.product_category);
+                $('#vConsumentPrice').text(data.product_price_consument);
+                $('#vRetailPrice').text(data.product_price_retail);
+                $('#vSubWholePrice').text(data.product_price_sub_whole);
+                $('#vWholePrice').text(data.product_price_whole);
+                $('#vStock').text(data.product_stock);
+                $('#vStatus').text(data.product_status);
             },
             error: function() {
                 alert('Tidak dapat menampilkan Data');

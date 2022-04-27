@@ -10,10 +10,5 @@ class Employee extends Model
 {
     use HasFactory;
 
-    protected $table = "customer";
-
-    public function order()
-    {
-        return $this->belongsTo(Order::class);
-    }
+    protected $table = "employees";
 }

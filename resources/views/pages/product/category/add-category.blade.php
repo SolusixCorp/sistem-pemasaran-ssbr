@@ -16,7 +16,7 @@
                         
                         <div class="form-group">
                             <label for="categoryName">Nama Kategori</label>
-                            <input name="categoryName" type="text" class="form-control" id="categoryName" placeholder="Makanan" autocomplete="off" required>
+                            <input name="categoryName" type="text" class="form-control" id="categoryName" placeholder="Kretek" autocomplete="off" required>
                             
                         </div>
                         <div class="form-group">

@@ -14,18 +14,23 @@
                 <div class="modal-body">
                     <div class="card-body">
                         
-                        <input name="id" type="hidden" class="form-control" id="id" placeholder="id">
-                        
                         <div class="form-group">
-                            <label for="editCustomerName">Nama Customer</label>
-                            <input name="customerName" type="text" class="form-control" id="editCustomerName" placeholder="Ali Hasan" autocomplete="off" required>
+                            <label for="upEmployeeName">Nama Employee</label>
+                            <input name="upEmployeeName" type="text" class="form-control" id="upEmployeeName" placeholder="Admin Depo" autocomplete="off" required>
                             
                         </div>
+
                         <div class="form-group">
-                            <label for="editCustomerPhone">Phone</label>
-                            <input name="customerPhone" type="text" class="form-control" id="editCustomerPhone" placeholder="082000111222" autocomplete="off" required>
-                        </div>
+                            <label for="upEmployeeNIK">NIK</label>
+                            <input name="upEmployeeNIK" type="number" class="form-control" id="upEmployeeNIK" placeholder="321000201020102" autocomplete="off" required>
                             
+                        </div>
+
+                        <div class="form-group">
+                            <label for="upEmployeePosition">Posisi</label>
+                            <input name="upEmployeePosition" type="text" class="form-control" id="upEmployeePosition" placeholder="Admin Gudang" autocomplete="off" required>
+                            
+                        </div>
                         
                     </div>
                 </div>

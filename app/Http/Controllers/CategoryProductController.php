@@ -22,11 +22,12 @@ class CategoryProductController extends Controller
     public function listData($status) {
 
         if ($status != 0) {
-            $categories = CategoryProduct::orderBy('category_id', 'desc')->where('category_barang.status', '=', $status)
-            ->get();
+            $categories = CategoryProduct::orderBy('id', 'desc')
+                ->where('category_barang.status', '=', $status)
+                ->get();
         } else {
-            $categories = CategoryProduct::orderBy('category_id', 'desc')
-            ->get();
+            $categories = CategoryProduct::orderBy('id', 'desc')
+                ->get();
         }
         $no = 0;
         $status = "";
@@ -78,7 +79,11 @@ class CategoryProductController extends Controller
         $category = new CategoryProduct;
         $category->category_name = $request['categoryName'];
         $category->status = $request['inputStatus'];
-        $category->save();
+
+        if (!$category->save()) {
+            return redirect()->route('category-product.index')
+            ->with('success_message', 'Kategori gagal ditambahkan.');
+        }
 
         return redirect()->route('category-product.index')
             ->with('success_message', 'Kategori berhasil ditambahkan.');

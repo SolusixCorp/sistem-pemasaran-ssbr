@@ -17,58 +17,51 @@ class ProductController extends Controller
     public function index()
     {
         //
-        $categories = CategoryProduct::orderBy('category_barang.category_name', 'asc')
-            ->where('category_barang.status', '=', "Aktif")->get();
-        $suppliers = Depo::orderBy('suppliers.supplier_name', 'asc')->get();
+        $categories = CategoryProduct::orderBy('category.category_name', 'asc')
+            ->where('category.status', '=', "Aktif")
+            ->get();
+
+        $suppliers = Depo::get();
+
         return view('pages.product.data-product.index', compact('categories'), compact('suppliers'));
     }
 
     public function listData($categoryId, $supplierId, $status) {
      
-        if ($status != 0 && $categoryId != 0 && $supplierId == 0) {
-            $products = Product::leftJoin('category_barang', 'category_barang.category_id', '=', 'barangs.category_id')
-            ->leftJoin('suppliers', 'suppliers.supplier_id', '=', 'barangs.supplier_id')
-            ->where('barangs.category_id', '=', $categoryId)
-            ->where('barangs.status', '=', $status)
-            ->get();
-        } else if ($status != 0 && $categoryId == 0 && $supplierId != 0) { 
-            $products = Product::leftJoin('category_barang', 'category_barang.category_id', '=', 'barangs.category_id')
-            ->leftJoin('suppliers', 'suppliers.supplier_id', '=', 'barangs.supplier_id')
-            ->where('suppliers.supplier_id', '=', $supplierId)
-            ->where('barangs.status', '=', $status)
-            ->get(); 
-        } else if ($status != 0 && $categoryId != 0 && $supplierId != 0) {
-            $products = Product::leftJoin('category_barang', 'category_barang.category_id', '=', 'barangs.category_id')
-            ->leftJoin('suppliers', 'suppliers.supplier_id', '=', 'barangs.supplier_id')
-            ->where('barangs.category_id', '=', $categoryId)
-            ->where('barangs.status', '=', $status)
-            ->where('suppliers.supplier_id', '=', $supplierId)
-            ->get(); 
-        } else if ($status == 0 && $categoryId != 0 && $supplierId == 0) {
-            $products = Product::leftJoin('category_barang', 'category_barang.category_id', '=', 'barangs.category_id')
-            ->leftJoin('suppliers', 'suppliers.supplier_id', '=', 'barangs.supplier_id')
-            ->where('barangs.category_id', '=', $categoryId)
-            ->get(); 
-        } else if ($status == 0 && $categoryId == 0 && $supplierId != 0) { 
-            $products = Product::leftJoin('category_barang', 'category_barang.category_id', '=', 'barangs.category_id')
-            ->leftJoin('suppliers', 'suppliers.supplier_id', '=', 'barangs.supplier_id')
-            ->where('suppliers.supplier_id', '=', $supplierId)
-            ->get(); 
-        } else if ($status != 0 && $categoryId == 0 && $supplierId == 0) { 
-            $products = Product::leftJoin('category_barang', 'category_barang.category_id', '=', 'barangs.category_id')
-            ->leftJoin('suppliers', 'suppliers.supplier_id', '=', 'barangs.supplier_id')
-            ->where('barangs.status', '=', $status)
-            ->get(); 
-        } else if ($status == 0 && $categoryId != 0 && $supplierId != 0) { 
-            $products = Product::leftJoin('category_barang', 'category_barang.category_id', '=', 'barangs.category_id')
-            ->leftJoin('suppliers', 'suppliers.supplier_id', '=', 'barangs.supplier_id')
-            ->where('barangs.category_id', '=', $categoryId)
-            ->where('suppliers.supplier_id', '=', $supplierId)
-            ->get(); 
-        } else {
-            $products = Product::leftJoin('category_barang', 'category_barang.category_id', '=', 'barangs.category_id')
-            ->leftJoin('suppliers', 'suppliers.supplier_id', '=', 'barangs.supplier_id')->get();
-        }
+        // if ($status != 0 && $categoryId != 0 && $supplierId == 0) {
+        //     $products = Product::leftJoin('category', 'category.category_id', '=', 'products.category_id')
+        //     ->where('products.category_id', '=', $categoryId)
+        //     ->where('products.status', '=', $status)
+        //     ->get();
+        // } else if ($status != 0 && $categoryId == 0 && $supplierId != 0) { 
+        //     $products = Product::leftJoin('category', 'category.category_id', '=', 'products.category_id')
+        //     ->where('products.status', '=', $status)
+        //     ->get(); 
+        // } else if ($status != 0 && $categoryId != 0 && $supplierId != 0) {
+        //     $products = Product::leftJoin('category', 'category.category_id', '=', 'products.category_id')
+        //     ->where('products.category_id', '=', $categoryId)
+        //     ->where('products.status', '=', $status)
+        //     ->get(); 
+        // } else if ($status == 0 && $categoryId != 0 && $supplierId == 0) {
+        //     $products = Product::leftJoin('category', 'category.category_id', '=', 'products.category_id')
+        //     ->where('products.category_id', '=', $categoryId)
+        //     ->get(); 
+        // } else if ($status == 0 && $categoryId == 0 && $supplierId != 0) { 
+        //     $products = Product::leftJoin('category', 'category.category_id', '=', 'products.category_id')
+        //     ->get(); 
+        // } else if ($status != 0 && $categoryId == 0 && $supplierId == 0) { 
+        //     $products = Product::leftJoin('category', 'category.category_id', '=', 'products.category_id')
+        //     ->where('products.status', '=', $status)
+        //     ->get(); 
+        // } else if ($status == 0 && $categoryId != 0 && $supplierId != 0) { 
+        //     $products = Product::leftJoin('category', 'category.category_id', '=', 'products.category_id')
+        //     ->where('products.category_id', '=', $categoryId)
+        //     ->get(); 
+        // } else {
+            $products = Product::leftJoin('category', 'category.id', '=', 'products.category_id')
+                        ->select('category.category_name', 'products.id as product_id', 'products.name', 'products.consument_price' , 'products.retail_price', 'products.sub_whole_price', 'products.wholesales_price', 'products.stock')
+                        ->get();
+        // }
 
         $no = 0;
         $status = "";
@@ -78,13 +71,13 @@ class ProductController extends Controller
             $row = array();
             $row[] = $products->category_name;
             $row[] = $products->name;
-            $row[] = rupiah($products->selling_price, TRUE);
-            $row[] = rupiah($products->buying_price, TRUE);
-            $row[] = rupiah($products->buying_price, TRUE);
-            $row[] = rupiah($products->buying_price, TRUE);
+            $row[] = rupiah($products->consument_price, TRUE);
+            $row[] = rupiah($products->retail_price, TRUE);
+            $row[] = rupiah($products->sub_whole_price, TRUE);
+            $row[] = rupiah($products->wholesales_price, TRUE);
             $row[] = $products->stock;
-            $row[] = '<a href="#" onclick="editForm(' . $products->barang_id . ')" class="btn btn-warning btn-sm" data-toggle="modal"><i class="far fa-edit"></i></a>
-            <a href="#" onclick="detailsView(' . $products->barang_id . ')" class="btn btn-primary btn-sm" data-toggle="modal"><i class="far fa-eye"></i></a>';
+            $row[] = '<a href="#" onclick="editForm(' . $products->product_id . ')" class="btn btn-warning btn-sm" data-toggle="modal"><i class="far fa-edit"></i></a>
+            <a href="#" onclick="detailsView(' . $products->product_id . ')" class="btn btn-primary btn-sm" data-toggle="modal"><i class="far fa-eye"></i></a>';
             $data[] = $row;
         }
 
@@ -112,19 +105,22 @@ class ProductController extends Controller
     {
         //
         $products = new Product;
-        $products->name = $request['name'];
-        $products->supplier_id = $request['inputSupplier'];
-        $products->category_id = $request['inputCategory'];
-        $products->merk = $request['merk'];
-        $products->selling_price = $request['sellingPrice'];
-        $products->buying_price = $request['buyingPrice'];
-        $products->discount = $request['discount'] || 0;
-        $products->discount_type = $request['discountType'] || "";
-        $products->stock = $request['stock'];
-        $products->status = $request['inputStatus'];
-        $products->save();
+        $products->name = $request['inProductName'];
+        $products->category_id = $request['inCategory'];
+        $products->description = $request['inDescription'];
+        $products->consument_price = $request['inConsumentPrice'];
+        $products->retail_price = $request['inRetailPrice'];
+        $products->sub_whole_price = $request['inSubWholePrice'];
+        $products->wholesales_price = $request['inWholesalesPrice'];
+        $products->image = $request['inPhoto'];
+        $products->status = $request['inStatus'];
 
-        return redirect()->route('data-Product.index')
+        if (!$products->save()) {
+            return redirect()->route('data-product.index')
+            ->with('success_message', 'Product gagal ditambahkan.');
+        }
+
+        return redirect()->route('data-product.index')
             ->with('success_message', 'Product berhasil ditambahkan.');
     }
 
@@ -136,19 +132,23 @@ class ProductController extends Controller
      */
     public function show($id)
     {
-        $products = Product::leftJoin('category_barang', 'category_barang.category_id', '=', 'barangs.category_id')
-        ->leftJoin('suppliers', 'suppliers.supplier_id', '=', 'barangs.supplier_id')
-        ->where('barangs.barang_id', '=', $id)
-        ->first(); 
-        $products->selling_price = rupiah($products->selling_price, TRUE);
-        $products->buying_price  = rupiah($products->buying_price, TRUE);
-        if ($products->discount_type != "%") {
-            $products->discount  = rupiah($products->discount, TRUE);
-        } else {
-            $products->discount  = $products->discount ."". $products->discount_type;
-        }
+        $product = Product::leftJoin('category', 'category.id', '=', 'products.category_id')
+                ->where('products.id', '=', $id)
+                ->first();
+
+                $productData = array(
+                    'product_name' => $product->name,
+                    'product_category' => $product->category_name,
+                    'product_price_consument' => rupiah($product->consument_price, TRUE),
+                    'product_price_retail' => rupiah($product->retail_price, TRUE),
+                    'product_price_sub_whole' => rupiah($product->sub_whole_price, TRUE),
+                    'product_price_whole' => rupiah($product->wholesales_price, TRUE),
+                    'product_stock' => $product->stock,
+                    'product_status' => $product->status,
+                    'product_image' => $product->image,
+                );
         
-        echo json_encode($products);
+        echo json_encode($productData);
     }
 
     /**
@@ -160,8 +160,23 @@ class ProductController extends Controller
     public function edit($id)
     {
         //
-        $products = Product::find($id);
-        echo json_encode($products);
+        $product = Product::leftJoin('category', 'category.id', '=', 'products.category_id')
+                ->where('products.id', '=', $id)
+                ->first();
+
+                $productData = array(
+                    'product_name' => $product->name,
+                    'product_category' => $product->category_id,
+                    'product_description' => $product->description,
+                    'product_price_consument' => rupiah($product->consument_price, TRUE),
+                    'product_price_retail' => rupiah($product->retail_price, TRUE),
+                    'product_price_sub_whole' => rupiah($product->sub_whole_price, TRUE),
+                    'product_price_whole' => rupiah($product->wholesales_price, TRUE),
+                    'product_stock' => $product->stock,
+                    'product_status' => $product->status,
+                    'product_image' => $product->image,
+                );
+        echo json_encode($productData);
     }
 
     /**
@@ -175,24 +190,23 @@ class ProductController extends Controller
     {
         //
         $products = Product::find($id);
-        $products->name = $request['name'];
-        $products->supplier_id = $request['inputSupplier'];
-        $products->category_id = $request['inputCategory'];
-        $products->merk = $request['merk'];
-        $products->selling_price = $request['sellingPrice'];
-        $products->buying_price = $request['buyingPrice'];
-        $products->discount = $request['discount'] || 0;
-        $products->discount_type = $request['discountType'] || "";
-        $products->stock = $request['stock'];
-        $products->status = $request['inputStatus'];
+        $products->name = $request['upProductName'];
+        $products->category_id = $request['upCategory'];
+        $products->description = $request['upDescription'];
+        $products->consument_price = $request['upConsumentPrice'];
+        $products->retail_price = $request['upRetailPrice'];
+        $products->sub_whole_price = $request['upSubWholePrice'];
+        $products->wholesales_price = $request['upWholesalesPrice'];
+        $products->image = $request['upPhoto'];
+        $products->status = $request['upStatus'];
         $products->update();
 
         if (!$products->update()) {
-            return redirect()->route('data-Product.index')
+            return redirect()->route('data-product.index')
                 ->with('failed_message', 'Data Product gagal diperbarui.');
         }
 
-        return redirect()->route('data-Product.index')
+        return redirect()->route('data-product.index')
                 ->with('success_message', 'Data Product berhasil diperbarui.');
     }
 

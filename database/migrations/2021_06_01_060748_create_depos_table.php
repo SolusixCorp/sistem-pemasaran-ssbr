@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateSuppliersTable extends Migration
+class CreateDeposTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,12 +13,15 @@ class CreateSuppliersTable extends Migration
      */
     public function up()
     {
-        if (!Schema::hasTable('suppliers')) {
-            Schema::create('suppliers', function (Blueprint $table) {
+        if (!Schema::hasTable('depos')) {
+            Schema::create('depos', function (Blueprint $table) {
                 $table->id();
-                $table->string('name');
+                $table->integer('user_id');
+                $table->enum('type', ['principle', 'freelance']);
+                $table->string('city');
                 $table->string('address');
                 $table->string('phone');
+                $table->float('ar_balance');
                 $table->string('email')->nullable();
                 $table->timestamps();
             });
@@ -32,6 +35,6 @@ class CreateSuppliersTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('suppliers');
+        Schema::dropIfExists('depos');
     }
 }

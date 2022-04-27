@@ -15,44 +15,45 @@ class DashboardController extends Controller
         $currentDate = Carbon::now()->format('Y-m-d');
         $startDate = Carbon::now()->subDays(7)->format('Y-m-d');
 
-        $purchaseCarts = Income::select(
-            DB::raw('sum(total) as nominals'))
-            ->whereBetween('date', [$startDate, $currentDate])
-            ->groupBy('date')
-            ->get();
+        // $purchaseCarts = Income::select(
+        //     DB::raw('sum(total) as nominals'))
+        //     ->whereBetween('date', [$startDate, $currentDate])
+        //     ->groupBy('date')
+        //     ->get();
 
-        $incomeCarts = Income::select(
-            DB::raw('sum(income) as nominals'))
-            ->whereBetween('date', [$startDate, $currentDate])
-            ->groupBy('date')
-            ->get();
+        // $incomeCarts = Income::select(
+        //     DB::raw('sum(income) as nominals'))
+        //     ->whereBetween('date', [$startDate, $currentDate])
+        //     ->groupBy('date')
+        //     ->get();
 
-        $dateCarts = Income::select(
-            DB::raw('date'))
-            ->whereBetween('date', [$startDate, $currentDate])
-            ->groupBy('date')
-            ->get();
+        // $dateCarts = Income::select(
+        //     DB::raw('date'))
+        //     ->whereBetween('date', [$startDate, $currentDate])
+        //     ->groupBy('date')
+        //     ->get();
 
-        $income = array();
-        foreach($incomeCarts as $nominal) {
-            $income[] = $nominal->nominals;
-        }
+        // $income = array();
+        // foreach($incomeCarts as $nominal) {
+        //     $income[] = $nominal->nominals;
+        // }
 
-        $purchase = array();
-        foreach($purchaseCarts as $nominal) {
-            $purchase[] = $nominal->nominals;
-        }
+        // $purchase = array();
+        // foreach($purchaseCarts as $nominal) {
+        //     $purchase[] = $nominal->nominals;
+        // }
 
-        $dates = array();
-        foreach($dateCarts as $date) {
-            $dates[] = tanggal($date->date);
-        }
+        // $dates = array();
+        // foreach($dateCarts as $date) {
+        //     $dates[] = tanggal($date->date);
+        // }
 
-        $incomeCartData = json_encode($income);
-        $purchaseCartData = json_encode($purchase);
-        $dateCartData = json_encode($dates);
+        // $incomeCartData = json_encode($income);
+        // $purchaseCartData = json_encode($purchase);
+        // $dateCartData = json_encode($dates);
+        // return view('index', compact('incomeCartData', 'purchaseCartData', 'dateCartData', 'startDate', 'currentDate'));
         
-        return view('index', compact('incomeCartData', 'purchaseCartData', 'dateCartData', 'startDate', 'currentDate'));
+        return view('index');
     }
 
     public function data($start, $end)

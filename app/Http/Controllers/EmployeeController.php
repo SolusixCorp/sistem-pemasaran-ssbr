@@ -27,11 +27,11 @@ class EmployeeController extends Controller
             $no++;
             $row = array();
             $row[] = $no;
-            $row[] = "Fanda";
-            $row[] = "Admin Gudang";
-            $row[] = "351315102221222";
-            $row[] = "2022-04-12"; 
-            $row[] = "2022-04-12";
+            $row[] = $employee->name;
+            $row[] = $employee->position;
+            $row[] = $employee->ktp_number;
+            $row[] = $employee->date_of_entry; 
+            $row[] = $employee->outdate;
             $row[] = '<a onclick="editForm(' . $employee->id . ')" class="btn btn-warning btn-sm"><i class="far fa-edit"></i></a>';
             $data[] = $row;
         }
@@ -79,9 +79,10 @@ class EmployeeController extends Controller
     public function store(Request $request)
     {
         //
-        $employee = new employee;
-        $employee->employee_name = $request['employeeName'];
-        $employee->employee_phone = $request['employeePhone'];
+        $employee = new Employee;
+        $employee->name = $request['inEmployeeName'];
+        $employee->position = $request['inEmployeePosition'];
+        $employee->ktp_number = $request['inEmployeeNIK'];
         
         if (!$employee->save()) {
             return redirect()->route('employee.index')
@@ -114,7 +115,12 @@ class EmployeeController extends Controller
     {
         //
         $employee = Employee::find($id);
-        echo json_encode($employee);
+        $employeeData = array(
+            'employee_name' => $employee->name, 
+            'employee_nik' => $employee->ktp_number,
+            'employee_position' => $employee->position
+        );
+        echo json_encode($employeeData);
     }
 
     /**
@@ -129,17 +135,17 @@ class EmployeeController extends Controller
         
         //
         $employee = Employee::find($id);
-        $employee->employee_name = $request['employeeName'];
-        $employee->employee_phone = $request['employeePhone'];
-        $employee->update();
-
+        $employee->name = $request['upEmployeeName'];
+        $employee->position = $request['upEmployeePosition'];
+        $employee->ktp_number = $request['upEmployeeNIK'];
+        
         if (!$employee->update()) {
             return redirect()->route('employee.index')
-                ->with('failed_message', 'Data employee gagal diperbarui.');
+                    ->with('failed_message', 'Employee gagal diperbarui.');
         }
-
+        
         return redirect()->route('employee.index')
-                ->with('success_message', 'Data employee berhasil diperbarui.');
+            ->with('success_message', 'Employee berhasil diperbarui.');
     }
 
     /**

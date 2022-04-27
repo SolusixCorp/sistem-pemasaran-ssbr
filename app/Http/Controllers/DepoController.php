@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Depo;
+use App\Models\User;
 
 class DepoController extends Controller
 {
@@ -15,12 +16,18 @@ class DepoController extends Controller
     public function index()
     {
         //
-        return view('pages.depo.index');
+        $users = User::select('name as user_name', 'id as user_id')
+            ->orderBy('users.name', 'asc')
+            ->get();
+
+        return view('pages.depo.index', compact('users'));
     }
 
     public function listData() {
         
-        $depos = Depo::orderBy('suppliers.supplier_id', 'desc')->get();
+        $depos = Depo::leftJoin('users', 'users.id', '=', 'user_id')
+                ->orderBy('name', 'desc')
+                ->get();
         
         $no = 0;
         $data = array();
@@ -28,12 +35,13 @@ class DepoController extends Controller
             $no++;
             $row = array();
             $row[] = $no;
-            $row[] = $depo->supplier_name;
-            $row[] = $depo->supplier_address;
-            $row[] = "Surabaya";
-            $row[] = $depo->supplier_email . '<br>' . $depo->supplier_phone;
-            $row[] = "Rp. 10.000.000,-";
-            $row[] = '<a href="#" onclick="editForm(' . $depo->supplier_id . ')" class="btn btn-warning btn-sm" data-toggle="modal"><i class="far fa-edit"></i></a>';
+            $row[] = $depo->name;
+            $row[] = ucfirst($depo->type);
+            $row[] = $depo->address;
+            $row[] = $depo->city;
+            $row[] = $depo->email . '<br>' . $depo->phone;
+            $row[] = rupiah($depo->ar_balance, TRUE);
+            $row[] = '<a href="#" onclick="editForm(' . $depo->id . ')" class="btn btn-warning btn-sm" data-toggle="modal"><i class="far fa-edit"></i></a>';
             $data[] = $row;
         }
 
@@ -60,15 +68,21 @@ class DepoController extends Controller
     public function store(Request $request)
     {
         //
-        $depo = new depo;
-        $depo->depo_name = $request['name'];
-        $depo->depo_address = $request['address'];
-        $depo->depo_email = $request['email'];
-        $depo->depo_phone = $request['phone'];
-        $depo->save();
+        $depo = new Depo;
+        $depo->user_id = $request['inUser'];
+        $depo->type = $request['inDepoType'];
+        $depo->address = $request['inDepoAddress'];
+        $depo->city = $request['inDepoCity'];
+        $depo->email = $request['inDepoEmail'];
+        $depo->phone = $request['inDepoPhone'];
+
+        if (!$depo->save()) {
+            return redirect()->route('depo.index')
+                ->with('success_message', 'Depo gagal ditambahkan.');
+        }
 
         return redirect()->route('depo.index')
-            ->with('success_message', 'depo berhasil ditambahkan.');
+            ->with('success_message', 'Depo berhasil ditambahkan.');
     }
 
     /**
@@ -93,9 +107,16 @@ class DepoController extends Controller
     public function edit($id)
     {
         //
-        // $depo = Depo::where('depo_id', '=', $id)->get();
         $depo = Depo::find($id);
-        return json_encode($depo);
+        $depoData = array(
+            'depo_id' => $depo->id,
+            'depo_type' => $depo->type,
+            'depo_address' => $depo->address,
+            'depo_city' => $depo->city,
+            'depo_phone' => $depo->phone,
+            'depo_email' => $depo->email
+        );
+        return json_encode($depoData);
     }
 
     /**
@@ -109,14 +130,16 @@ class DepoController extends Controller
     {
         //
         $depo = Depo::find($id);
-        $depo->depo_name = $request['name'];
-        $depo->depo_address = $request['address'];
-        $depo->depo_email = $request['email'];
-        $depo->depo_phone = $request['phone'];
+        $depo->user_id = $request['upUser'];
+        $depo->type = $request['upDepoType'];
+        $depo->address = $request['upDepoAddress'];
+        $depo->city = $request['upDepoCity'];
+        $depo->email = $request['upDepoEmail'];
+        $depo->phone = $request['upDepoPhone'];
         $depo->update();
   
         return redirect()->route('depo.index')
-        ->with('success_message', 'depo berhasil diperbarui.');
+        ->with('success_message', 'Depo berhasil diperbarui.');
     }
 
     /**

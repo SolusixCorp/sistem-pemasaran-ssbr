@@ -14,67 +14,53 @@
                 <div class="modal-body">
                     <div class="card-body">
                         
-                        <!-- <label for="inputSupplier">Supplier</label>
-                        <div class="form-row">
-                            <div class="form-group col-md-9">
-                                <select id="inputSupplier" name="inputSupplier" class="form-control">
-                                    @foreach ($suppliers as $supplier)
-                                        <option value="{{ $supplier->supplier_id }}" >{{ $supplier->supplier_name }}</option>
-                                    @endforeach
-                                </select>
-                            </div>
-                            <div class="form-group col-md-3">
-                                    <a href="/supplier" id="btnAddSupplier" class="form-control btn btn-primary col-md-12">
-                                        <i class="fas fa-plus" aria-hidden="tru"></i> Supplier
-                                    </a>
-                                
-                            </div>
-                        </div> -->
                         <div class="form-group">
                             <label for="productName">Nama Produk</label>
-                            <input type="text" name="name" class="form-control" id="productName" placeholder="Gudang Garam Surya" autocomplete="off" required>
+                            <input type="text" name="inProductName" class="form-control" id="productName" placeholder="Gudang Garam Surya" autocomplete="off" required>
                             
                         </div>
                         <div class="form-group">
                             <label for="inputCategory">Kategori</label>
-                            <select id="inputCategory" name="inputCategory" class="form-control">
+                            <select id="inputCategory" name="inCategory" class="form-control">
                                 @foreach ($categories as $category)
-                                <option value="{{ $category->category_id }}" >{{ $category->category_name }}</option>
+                                <option value="{{ $category->id }}" >{{ $category->category_name }}</option>
                                 @endforeach
                             </select>
                         </div>
-                        <!-- <div class="form-group">
-                            <label for="merk">Merek</label>
-                            <input type="text" name="merk" class="form-control" id="merk" required placeholder="Udang Makmur">
-                        </div> -->
+
+                        <div class="form-group">
+                            <label for="description">Deskripsi</label>
+                            <textarea type="text" name="inDescription" class="form-control" id="description"></textarea>
+                        </div>
+                        
                         <div class="form-group">
                             <label for="consumentPrice">Harga Konsumen</label>
-                            <input type="number" min="0" name="consumentPrice" class="form-control" id="consumentPrice" required placeholder="40000" >
+                            <input type="number" min="0" name="inConsumentPrice" class="form-control" id="consumentPrice" required placeholder="40000" >
                         </div>
 
                         <div class="form-group">
                             <label for="retailPrice">Harga Retail</label>
-                            <input type="number" min="0" name="retailPrice" class="form-control" id="retailPrice" required placeholder="50000">
+                            <input type="number" min="0" name="inRetailPrice" class="form-control" id="retailPrice" required placeholder="50000">
                         </div>
                     
                         <div class="form-group">
                             <label for="retailPrice">Harga Sub Whole</label>
-                            <input type="number" min="0" name="retailPrice" class="form-control" id="retailPrice" required placeholder="50000">
+                            <input type="number" min="0" name="inSubWholePrice" class="form-control" id="retailPrice" required placeholder="50000">
                         </div>
 
                         
                         <div class="form-group">
                             <label for="retailPrice">Harga Whole</label>
-                            <input type="number" min="0" name="retailPrice" class="form-control" id="retailPrice" required placeholder="50000">
+                            <input type="number" min="0" name="inWholesalesPrice" class="form-control" id="retailPrice" required placeholder="50000">
                         </div>
 
                         <div class="form-row">
                             <div class="form-group col-md-12">
                                 <label for="validatedCustomFile">Foto Produk</label>
                                 <div class="custom-file">
-                                    <input type="file" class="custom-file-input" id="validatedCustomFile" required>
+                                    <input type="file" name="inPhoto" class="custom-file-input" id="validatedCustomFile">
                                     <label class="custom-file-label" for="validatedCustomFile">Pilih
-                                        file...</label>
+                                        Gambar...</label>
                                 </div>
                             </div>
                         </div>
@@ -98,7 +84,7 @@
                         </div> -->
                         <div class="form-group">
                             <label for="inputStatus">Status</label>
-                            <select id="inputStatus" name="inputStatus" class="form-control">
+                            <select id="inputStatus" name="inStatus" class="form-control">
                                 <option selected>Aktif</option>
                                 <option>Tidak Aktif</option>
                             </select>
