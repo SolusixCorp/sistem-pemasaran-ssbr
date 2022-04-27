@@ -38,9 +38,9 @@
                         <table id="dataTable" class="table table-bordered table-hover" style="width:100%">
                             <thead>
                                 <tr>
-                                    <th>No</th>
+                                    <th width="1%">No</th>
                                     <th>Nama</th>
-                                    <th>Username</th>
+                                    <th>Email</th>
                                     <th>Role</th>
                                     <th width="15%">Aksi</th>
                                 </tr>

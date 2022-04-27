@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 
-class BarangSeeder extends Seeder
+class ProductSeeder extends Seeder
 {
     /**
      * Run the database seeds.
@@ -16,13 +16,14 @@ class BarangSeeder extends Seeder
      */
     public function run()
     {
-        DB::table('barangs')->insert([
-            'name' => 'Test Barang',
+        DB::table('products')->insert([
+            'name' => 'Test Product',
             'category_id' => 1,
-            'supplier_id' => 1,
-            'merk' => "Test Merk",
-            'buying_price' => 40000,
-            'selling_price' => 50000,
+            'description' => 'Isi 12',
+            'consument_price' => 20000,
+            'retail_price' => 19000,
+            'sub_whole_price' => 18000,
+            'wholesales_price' => 17000,
             'stock' => 50,
             'status' => "Aktif",
         ]);

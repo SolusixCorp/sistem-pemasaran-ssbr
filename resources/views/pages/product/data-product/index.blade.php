@@ -1,7 +1,7 @@
 @extends('layouts.dashboard')
 
 @section('title', 'Data Produk')
-@section('breadcrumb', 'Products Knowladge')
+@section('breadcrumb', 'Data Produk')
 
 @section('content')
     <div class="row">
