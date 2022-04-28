@@ -71,6 +71,13 @@
                 </li>
 
                 <li class="submenu">
+                    <a href="{{ url('/ar-ap-report') }}">
+                        <i class="fas fa-chart-line"></i>
+                        <span> AR/AP Report </span>
+                    </a>
+                </li>
+
+                <li class="submenu">
                     <a href="{{ url('/user') }}">
                         <i class="fas fa-user-circle"></i>
                         <span> Users </span>
