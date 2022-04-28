@@ -23,7 +23,7 @@ class CategoryProductController extends Controller
 
         if ($status != 0) {
             $categories = CategoryProduct::orderBy('id', 'desc')
-                ->where('category_barang.status', '=', $status)
+                ->where('category.status', '=', $status)
                 ->get();
         } else {
             $categories = CategoryProduct::orderBy('id', 'desc')
@@ -82,7 +82,7 @@ class CategoryProductController extends Controller
 
         if (!$category->save()) {
             return redirect()->route('category-product.index')
-            ->with('success_message', 'Kategori gagal ditambahkan.');
+            ->with('failed_message', 'Kategori gagal ditambahkan.');
         }
 
         return redirect()->route('category-product.index')
@@ -128,10 +128,15 @@ class CategoryProductController extends Controller
         $category = CategoryProduct::find($id);
         $category->category_name = $request['categoryName'];
         $category->status = $request['inputStatus'];
-        $category->update();
-  
-        return redirect()->route('category-Product.index')
+        
+        if (!$category->update()) {
+            return redirect()->route('category-product.index')
+            ->with('failed_message', 'Kategori gagal diperbarui.');
+        }
+
+        return redirect()->route('category-product.index')
             ->with('success_message', 'Kategori berhasil diperbarui.');
+  
     }
 
     /**

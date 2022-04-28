@@ -9,7 +9,7 @@
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
-            <form id="formEdit" method="POST" autocomplete="off" >
+            <form id="formEdit" method="POST" autocomplete="off" enctype="multipart/form-data">
             @method('PUT')
             @csrf
                 <div class="modal-body">
@@ -24,7 +24,7 @@
                             <label for="upCategory">Kategori</label>
                             <select id="upCategory" name="upCategory" class="form-control">
                                 @foreach ($categories as $category)
-                                    <option value="{{ $category->id }}">{{ $category->category_name }}</option>
+                                    <option value="{{ $category->category_id }}">{{ $category->category_name }}</option>
                                 @endforeach
                             </select>
                         </div>
@@ -57,11 +57,10 @@
 
                         <div class="form-row">
                             <div class="form-group col-md-12">
-                                <label for="validatedCustomFile">Foto Produk</label>
+                                <label for="upValidatedCustomFile">Foto Produk</label>
                                 <div class="custom-file">
-                                    <input type="file" name="upPhoto" class="custom-file-input" id="validatedCustomFile">
-                                    <label class="custom-file-label" for="validatedCustomFile">Pilih
-                                        Gambar...</label>
+                                    <input type="file" name="upPhoto" class="custom-file-input" id="upValidatedCustomFile">
+                                    <label id="upValidatedCustomFileLabel" class="custom-file-label" for="upValidatedCustomFile">Pilih Gambar...</label>
                                 </div>
                             </div>
                         </div>
@@ -69,14 +68,10 @@
                         <div class="form-group">
                             <label for="upStatus">Status</label>
                             <select id="upStatus" name="upStatus" class="form-control">
-                                <option selected>Aktif</option>
+                                <option>Aktif</option>
                                 <option>Tidak Aktif</option>
                             </select>
                         </div>
-                        <!-- <div class="card-body">
-                            <div class="col-12"></div>
-                            <input type="file" name="files[]" id="filer_example1" multiple="multiple">
-                        </div> -->
                         
                     </div>
                 </div>

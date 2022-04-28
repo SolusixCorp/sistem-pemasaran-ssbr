@@ -20,6 +20,7 @@ class DatabaseSeeder extends Seeder
             DepoSeeder::class,
             CategoryProductSeeder::class,
             ProductSeeder::class,
+            ProductDepoSeeder::class,
         ]);
     }
 }

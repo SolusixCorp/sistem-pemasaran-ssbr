@@ -29,7 +29,7 @@
                     @endif
                     @if(Session::has('failed_message'))
                         <div class="alert alert-danger alert-dismissable flat" style="margin-left: 0px;">
-                            <i class="fa fa-check"></i>
+                            <i class="fa fa-times-circle"></i>
                             {{ Session::get('failed_message') }}
                             <button type="button" class="close" data-dismiss="alert" aria-label="Close">
                             <span aria-hidden="true">&times;</span>

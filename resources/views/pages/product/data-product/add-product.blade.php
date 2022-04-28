@@ -9,7 +9,7 @@
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
-            <form method="POST" autocomplete="off" >
+            <form method="POST" autocomplete="off" enctype="multipart/form-data">
             @csrf
                 <div class="modal-body">
                     <div class="card-body">
@@ -23,7 +23,7 @@
                             <label for="inputCategory">Kategori</label>
                             <select id="inputCategory" name="inCategory" class="form-control">
                                 @foreach ($categories as $category)
-                                <option value="{{ $category->id }}" >{{ $category->category_name }}</option>
+                                <option value="{{ $category->category_id }}" >{{ $category->category_name }}</option>
                                 @endforeach
                             </select>
                         </div>
@@ -47,7 +47,6 @@
                             <label for="retailPrice">Harga Sub Whole</label>
                             <input type="number" min="0" name="inSubWholePrice" class="form-control" id="retailPrice" required placeholder="50000">
                         </div>
-
                         
                         <div class="form-group">
                             <label for="retailPrice">Harga Whole</label>
@@ -59,40 +58,11 @@
                                 <label for="validatedCustomFile">Foto Produk</label>
                                 <div class="custom-file">
                                     <input type="file" name="inPhoto" class="custom-file-input" id="validatedCustomFile">
-                                    <label class="custom-file-label" for="validatedCustomFile">Pilih
+                                    <label id="validatedCustomFileLabel" class="custom-file-label" for="validatedCustomFile">Pilih
                                         Gambar...</label>
                                 </div>
                             </div>
                         </div>
-                        <!-- <div class="form-row">
-                            <div class="form-group col-md-9">
-                                <label for="discount">Diskon</label>
-                                <input type="number" name="discount" class="form-control" id="discount" required placeholder="50">
-                            </div>
-                            <div class="form-group col-md-3">
-                                <label for="inputDiscType">Tipe</label>
-                                <select id="inputDiscType" name="discountType" class="form-control">
-                                    <option selected>%</option>
-                                    <option>Rupiah</option>
-                                </select>
-                            </div>
-                        
-                        </div> -->
-                        <!-- <div class="form-group">
-                            <label for="stock">Stok</label>
-                            <input type="number"  min="0" name="stock" class="form-control" id="stock" placeholder="50" required>
-                        </div> -->
-                        <div class="form-group">
-                            <label for="inputStatus">Status</label>
-                            <select id="inputStatus" name="inStatus" class="form-control">
-                                <option selected>Aktif</option>
-                                <option>Tidak Aktif</option>
-                            </select>
-                        </div>
-                        <!-- <div class="card-body">
-                            <div class="col-12"></div>
-                            <input type="file" name="files[]" id="filer_example1" multiple="multiple">
-                        </div> -->
                         
                     </div>
                 </div>

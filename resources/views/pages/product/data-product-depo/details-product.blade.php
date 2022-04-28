@@ -47,6 +47,11 @@
                         </div>
 
                         <div class="message-item">
+                            <h6 class="message-item-user">Harga Depo</h6>
+                            <h6 id="vDepoPrice" class="message-item-date"></h6>
+                        </div>
+
+                        <div class="message-item">
                             <h6 class="message-item-user">Stok</h6>
                             <h6 id="vStock" class="message-item-date"></h6>
                         </div>

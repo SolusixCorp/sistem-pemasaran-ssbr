@@ -5,6 +5,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\CategoryProductController;
 use App\Http\Controllers\ProductController;
+use App\Http\Controllers\ProductDepoController;
 use App\Http\Controllers\DepoController;
 use App\Http\Controllers\EmployeeController;
 use App\Http\Controllers\ExpenseController;
@@ -47,13 +48,17 @@ Route::middleware(['auth:sanctum', 'verified'])->group(function () {
     Route::get('profile', [UserController::class, 'profile'])->name('profile');
     Route::patch('profile', [UserController::class, 'updateProfile'])->name('profile-update');
 
-    // Product -> Kategory
+    // Product -> Kategori
     Route::get('category-product/data/{status}', [CategoryProductController::class, 'listData'])->name('category-product.data');
     Route::resource('category-product', CategoryProductController::class);
   
     // Product -> Data Product
-    Route::get('data-product/data/{categoryId}/{supplierId}/{status}', [ProductController::class, 'listData'])->name('data-product.data');
+    Route::get('data-product/data', [ProductController::class, 'listData'])->name('data-product.data');
     Route::resource('data-product', ProductController::class);
+
+    // Product -> Data Product Depo
+    Route::get('data-product-depo/data/{categoryId}/{depoId}/{status}', [ProductDepoController::class, 'listData'])->name('data-product-depo.data');
+    Route::resource('data-product-depo', ProductDepoController::class);
 
     // Depo
     Route::get('depo/data', [DepoController::class, 'listData'])->name('depo.data');

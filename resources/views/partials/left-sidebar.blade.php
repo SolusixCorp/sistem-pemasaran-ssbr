@@ -22,15 +22,21 @@
                     </a>
                     <ul class="list-unstyled">
                         <li>
-                            <a id="tables" href="{{ url('/data-product') }}">
-                                <i class="fas fa-cubes"></i>
-                                <span> Data Product </span>
+                            <a id="tables" href="{{ url('/category-product') }}">
+                                <i class="fas fa-boxes"></i>
+                                <span> Category </span>
                             </a>
                         </li>
                         <li>
-                        <a id="tables" href="{{ url('/category-product') }}">
-                                <i class="fas fa-boxes"></i>
-                                <span> Category </span>
+                            <a id="tables" href="{{ url('/data-product') }}">
+                                <i class="fas fa-cubes"></i>
+                                <span> Product HO</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a id="tables" href="{{ url('/data-product-depo') }}">
+                                <i class="fas fa-cubes"></i>
+                                <span> Product Depo</span>
                             </a>
                         </li>
                     </ul>

@@ -1,7 +1,7 @@
 @extends('layouts.dashboard')
 
-@section('title', 'Produk Master')
-@section('breadcrumb', 'Produk Master')
+@section('title', 'Produk Depo')
+@section('breadcrumb', 'Produk Depo')
 
 @section('content')
     <div class="row">
@@ -13,9 +13,9 @@
                             <i class="fas fa-plus-circle" aria-hidden="true"></i> Produk Baru
                         </button>
                     </span>
-                    <h3><i class="fas fa-cubes"></i> Produk Master</h3>
-                    @include('pages/product/data-product/add-product')
-                    @include('pages/product/data-product/edit-product')
+                    <h3><i class="fas fa-cubes"></i> Produk Depo</h3>
+                    @include('pages/product/data-product-depo/add-product')
+                    @include('pages/product/data-product-depo/edit-product')
                 </div>
 
                 <div class="card-body">
@@ -38,6 +38,37 @@
                             </button>
                         </div>
                     @endif
+
+                    <div class="form-row col-7 pull-right">
+                        <div class="form-group col-md-4">
+                        <label for="inCategorySearch">Kategori</label>
+                            <select id="inCategorySearch" name="inCategorySearch" class="form-control">
+                            <option value="0" selected>Semua</option>    
+                                @foreach ($categories as $category)
+                                    <option value="{{ $category->category_id }}" >{{ $category->category_name }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+
+                        <div class="form-group col-md-4">
+                        <label for="inDepoSearch">Depo</label>
+                            <select id="inDepoSearch" name="inDepoSearch" class="form-control">
+                                <option value="0" selected>Semua</option>
+                                @foreach ($depos as $depo)
+                                    <option value="{{ $depo->depo_id }}" >{{ $depo->depo_name }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+
+                        <div class="form-group col-md-4">
+                        <label for="inStatusSearch">Status</label>
+                            <select id="inStatusSearch" name="inStatusSearch" class="form-control">
+                                <option value="0" selected>Semua</option>
+                                <option value="Aktif" >Aktif</option>
+                                <option value="Tidak Aktif" >Tidak Aktif</option>
+                            </select>
+                        </div>
+                    </div>
                     
                     <div class="table-responsive">
                         <table id="dataTable" class="table table-bordered table-hover" style="width:100%">
@@ -45,10 +76,8 @@
                                 <tr>
                                     <th>Kategori Produk</th>
                                     <th>Nama Produk</th>
-                                    <th>Harga Konsumen</th>
-                                    <th>Harga Retail</th>
-                                    <th>Harga Jual</th>
-                                    <th>Harga Beli</th>
+                                    <th>Depo</th>
+                                    <th>Harga Depo</th>
                                     <th>Stok</th>
                                     <th style="width:10%">Aksi</th>
                                 </tr>
@@ -68,7 +97,7 @@
     
     </div>
     <!-- end row-->
-    @include('pages/product/data-product/details-product')
+    @include('pages/product/data-product-depo/details-product')
 @endsection
 
 @section('custom_js')
@@ -81,7 +110,7 @@
         table = $('#dataTable').DataTable({
             data: dataSet,
             ajax: {
-                url: "data-product/data",
+                url: "data-product-depo/data/" + categoryId + "/" + DepoId + "/" + status,
                 type: "GET"
             }
         });
@@ -92,10 +121,25 @@
         {
             categoryId = $(this).val();
             $.ajax({
-                url: "data-product/data/" + categoryId + "/" + DepoId + "/" + status,
+                url: "data-product-depo/data/" + categoryId + "/" + DepoId + "/" + status,
                 success: function(response){
-                    table.ajax.url("data-product/data/" + categoryId + "/" + DepoId + "/" + status).load(); 
+                    table.ajax.url("data-product-depo/data/" + categoryId + "/" + DepoId + "/" + status).load(); 
                     } ,
+                error: function() {
+                    alert('Tidak dapat menampilkan Data');
+                }
+            });
+        })
+
+        // Depo ketika ada event change
+        $("#inDepoSearch").change(function()
+        {				
+            depoId = $(this).val();
+            $.ajax({
+                url: "data-product-depo/data/" + categoryId + "/" + depoId + "/" + status,
+                success: function(response){
+                    table.ajax.url("data-product-depo/data/" + categoryId + "/" + depoId + "/" + status).load(); 
+                } ,
                 error: function() {
                     alert('Tidak dapat menampilkan Data');
                 }
@@ -107,9 +151,9 @@
         {				
             status = $(this).val();
             $.ajax({
-                url: "data-product/data/" + categoryId + "/" + depoId + "/" + status,
+                url: "data-product-depo/data/" + categoryId + "/" + depoId + "/" + status,
                 success: function(response){
-                    table.ajax.url("data-product/data/" + categoryId + "/" + depoId + "/" + status).load(); 
+                    table.ajax.url("data-product-depo/data/" + categoryId + "/" + depoId + "/" + status).load(); 
                 } ,
                 error: function() {
                     alert('Tidak dapat menampilkan Data');
@@ -129,9 +173,9 @@
 
     // Form Edit Product
     function editForm($id) {
-        url = "data-product/" + $id;
+        url = "data-product-depo/" + $id;
         $.ajax({
-            url: "data-product/" + $id + "/edit",
+            url: "data-product-depo/" + $id + "/edit",
             type: "GET",
             dataType: "JSON",
             success: function(data) {
@@ -139,15 +183,7 @@
                 $('.modal-title').text('Edit Product');
                 $('#formEdit').attr('action', url);
                 $('#upProductName').val(data.product_name);
-                $('#upCategory').val(data.product_category);
-                $('#upDescription').text(data.product_description);
-                $('#upConsumentPrice').val(data.product_price_consument);
-                $('#upRetailPrice').val(data.product_price_retail);
-                $('#upSubWholePrice').val(data.product_price_sub_whole);
-                $('#upWholesalesPrice').val(data.product_price_whole);
-                $('#upStock').val(data.product_stock);
                 $('#upStatus').val(data.product_status);
-                $('.custom-file-label').text(data.product_image);
             },
             error: function() {
                 alert('Tidak dapat menampilkan Data');
@@ -158,7 +194,7 @@
     // View Details product
     function detailsView($id) {
         $.ajax({
-            url: "data-product/" + $id,
+            url: "data-product-depo/" + $id,
             type: "GET",
             dataType: "JSON",
             success: function(data) {
@@ -170,6 +206,7 @@
                 $('#vRetailPrice').text(data.product_price_retail);
                 $('#vSubWholePrice').text(data.product_price_sub_whole);
                 $('#vWholePrice').text(data.product_price_whole);
+                $('#vDepoPrice').text(data.product_price_depo);
                 $('#vStock').text(data.product_stock);
                 $('#vStatus').text(data.product_status);
                 $('#vPhoto').attr("src", data.product_image);

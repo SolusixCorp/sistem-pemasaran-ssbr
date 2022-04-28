@@ -78,7 +78,7 @@ class DepoController extends Controller
 
         if (!$depo->save()) {
             return redirect()->route('depo.index')
-                ->with('success_message', 'Depo gagal ditambahkan.');
+                ->with('failed_message', 'Depo gagal ditambahkan.');
         }
 
         return redirect()->route('depo.index')
@@ -136,10 +136,15 @@ class DepoController extends Controller
         $depo->city = $request['upDepoCity'];
         $depo->email = $request['upDepoEmail'];
         $depo->phone = $request['upDepoPhone'];
-        $depo->update();
-  
+
+        if (!$depo->update()) {
+            return redirect()->route('depo.index')
+                ->with('failed_message', 'Depo gagal diperbarui.');
+        }
+
         return redirect()->route('depo.index')
-        ->with('success_message', 'Depo berhasil diperbarui.');
+            ->with('success_message', 'Depo berhasil diperbarui.');
+  
     }
 
     /**
