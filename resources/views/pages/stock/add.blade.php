@@ -53,10 +53,10 @@
                                     </div>
                                     
                                     <div class="form-group">
-                                        <label for="customer_name">Nama Depo</label>
-                                        <select id="customer_name" name="customer_name" class="form-control js-example-basic-single">
-                                            @foreach ($customers as $customer)
-                                                <option value="{{ $customer->id }}" >{{ $customer->customer_name }}</option>
+                                        <label for="depo_name">Nama Depo</label>
+                                        <select id="depo_name" name="depo_name" class="form-control js-example-basic-single">
+                                            @foreach ($depos as $depo)
+                                                <option value="{{ $depo->id }}" >{{ $depo->name }}</option>
                                             @endforeach
                                         </select>
                                     </div>
@@ -70,11 +70,11 @@
                                     </div>
 
                                     <div class="form-group">
-                                        <label for="stock_category">Kategori Stok (IN / OUT)</label>
+                                        <label for="stock_category" id="stock_category_label">Kategori Stok (IN)</label>
                                         <select id="stock_category" name="stock_category" class="form-control js-example-basic-single">
                                             <option value="dropping" >Dropping</option>
                                             <option value="return" >Return</option>
-                                            <option value="stock" >stock</option>
+                                            <option value="stock" >Stock</option>
                                             <option value="return" >Return</option>
                                         </select>
                                     </div>
@@ -88,24 +88,28 @@
                                                             <td width="50%">
                                                                 <div class="form-group">
                                                                 <label for="item">Item</label>
-                                                                    <select id="barang_item_id" name="barang_item_id[]" class="form-control barang_item_id">
-                                                                        @foreach ($barangs_item as $b)
-                                                                            <option value="{{ $b->barang_id }}" >{{ $b->name . ' (' . rupiah($b->selling_price, TRUE) . ')' }}</option>
+                                                                    <select id="product_item_id" name="product_item_id[]" class="form-control product_item_id">
+                                                                        @foreach ($products_item as $b)
+                                                                            <option value="{{ $b['product_id'] }}" >{{ $b['product_name'] }}</option>
                                                                         @endforeach
                                                                     </select>
                                                                 </div>
                                                             </td>  
                                                             <td width="15%">
                                                                 <label for="item">Remaining Stok</label>
-                                                                <input type="text" name="notes_item[]" id="notes_item" placeholder="0" value="100" class="form-control" readonly>
+                                                                <input type="text" name="remmaining_stock[]" id="remmaining_stock" placeholder="0" value="100" class="form-control" readonly>
                                                             </td>  
                                                             <td width="10%">
                                                                 <label for="item">Qty</label>
-                                                                <input type="number" name="qty[]" id="qty" value="1" class="form-control" >
+                                                                <input type="number" name="qty[]" id="qty" oninput="qtyCheck()" value="1" class="form-control" >
                                                             </td> 
                                                             <td>
                                                                 <label for="item">Harga</label>
-                                                                <input type="number" name="price[]" id="price" value="0" class="form-control" >
+                                                                <select id="price" name="price[]" class="form-control price">
+                                                                    @foreach ($products_item as $b)
+                                                                        <option value="{{ $b['product_id'] }}" >{{ $b['product_name'] }}</option>
+                                                                    @endforeach
+                                                                </select>
                                                             </td>
                                                         </tr>  
                                                     </tbody>
@@ -158,11 +162,10 @@
     <script>
         $('#add').click(function(){  
             i++;  
-            $('#dynamic_field').append('<tr id="row'+i+'"><td width="40%"><select id="barang_item_id" name="barang_item_id[]" class="form-control barang_item_id"> @foreach ($barangs_item as $barang) <option value="{{ $barang->barang_id }}" >{{ $barang->name . " (" . rupiah($b->selling_price, TRUE) . ")" }}</option> @endforeach </select></td>  <td width="15%"><input type="text" name="notes_item[]" id="notes_item" placeholder="0" value="100" class="form-control" >  <td width="10%"><input type="number" name="qty[]" id="qty" value="1" class="form-control" ></td><td><input type="number" name="price[]" id="price" value="0" class="form-control"></td><td><button type="button" name="remove" id="'+i+'" class="btn btn-danger btn_remove">X</button></td></tr>');  
+            $('#dynamic_field').append('<tr id="row'+i+'"><td width="40%"><select id="'+i+'" name="product_item_id[]" class="form-control product_item_id"> @foreach ($products_item as $product) <option value="{{ $product['product_id'] }}" >{{ $product['product_name'] }}</option> @endforeach </select></td>  <td width="15%"><input type="text" name="remmaining_stock[]" id="remmaining_stock'+i+'" placeholder="0" value="100" class="form-control" readonly><td width="10%"><input type="number" name="qty[]" id="qty" value="1" class="form-control" ></td><td><select id="price'+i+'" name="price[]" class="form-control price">@foreach ($product['price'] as $price) <option value="{{ $price }}" >{{ $price }}</option> @endforeach</select></td><td><button type="button" name="remove" id="'+i+'" class="btn btn-danger btn_remove">X</button></td></tr>');  
        
-            
             $(document).ready(function(){
-                $('.barang_item_id').select2({
+                $('.product_item_id').select2({
                     theme:'bootstrap4',
                     tags:true,
                 }).on('select2:close', function(){
@@ -170,44 +173,102 @@
                     var element_val = $.trim(element.val());
 
                     console.log(element_val)
+                    if(element_val != '') {
+                    $.ajax({
+                        url: "{{ url('/') }}" + "/stock/product/" + element_val,
+                        method: "GET",
+                        success: function(data) {
+                            $('#remmaining_stock'+i+'').val(data.stock_remaining);
+                            var priceOps = $('#price'+i+'');
+                            priceOps.empty();
+                            for (let i = 0; i < data.price.length; i++) {
+                                priceOps.append('<option value="' + data.price[i] + '">'+ data.price[i] +'</option>');
+                            }
+                            console.log(id)
+                        }
+                    })
+                }
                 })
             })
         });  
+
         $(document).on('click', '.btn_remove', function(){  
             var button_id = $(this).attr("id");   
             $('#row'+button_id+'').remove();  
         });  
 
         $(document).ready(function(){
-            $('.barang_item_id').select2({
+            //Select Item
+            $('.product_item_id').select2({
                 theme:'bootstrap4',
                 tags:true,
             }).on('select2:close', function(){
                 var element = $(this);
                 var element_val = $.trim(element.val());
 
-                console.log(element_val)
-            })
+                if(element_val != '') {
+                    $.ajax({
+                        url: "{{ url('/') }}" + "/stock/product/" + element_val,
+                        method: "GET",
+                        success: function(data) {
+                            console.log(data)
+                            $("#remmaining_stock").val(data.stock_remaining);
+                            
+                        }
+                    })
+                }
 
-            $("#qty").bind('keyup mouseup', function () {
-                // $('input.barang_item_id').each(function() {
-                //     alert($(this).val()); 
-                // });
-                // var menu = $("[name^='barang_item_id']").val()
-                // alert("changed : " + menu);            
+                console.log(element_val)
             });
-        })
+
+            //Select Stock Type
+            $('#stock_type').select2({
+                theme:'bootstrap4',
+                tags:true,
+            }).on('select2:close', function(){
+                var element = $(this);
+                var element_val = $.trim(element.val());
+
+                if(element_val != '') {
+                    var stockCategoryOps = $('#stock_category');
+                    var stockCategoryLabel = $('#stock_category_label');
+                    stockCategoryOps.empty();
+                    if (element_val == 'in') {
+                        stockCategoryLabel.text('Kategori Stok (IN)');
+                        stockCategoryOps.append('<option value="dropping">Dropping</option>');
+                    } else {
+                        stockCategoryLabel.text('Kategori Stok (OUT)');
+                        stockCategoryOps.append('<option value="sales">Sales</option>');
+                    }
+                    stockCategoryOps.append('<option value="return">Return</option>');
+                }
+
+                console.log(element_val)
+            });
+
+            
+
+            // $('input[name="qty"]').addEventListener('change', (e) => {  
+            //     console.log(e.target.value);  
+            // });
+
+        });
+
+        // function qtyCheck() {
+        //     var element = $(this);
+        //     var element_val = $.trim(element.val());
+        //     console.log(element_val); 
+        // }
 
         // Single Date Picker
         $('input[name="singledatepicker"]').daterangepicker({
-                singleDatePicker: true,
-                showDropdowns: true
-            });
+            singleDatePicker: true,
+            showDropdowns: true
+        });
 
-        $(document).ready(function(){
-
-            $('#customer_name').select2({
-                placeholder:'Pilih Pembeli',
+        $(document).ready(function() {
+            $('#depo_name').select2({
+                placeholder:'Pilih Depo',
                 theme:'bootstrap4',
                 tags:true,
             }).on('select2:close', function(){
@@ -217,9 +278,9 @@
                 console.log(element_val)
 
                 var isExist = false
-                for (i = 0; i < document.getElementById("customer_name").length - 1; ++i){
-                    console.log(i + ") " + document.getElementById("customer_name").options[i].text)
-                    if (document.getElementById("customer_name").options[i].value == element_val){
+                for (i = 0; i < document.getElementById("depo_name").length - 1; ++i){
+                    console.log(i + ") " + document.getElementById("depo_name").options[i].text)
+                    if (document.getElementById("depo_name").options[i].value == element_val){
                         console.log("exist")
                         isExist = true
                         break
@@ -228,11 +289,11 @@
                 
                 if(element_val != '' && !isExist) {
                     $.ajax({
-                        url: "{{ url('/') }}" + "/customer/add",
+                        url: "{{ url('/') }}" + "/depo/add",
                         method: "POST",
                         data: {
                             "_token": "{{ csrf_token() }}",
-                            "customerName" : element_val
+                            "depoName" : element_val
                         },
                         success: function(data) {
                             console.log(data)

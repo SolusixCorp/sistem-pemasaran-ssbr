@@ -17,11 +17,11 @@ class ProductDepoSeeder extends Seeder
     public function run()
     {
         DB::table('products_depo')->insert([
-            'depo_id' => 1,
+            'depo_id'    => 1,
             'product_id' => 1,
-            'stock' => 100,
+            'stock'      => 100,
             'depo_price' => 20000,
-            'status' => "Aktif",
+            'status'     => "Aktif",
         ]);
     }
 }

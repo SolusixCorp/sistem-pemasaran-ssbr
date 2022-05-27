@@ -4,10 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Models\CategoryProduct;
 use App\Models\Product;
+use App\Models\ProductDepo;
 use App\Models\Depo;
-use App\Models\Order;
-use App\Models\OrderItem;
-use App\Models\Employee;
+use App\Models\Stock;
+use App\Models\StockFlow;
 use App\Models\Settings;
 use App\Models\Income;
 use Illuminate\Support\Facades\Auth;
@@ -23,35 +23,35 @@ use Illuminate\Http\Request;
 class StockFlowController extends Controller
 {
     public function index() {
-        $categories = CategoryProduct::orderBy('category_barang.category_name', 'asc')->get();
-        $suppliers = Depo::orderBy('suppliers.supplier_name', 'asc')->get();
+        $categories = CategoryProduct::orderBy('category.category_name', 'asc')->get();
+        $depos = Depo::leftJoin('users', 'user_id', '=', 'users.id')->get();
 
         return view('pages.stock.index', [
             "categories" => $categories,
-            "suppliers"  => $suppliers,   
+            "depos"  => $depos,   
         ]);
     }
 
     public function getAllData() {
-        $orders =  Order::leftJoin('customer', 'customer.id', '=', 'orders.customer_id')
-                    ->leftJoin('users', 'users.id', '=', 'orders.kasir_id')
-                    ->select(['orders.id as order_id', 'orders.order_date', 'customer.customer_name', 'orders.total_with_discount'])
-                    ->orderBy('orders.order_date', 'desc')
+        $stocks =  Stock::leftJoin('customer', 'customer.id', '=', 'stocks.customer_id')
+                    ->leftJoin('users', 'users.id', '=', 'stocks.kasir_id')
+                    ->select(['stocks.id as stock_id', 'stocks.stock_date', 'customer.customer_name', 'stocks.total_with_discount'])
+                    ->orderBy('stocks.stock_date', 'desc')
                     ->get(); 
         $no = 0;
         $status = "";
         $data = array();
-        foreach ($orders as $order) {
+        foreach ($stocks as $stock) {
             $no++;
             $row = array();
             $row[] = $no;
-            $row[] = $order->order_date;
+            $row[] = $stock->stock_date;
             $row[] = 'Depo Malang';
             $row[] = 'IN';
             $row[] = 'Dropping';
-            $row[] = '<a href="'. url("/") .'/stock/edit/' . $order->order_id . '" onclick="editForm(' . $order->order_id . ')" class="btn btn-warning btn-sm"><i class="far fa-edit"></i></a>
-            <a href="#" onclick="detailsView(' . $order->order_id . ')" class="btn btn-primary btn-sm" data-toggle="modal"  data-target="#modal-details"><i class="far fa-eye"></i></a>
-            <a href="'. url("/") .'/stock/print-invoice/' . $order->order_id . '" onclick="editForm(' . $order->order_id . ')" class="btn btn-dark btn-sm"><i class="far fa-file"></i></a>';
+            $row[] = '<a href="'. url("/") .'/stock/edit/' . $stock->stock_id . '" onclick="editForm(' . $stock->stock_id . ')" class="btn btn-warning btn-sm"><i class="far fa-edit"></i></a>
+            <a href="#" onclick="detailsView(' . $stock->stock_id . ')" class="btn btn-primary btn-sm" data-toggle="modal"  data-target="#modal-details"><i class="far fa-eye"></i></a>
+            <a href="'. url("/") .'/stock/print-invoice/' . $stock->stock_id . '" onclick="editForm(' . $stock->stock_id . ')" class="btn btn-dark btn-sm"><i class="far fa-file"></i></a>';
             
             array_push($data, $row);
         }
@@ -61,10 +61,10 @@ class StockFlowController extends Controller
     }
 
     public function getById($id) {
-        $order =  Order::with(['customer', 'kasir', 'order_items', 'order_items.barang'])
-                    ->where('orders.id', $id)
+        $stock =  stock::with(['customer', 'kasir', 'stock_items', 'stock_items.product'])
+                    ->where('stocks.id', $id)
                     ->first(); 
-        return response()->json($order);
+        return response()->json($stock);
     }
     
     /**
@@ -74,13 +74,78 @@ class StockFlowController extends Controller
      */
     public function create()
     {
-        $barangs = Product::orderBy('barang_id', 'asc')->get();
-        $customers = Employee::orderBy('id', 'desc')->get();
-        
+        $user = Auth::user();
+
+        if ($user->role == 'ho') {
+            $products = Product::orderBy('name', 'asc')->get();
+        } else {
+            $products = ProductDepo::leftJoin('products', 'product_id', '=', 'products.id')
+                    ->select('products_depo.id', 'products.name', 'products_depo.stock', 'products_depo.depo_price')
+                    ->orderBy('name', 'asc')
+                    ->get();
+        }
+        $depos = Depo::leftJoin('users', 'user_id', '=', 'users.id')->get();
+
+        $productDatas = array();
+        foreach ($products as $product) {
+            $depo = Depo::where('user_id', '=', $user->id)->first();
+            if ($depo->type == 'principle') {
+                $prices = array(
+                    rupiah($product->consument_price, TRUE),
+                    rupiah($product->retail_price, TRUE),
+                    rupiah($product->sub_whole_price, TRUE),
+                    rupiah($product->wholesales_price, TRUE));
+            } else {
+                $prices = array(
+                    rupiah($product->depo_price, TRUE));
+            }
+
+            $productData = array(
+                'product_id' => $product->id,
+                'product_name' => $product->name,
+                'stock_remaining' => $product->stock,
+                'price' => $prices
+            );
+            $productDatas[] = $productData;
+        }
+
+        // return $productDatas;
+
         return view('pages.stock.add', [
-            "barangs_item" => $barangs,
-            "customers"  => $customers,   
+            "products_item" => $productDatas,
+            "depos"  => $depos,   
         ]);
+    }
+
+    public function getProductById($id) {
+        $user = Auth::user();
+        if ($user->role == 'ho') {
+            $product = Product::find($id);
+        } else {
+            $product = ProductDepo::leftJoin('products', 'product_id', '=', 'products.id')
+                    ->select('products_depo.id', 'products.name', 'products_depo.stock', 'products_depo.depo_price')
+                    ->find($id);
+        }
+        $depo = Depo::where('user_id', '=', $user->id)->first();
+            if ($depo->type == 'principle') {
+                $prices = array(
+                    rupiah($product->consument_price, TRUE),
+                    rupiah($product->retail_price, TRUE),
+                    rupiah($product->sub_whole_price, TRUE),
+                    rupiah($product->wholesales_price, TRUE));
+            } else {
+                $prices = array(
+                    rupiah($product->depo_price, TRUE));
+            }
+
+            $productData = array(
+                'product_id' => $product->id,
+                'product_name' => $product->name,
+                'stock_remaining' => $product->stock,
+                'price' => $prices
+            );
+
+        return response()->json($productData);
     }
 
     /**
@@ -93,107 +158,113 @@ class StockFlowController extends Controller
     {
         $user = Auth::user();
         $user_id = Auth::id();
-
-        $barang_items = $request['barang_item_id'];
-        $qty_items = $request['qty'];
-        $notes_item = $request['notes_item'];
-        $order_date = $request['date'];
-        $order_time = $request['time'];
         
-        $order = new Order;
-        if ($order_date != null && $order_time != null) {
-            $order->order_date = $order_date . " " . $order_time . ":00";
-        }
-        $order->kasir_id = $user_id;
-        $order->customer_id = (int) $request['customer_name'];
-        $order->notes = $request['notes'];
-        $order->total = 0;
+        $in_date = $request['date'];
+        $in_time = $request['time'];
+        $in_depo = $request['depo_name'];
+        $in_stock_type = $request['stock_type'];
+        $in_stock_category = $request['stock_category'];
 
-        $item_expense = 0;
-        foreach($barang_items as $index => $item) {
-            $barang = Product::where('barangs.barang_id', '=', (int) $item)->first(); 
+        $product_items = $request['product_item_id'];
+        $qty_items = $request['qty'];
+        $price_items = $request['price'];
 
-            if ($barang->stock < $qty_items[$index]) {
+        $total_amount = 0;
+        $stoks = array();
+        $updateProducts = array();
+        foreach($product_items as $index => $item) {
+            $product = Product::where('products.id', '=', (int) $item)->first(); 
+
+            if ($product->stock < $qty_items[$index]) {
                 return redirect()->route('stock.create')
-                ->with('failed_message', 'Stock '. $barang->name .' tidak cukup');
+                ->with('failed_message', 'Stock '. $product->name .' tidak cukup');
             }
 
-            $order->total += $barang->selling_price * (int) $qty_items[$index];
-            $item_expense += $barang->buying_price * (int) $qty_items[$index];
-        }
-
-        $discount_notes = $request['discount_notes'];
-        $discount_percentage = 0;
-        $discount_rp = 0;
-
-        if ($request['discountType'] == "rp") {
-            $discount_rp = $request['discount'];
-            $discount_percentage = round($request['discount'] / $order->total * 100 , 2);
-        } else {
-            $discount_rp = $request['discount'] / 100 * $order->total;
-            $discount_percentage = $request['discount'];
-        }
-
-        $order->total_with_discount = $order->total - $discount_rp;
-
-        $order->discount_notes = $discount_notes;
-        $order->discount_rp = $discount_rp;
-        $order->discount_percentage = $discount_percentage;
-        $order->discount_type = $request['discountType'];
-
-        if ($request['bayar'] < $order->total_with_discount) {
-            return redirect()->route('stock.create')
-                ->with('failed_message', 'Uang bayar tidak cukup.');
-        }
-
-        $order->bayar = $request['bayar'];
-        $order->kembalian = (float) $request['bayar'] - $order->total_with_discount;
-
-        if (!$order->save()) {
-            return redirect()->route('stock.create')
-                ->with('failed_message', 'Data order gagal disimpan.');
-        }
-
-        $income = new Income;
-        $income->order_id = $order->id;
-        $income->item_expense = $item_expense;
-        $income->total = $order->total_with_discount;
-        $income->income = $income->total - $income->item_expense;
-        if (!$income->save()) {
-            return redirect()->route('stock.create')
-                ->with('failed_message', 'Data income gagal disimpan.');
-        }
-
-        foreach($barang_items as $index => $item) {
-            $barang = Product::where('barangs.barang_id', '=', (int) $item)->first(); 
-
-            $order_item = new OrderItem;
-            $order_item->order_id = $order->id;
-            $order_item->barang_id = $barang->barang_id;
-            $order_item->qty = $qty_items[$index];
-            if ($notes_item[$index] == null) {
-                $notes_item[$index] = "-";
+            $stock = new StockFlow;
+            $stock->depo_id = (int) $in_depo;
+            $stock->product_id = (int) $item;
+            $stock->stock = (int) $product->stock + (int) $qty_items[$index];
+            if ($in_date != null && $in_time != null) {
+                $stock->input_date = $in_date . " " . $in_time . ":00";
             }
-            $order_item->notes = $notes_item[$index];
-            $order_item->sub_total = $barang->selling_price * (int) $qty_items[$index];
+            $stock->stock_type = $in_stock_type;
+            $stock->qty = (int) $qty_items[$index];
+            $stock->remaining_stock = (int) $product->stock;
+            $stock->price_type = 'retail';
+            $stock->price = $price_items[$index];
+            if ($in_stock_type == 'in') {
+                $stock->stockin_category = $in_stock_category;
+                $product->stock += (int) $qty_items[$index];
+            } else {
+                $stock->stockout_category = $in_stock_category;
+                $product->stock -= (int) $qty_items[$index];
+            }
 
-            if (!$order_item->save()) {
+            $total_amount += $stock->price * (int) $qty_items[$index];
+
+            if (!$stock->save()) {
                 return redirect()->route('stock.create')
-                    ->with('failed_message', 'Data order item gagal disimpan.');
+                    ->with('failed_message', 'Data stock flow gagal disimpan.');
             }
-
-            $barang->stock -= $order_item->qty;
-            if (!$barang->update()) {
-                return redirect()->route('stock.index')
-                    ->with('failed_message', 'Data stok barang gagal diupdate.');
+    
+            if (!$product->update()) {
+                return redirect()->route('stock.create')
+                    ->with('failed_message', 'Data stock flow gagal disimpan.');
             }
 
         }
 
-        if (!$this->printReceipt($order->id)) {
-            return redirect()->route('stock.index')
-                    ->with('success_message', 'Data berhasil disimpan. Gagal printing, printer tidak terkoneksi');
+
+        if ($in_stock_type == 'out') {
+            $cash = new CashFlow;
+            $cash->depo_id = $in_depo;
+            if ($stock_date != null && $stock_time != null) {
+                $cash->input_date = $in_date . " " . $in_time . ":00";
+            }
+            $cash->cash_type = 'revenue';
+            $cash->revenue_type_in = 'product_sales';
+            $cash->expense_type = 'transfer';
+            $cash->notes = 'Product Sales';
+            $cash->amount = $total_amount;
+            $cash->is_matched = 'true';
+            $cash->upload_file = '';
+
+            if (!$cash->save()) {
+                return redirect()->route('stock.create')
+                    ->with('failed_message', 'Data cash flow gagal disimpan.');
+            }
         }
+        
+        // foreach($product_items as $index => $item) {
+        //     $product = Product::where('products.product_id', '=', (int) $item)->first(); 
+
+        //     $stock_item = new stockItem;
+        //     $stock_item->stock_id = $stock->id;
+        //     $stock_item->product_id = $product->product_id;
+        //     $stock_item->qty = $qty_items[$index];
+        //     if ($notes_item[$index] == null) {
+        //         $notes_item[$index] = "-";
+        //     }
+        //     $stock_item->notes = $notes_item[$index];
+        //     $stock_item->sub_total = $product->selling_price * (int) $qty_items[$index];
+
+        //     if (!$stock_item->save()) {
+        //         return redirect()->route('stock.create')
+        //             ->with('failed_message', 'Data stock item gagal disimpan.');
+        //     }
+
+        //     $product->stock -= $stock_item->qty;
+        //     if (!$product->update()) {
+        //         return redirect()->route('stock.index')
+        //             ->with('failed_message', 'Data stok product gagal diupdate.');
+        //     }
+
+        // }
+
+        // if (!$this->printReceipt($stock->id)) {
+        //     return redirect()->route('stock.index')
+        //             ->with('success_message', 'Data berhasil disimpan. Gagal printing, printer tidak terkoneksi');
+        // }
 
         return redirect()->route('stock.index')
             ->with('success_message', 'Data berhasl disimpan.');
@@ -208,18 +279,18 @@ class StockFlowController extends Controller
      */
     public function show($id)
     {
-        $orders = Order::where("id", $id)->orderBy('id', 'desc')->get();
+        $stocks = stock::where("id", $id)->orderBy('id', 'desc')->get();
         $no = 0;
         $status = "";
         $data = array();
-        foreach ($orders as $order) {
+        foreach ($stocks as $stock) {
             $no++;
             $row = array();
             $row[] = 'Depo Malang';
-            $row[] = $order->order_date;
-            $row[] = $order->total;
-            $row[] = '<a href="#" onclick="editForm(' . $order->id . ')" class="btn btn-success btn-sm btn-block" data-toggle="modal"><i class="far fa-edit"></i> Edit</a>
-            <a href="#" onclick="detailsView(' . $order->id . ')" class="btn btn-warning btn-sm btn-block" data-toggle="modal"><i class="far fa-eye"></i> Details</a>';
+            $row[] = $stock->stock_date;
+            $row[] = $stock->total;
+            $row[] = '<a href="#" onclick="editForm(' . $stock->id . ')" class="btn btn-success btn-sm btn-block" data-toggle="modal"><i class="far fa-edit"></i> Edit</a>
+            <a href="#" onclick="detailsView(' . $stock->id . ')" class="btn btn-warning btn-sm btn-block" data-toggle="modal"><i class="far fa-eye"></i> Details</a>';
             
             array_push($data, $row);
         }
@@ -236,17 +307,17 @@ class StockFlowController extends Controller
      */
     public function edit($id)
     {
-        $barangs = Product::orderBy('barang_id', 'asc')->get();
-        $customers = Employee::orderBy('id', 'desc')->get();
+        $products = Product::orderBy('product_id', 'asc')->get();
+        $depos = Depo::orderBy('id', 'desc')->get();
 
-        $order = Order::with(['customer', 'kasir', 'order_items'])
+        $stock = stock::with(['customer', 'kasir', 'stock_items'])
                     ->orderBy('id', 'asc')->where('id', '=', $id)->first();
         
-        // return response()->json($order);
+        // return response()->json($stock);
         return view('pages.stock.edit', [
-            "order" => $order,
-            "barangs_item" => $barangs,
-            "customers"  => $customers,   
+            "stock" => $stock,
+            "products_item" => $products,
+            "depos"  => $depos,   
         ]);
     }
 
@@ -262,34 +333,34 @@ class StockFlowController extends Controller
         $user = Auth::user();
         $user_id = Auth::id();
 
-        $barang_items = $request['barang_item_id'];
+        $product_items = $request['product_item_id'];
         $qty_items = $request['qty'];
         $notes_item = $request['notes_item'];
 
-        $order_date = $request['date'];
-        $order_time = $request['time'];
+        $stock_date = $request['date'];
+        $stock_time = $request['time'];
         
         
-        $order = Order::with(['customer', 'kasir', 'order_items'])->find($id);
-        if ($order_date != null && $order_time != null) {
-            $order->order_date = $order_date . " " . $order_time . ":00";
+        $stock = stock::with(['customer', 'kasir', 'stock_items'])->find($id);
+        if ($stock_date != null && $stock_time != null) {
+            $stock->stock_date = $stock_date . " " . $stock_time . ":00";
         }
-        $order->kasir_id = $user_id;
-        $order->customer_id = (int) $request['customer_name'];
-        $order->notes = $request['notes'];
-        $order->total = 0;
+        $stock->kasir_id = $user_id;
+        $stock->customer_id = (int) $request['customer_name'];
+        $stock->notes = $request['notes'];
+        $stock->total = 0;
 
         $item_expense = 0;
-        foreach($barang_items as $index => $item) {
-            $barang = Product::where('barangs.barang_id', '=', (int) $item)->first(); 
+        foreach($product_items as $index => $item) {
+            $product = Product::where('products.product_id', '=', (int) $item)->first(); 
 
-            if ($barang->stock < $qty_items[$index]) {
+            if ($product->stock < $qty_items[$index]) {
                 return redirect()->route('stock.create')
-                ->with('failed_message', 'Stock '. $barang->name .' tidak cukup');
+                ->with('failed_message', 'Stock '. $product->name .' tidak cukup');
             }
 
-            $order->total += $barang->selling_price * (int) $qty_items[$index];
-            $item_expense += $barang->buying_price * (int) $qty_items[$index];
+            $stock->total += $product->selling_price * (int) $qty_items[$index];
+            $item_expense += $product->buying_price * (int) $qty_items[$index];
         }
 
         $discount_notes = $request['discount_notes'];
@@ -298,76 +369,76 @@ class StockFlowController extends Controller
 
         if ($request['discountType'] == "rp") {
             $discount_rp = $request['discount'];
-            $discount_percentage = round($request['discount'] / $order->total * 100 , 2);
+            $discount_percentage = round($request['discount'] / $stock->total * 100 , 2);
         } else {
-            $discount_rp = $request['discount'] / 100 * $order->total;
+            $discount_rp = $request['discount'] / 100 * $stock->total;
             $discount_percentage = $request['discount'];
         }
 
-        $order->total_with_discount = $order->total - $discount_rp;
+        $stock->total_with_discount = $stock->total - $discount_rp;
 
-        $order->discount_notes = $discount_notes;
-        $order->discount_rp = $discount_rp;
-        $order->discount_percentage = $discount_percentage;
-        $order->discount_type = $request['discountType'];
+        $stock->discount_notes = $discount_notes;
+        $stock->discount_rp = $discount_rp;
+        $stock->discount_percentage = $discount_percentage;
+        $stock->discount_type = $request['discountType'];
 
-        if ($request['bayar'] < $order->total_with_discount) {
+        if ($request['bayar'] < $stock->total_with_discount) {
             return redirect()->route('stock.create')
                 ->with('failed_message', 'Uang bayar tidak cukup.');
         }
 
-        $order->bayar = $request['bayar'];
-        $order->kembalian = (float) $request['bayar'] - $order->total_with_discount;
+        $stock->bayar = $request['bayar'];
+        $stock->kembalian = (float) $request['bayar'] - $stock->total_with_discount;
 
-        if (!$order->update()) {
+        if (!$stock->update()) {
             return redirect()->route('stock.index')
-                ->with('failed_message', 'Data order gagal diedit.');
+                ->with('failed_message', 'Data stock gagal diedit.');
         }
 
-        $income = Income::where("order_id", $order->id)->first();
+        $income = Income::where("stock_id", $stock->id)->first();
         $income->item_expense = $item_expense;
-        $income->total = $order->total_with_discount;
+        $income->total = $stock->total_with_discount;
         $income->income = $income->total - $income->item_expense;
         if (!$income->update()) {
             return redirect()->route('stock.create')
                 ->with('failed_message', 'Data income gagal diedit.');
         }
 
-        foreach($order->order_items as $index => $item) {
-            $items_delete = OrderItem::find($item->id)->delete();
+        foreach($stock->stock_items as $index => $item) {
+            $items_delete = stockItem::find($item->id)->delete();
             if(!$items_delete){
                 return redirect()->route('stock.index')
-                    ->with('failed_message', 'Data order times gagal diedit.');
+                    ->with('failed_message', 'Data stock times gagal diedit.');
             }
         }
 
-        foreach($barang_items as $index => $item) {
-            $barang = Product::where('barangs.barang_id', '=', (int) $item)->first(); 
+        foreach($product_items as $index => $item) {
+            $product = Product::where('products.product_id', '=', (int) $item)->first(); 
 
-            $order_item = new OrderItem;
-            $order_item->order_id = $order->id;
-            $order_item->barang_id = $barang->barang_id;
-            $order_item->qty = $qty_items[$index];
+            $stock_item = new stockItem;
+            $stock_item->stock_id = $stock->id;
+            $stock_item->product_id = $product->product_id;
+            $stock_item->qty = $qty_items[$index];
             if ($notes_item[$index] == null) {
                 $notes_item[$index] = "-";
             }
-            $order_item->notes = $notes_item[$index];
-            $order_item->sub_total = $barang->selling_price * (int) $qty_items[$index];
+            $stock_item->notes = $notes_item[$index];
+            $stock_item->sub_total = $product->selling_price * (int) $qty_items[$index];
 
-            if (!$order_item->save()) {
+            if (!$stock_item->save()) {
                 return redirect()->route('stock.index')
-                    ->with('failed_message', 'Data order item gagal diedit.');
+                    ->with('failed_message', 'Data stock item gagal diedit.');
             }
 
-            if (!$barang->update()) {
+            if (!$product->update()) {
                 return redirect()->route('stock.index')
-                    ->with('failed_message', 'Data stok barang gagal diupdate.');
+                    ->with('failed_message', 'Data stok product gagal diupdate.');
             }
         }
 
 
         return redirect()->route('stock.index')
-            ->with('success_message', 'Data order berhasil diedit.');
+            ->with('success_message', 'Data stock berhasil diedit.');
     }
 
     /**
@@ -381,13 +452,13 @@ class StockFlowController extends Controller
         //
     }
 
-    public function printReceiptHandler($order_id) {
-        // dd($this->printReceipt2($order_id));
-        if($this->printReceipt($order_id) == true){
+    public function printReceiptHandler($stock_id) {
+        // dd($this->printReceipt2($stock_id));
+        if($this->printReceipt($stock_id) == true){
             return redirect()->route('stock.index')
                     ->with('success_message', 'Data berhasil di cetak.');
         } else { 
-            if($this->printReceipt2($order_id) == true){
+            if($this->printReceipt2($stock_id) == true){
                 return redirect()->route('stock.index')
                         ->with('success_message', 'Data berhasil di cetak.');
             } else { 
@@ -397,12 +468,12 @@ class StockFlowController extends Controller
         }
     }
 
-    public function printReceipt($order_id) {
+    public function printReceipt($stock_id) {
         try {
             // Enter the share name for your USB printer here
             $connector3 = new WindowsPrintConnector("POS-80C");
             $printer3 = new Printer($connector3);
-            $this->printStruct($printer3, $order_id);
+            $this->printStruct($printer3, $stock_id);
 
             return true;
         } catch(Exception $e) {
@@ -410,11 +481,11 @@ class StockFlowController extends Controller
             return false;
         }
     }
-    public function printReceipt2($order_id) {
+    public function printReceipt2($stock_id) {
         try {
             $connector2 = new WindowsPrintConnector("POS-80C-USB1");
             $printer2 = new Printer($connector2);
-            $this->printStruct($printer2, $order_id);
+            $this->printStruct($printer2, $stock_id);
 
             return true;
         } catch(Exception $e) {
@@ -423,7 +494,7 @@ class StockFlowController extends Controller
         }
     }
 
-    public function printStruct($printer, $order_id) {
+    public function printStruct($printer, $stock_id) {
         $settings =  Settings::first(); 
 
         if ($settings == null ){
@@ -435,25 +506,25 @@ class StockFlowController extends Controller
             $settings->invoice_prefix = "TRXKSR000";
         }
 
-        $order =  Order::with(['customer', 'kasir', 'order_items', 'order_items.barang'])
-                ->where('orders.id', $order_id)
+        $stock =  stock::with(['customer', 'kasir', 'stock_items', 'stock_items.product'])
+                ->where('stocks.id', $stock_id)
                 ->first(); 
                 
         $items = array();
         $notes = array();
 
-        foreach($order->order_items as $it) {
-            array_push($items, new item($it->barang->name .  " | " . $it->qty ." x ". rupiah($it->barang->selling_price, FALSE), rupiah($it->sub_total, FALSE)));
+        foreach($stock->stock_items as $it) {
+            array_push($items, new item($it->product->name .  " | " . $it->qty ." x ". rupiah($it->product->selling_price, FALSE), rupiah($it->sub_total, FALSE)));
             if($it->notes != "" && $it->notes != "-") {
                 array_push($notes, new item($it->notes, ""));
             }
         }
         
     
-        $total = new item('GRAND TOTAL ', rupiah($order->total_with_discount, false), false);
+        $total = new item('GRAND TOTAL ', rupiah($stock->total_with_discount, false), false);
         /* Date is kept the same for testing */
         // $date = date('l jS \of F Y h:i:s A');
-        $date = $order->order_date;
+        $date = $stock->stock_date;
         
         /* Start the printer */
         // $logo = EscposImage::load("images/no-logo-available.png", false);
@@ -474,18 +545,18 @@ class StockFlowController extends Controller
         
         /* Title of receipt */
         $printer -> setEmphasis(true);
-        $printer -> text("INVOICE : ". $settings->invoice_prefix . $order->id ."\n");
+        $printer -> text("INVOICE : ". $settings->invoice_prefix . $stock->id ."\n");
         $printer -> setEmphasis(true);
         $printer -> feed();
         
         /* Items */
         $printer -> setJustification(Printer::JUSTIFY_LEFT);
-        $printer -> text(new item('PEMBELI : '. $order->customer->customer_name, ''));
+        $printer -> text(new item('PEMBELI : '. $stock->customer->customer_name, ''));
         $printer -> setEmphasis(true);
-        $printer -> text(new item('KASIR : '. $order->kasir->name, ''));
+        $printer -> text(new item('KASIR : '. $stock->kasir->name, ''));
         $printer -> setEmphasis(false);
-        if ($order->notes != "" && $order->notes != null && $order->notes != "-"){
-            $printer -> text(new item('CATATAN : '. $order->notes, ''));
+        if ($stock->notes != "" && $stock->notes != null && $stock->notes != "-"){
+            $printer -> text(new item('CATATAN : '. $stock->notes, ''));
         }
 
         $printer -> text(new item('------------------------------------------------', ''));
@@ -502,11 +573,11 @@ class StockFlowController extends Controller
         $printer -> feed();
 
         $printer -> setEmphasis(true);
-        $printer -> text(new item('TOTAL ', rupiah($order->total, false)));
+        $printer -> text(new item('TOTAL ', rupiah($stock->total, false)));
         $printer -> setEmphasis(false);
-        $printer -> text(new item('Diskon (%)  ', (string) $order->discount_percentage . "%" ));
+        $printer -> text(new item('Diskon (%)  ', (string) $stock->discount_percentage . "%" ));
         $printer -> setEmphasis(false);
-        $printer -> text(new item('Diskon (RP) ', rupiah($order->discount_rp, false)));
+        $printer -> text(new item('Diskon (RP) ', rupiah($stock->discount_rp, false)));
 
         
         /* Tax and total */
@@ -515,9 +586,9 @@ class StockFlowController extends Controller
 
         $printer -> text(new item('------------------------------------------------', ''));
         $printer -> setEmphasis(false);
-        $printer -> text(new item('BAYAR', rupiah($order->bayar, false) ));
+        $printer -> text(new item('BAYAR', rupiah($stock->bayar, false) ));
         $printer -> setEmphasis(false);
-        $printer -> text(new item('KEMBALIAN ', rupiah($order->kembalian, false)));
+        $printer -> text(new item('KEMBALIAN ', rupiah($stock->kembalian, false)));
 
 
         $printer -> selectPrintMode();
