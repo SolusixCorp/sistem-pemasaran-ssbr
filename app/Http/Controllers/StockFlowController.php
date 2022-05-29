@@ -8,6 +8,7 @@ use App\Models\ProductDepo;
 use App\Models\Depo;
 use App\Models\Stock;
 use App\Models\StockFlow;
+use App\Models\CashFlow;
 use App\Models\Settings;
 use App\Models\Income;
 use Illuminate\Support\Facades\Auth;
@@ -17,6 +18,7 @@ use Mike42\Escpos\EscposImage;
 use Mike42\Escpos\PrintConnectors\FilePrintConnector;
 use App\Models\Item;    
 use Exception;
+use DB;
 
 use Illuminate\Http\Request;
 
@@ -33,11 +35,16 @@ class StockFlowController extends Controller
     }
 
     public function getAllData() {
-        $stocks =  Stock::leftJoin('customer', 'customer.id', '=', 'stocks.customer_id')
-                    ->leftJoin('users', 'users.id', '=', 'stocks.kasir_id')
-                    ->select(['stocks.id as stock_id', 'stocks.stock_date', 'customer.customer_name', 'stocks.total_with_discount'])
-                    ->orderBy('stocks.stock_date', 'desc')
-                    ->get(); 
+        $user = Auth::user();
+
+        $stocks =  StockFlow::leftJoin('depos', 'depo_id', '=', 'depos.id')
+                ->leftJoin('users', 'depos.user_id', '=', 'users.id')
+                ->select('stock_flow.id as stock_id', 'stock_flow.input_date', 'name', 'stock_type', 'stockin_category', 'stockout_category', DB::raw('sum(qty) as qty'))
+                ->groupBy('input_date')
+                ->where('depos.user_id', '=', $user->id)
+                ->orderBy('stock_flow.input_date', 'desc')
+                ->get(); 
+       
         $no = 0;
         $status = "";
         $data = array();
@@ -45,13 +52,17 @@ class StockFlowController extends Controller
             $no++;
             $row = array();
             $row[] = $no;
-            $row[] = $stock->stock_date;
-            $row[] = 'Depo Malang';
-            $row[] = 'IN';
-            $row[] = 'Dropping';
-            $row[] = '<a href="'. url("/") .'/stock/edit/' . $stock->stock_id . '" onclick="editForm(' . $stock->stock_id . ')" class="btn btn-warning btn-sm"><i class="far fa-edit"></i></a>
-            <a href="#" onclick="detailsView(' . $stock->stock_id . ')" class="btn btn-primary btn-sm" data-toggle="modal"  data-target="#modal-details"><i class="far fa-eye"></i></a>
-            <a href="'. url("/") .'/stock/print-invoice/' . $stock->stock_id . '" onclick="editForm(' . $stock->stock_id . ')" class="btn btn-dark btn-sm"><i class="far fa-file"></i></a>';
+            $row[] = $stock->input_date;
+            $row[] = $stock->name;
+            $row[] = strtoupper($stock->stock_type);
+            if ($stock->stockin_category != '') {
+                $row[] = ucfirst($stock->stockin_category);
+            } else {
+                $row[] = ucfirst($stock->stockout_category);
+            }
+            $row[] = $stock->qty;
+            $row[] = '<a href="'. url("/") .'/stock/edit/' . $stock->input_date . '" onclick="editForm(' . $stock->stock_id . ')" class="btn btn-warning btn-sm"><i class="far fa-edit"></i></a>
+            <a href="#" onclick="detailsView(' . dateToNumber($stock->input_date) . ')" class="btn btn-primary btn-sm" data-toggle="modal"><i class="far fa-eye"></i></a>';
             
             array_push($data, $row);
         }
@@ -61,11 +72,51 @@ class StockFlowController extends Controller
     }
 
     public function getById($id) {
-        $stock =  stock::with(['customer', 'kasir', 'stock_items', 'stock_items.product'])
-                    ->where('stocks.id', $id)
-                    ->first(); 
+        $stockData =  StockFlow::with('depo', 'products')->find($id);
+
+        $stock = array(
+            'stock_id' => $stockData->id,
+            'input_date' => $stockData->input_date,
+            'depo' => $stockData->depo->user->name,
+            'type' => $stockData->stock_type,
+            'products' => $stockData->products,
+        );
         return response()->json($stock);
     }
+
+    public function getByDate($date) {
+        $stockDatas =  StockFlow::with('depo', 'product')
+                    ->where('input_date', '=', numberToDate($date))
+                    ->get();
+
+        $products = array();
+        foreach($stockDatas as $stockData) { 
+            $products[] = array(
+                'product_name' => $stockData->product->name,
+                'qty' => $stockData->qty,
+                'remaining_stock' => $stockData->remaining_stock
+            ); 
+        }
+
+        $desc = "";
+        if ($stockDatas[0]->stockin_category != '') {
+            $desc = $stockDatas[0]->stockin_category;
+        } else {
+            $desc = $stockDatas[0]->stockout_category;
+        }
+
+        $stock = array(
+            'input_date' => $stockDatas[0]->input_date,
+            'depo' => $stockDatas[0]->depo->user->name,
+            'type' => strtoupper($stockDatas[0]->stock_type),
+            'desc' => ucfirst($desc),
+            'products' => $products,
+        );
+        
+        return response()->json($stock);
+    }
+    
+    
     
     /**
      * Show the form for creating a new resource.
@@ -78,26 +129,30 @@ class StockFlowController extends Controller
 
         if ($user->role == 'ho') {
             $products = Product::orderBy('name', 'asc')->get();
+            $depos = Depo::leftJoin('users', 'user_id', '=', 'users.id')->get();
         } else {
             $products = ProductDepo::leftJoin('products', 'product_id', '=', 'products.id')
                     ->select('products_depo.id', 'products.name', 'products_depo.stock', 'products_depo.depo_price')
                     ->orderBy('name', 'asc')
                     ->get();
+
+            $depos = Depo::leftJoin('users', 'user_id', '=', 'users.id')
+                    ->where('user_id', '=', $user->id)
+                    ->get();
         }
-        $depos = Depo::leftJoin('users', 'user_id', '=', 'users.id')->get();
 
         $productDatas = array();
         foreach ($products as $product) {
             $depo = Depo::where('user_id', '=', $user->id)->first();
             if ($depo->type == 'principle') {
                 $prices = array(
-                    rupiah($product->consument_price, TRUE),
-                    rupiah($product->retail_price, TRUE),
-                    rupiah($product->sub_whole_price, TRUE),
-                    rupiah($product->wholesales_price, TRUE));
+                    rupiah($product->consument_price, TRUE) . ' (Consument)',
+                    rupiah($product->retail_price, TRUE) . ' (Retail)',
+                    rupiah($product->sub_whole_price, TRUE) . ' (Sub Whole)',
+                    rupiah($product->wholesales_price, TRUE). ' (Whole)');
             } else {
                 $prices = array(
-                    rupiah($product->depo_price, TRUE));
+                    rupiah($product->depo_price, TRUE) . ' (Depo)');
             }
 
             $productData = array(
@@ -129,13 +184,13 @@ class StockFlowController extends Controller
         $depo = Depo::where('user_id', '=', $user->id)->first();
             if ($depo->type == 'principle') {
                 $prices = array(
-                    rupiah($product->consument_price, TRUE),
-                    rupiah($product->retail_price, TRUE),
-                    rupiah($product->sub_whole_price, TRUE),
-                    rupiah($product->wholesales_price, TRUE));
+                    rupiah($product->consument_price, TRUE) . ' (Consument)',
+                    rupiah($product->retail_price, TRUE) . ' (Retail)',
+                    rupiah($product->sub_whole_price, TRUE) . ' (Sub Whole)',
+                    rupiah($product->wholesales_price, TRUE) . ' (Whole)');
             } else {
                 $prices = array(
-                    rupiah($product->depo_price, TRUE));
+                    rupiah($product->depo_price, TRUE) . ' (Depo)');
             }
 
             $productData = array(
@@ -173,11 +228,15 @@ class StockFlowController extends Controller
         $stoks = array();
         $updateProducts = array();
         foreach($product_items as $index => $item) {
-            $product = Product::where('products.id', '=', (int) $item)->first(); 
-
-            if ($product->stock < $qty_items[$index]) {
-                return redirect()->route('stock.create')
-                ->with('failed_message', 'Stock '. $product->name .' tidak cukup');
+            $user = Auth::user();
+            if ($user->role == 'ho') {
+                $product = Product::where('products.id', '=', (int) $item)->first(); 
+            } else {
+                $productHO = Product::where('products.id', '=', (int) $item)->first(); 
+                $product = ProductDepo::leftJoin('products', 'product_id', '=', 'products.id')
+                        ->select('products_depo.id', 'products.name', 'products_depo.stock', 'products_depo.depo_price')
+                        ->where('products.id', '=', (int) $item)
+                        ->first(); 
             }
 
             $stock = new StockFlow;
@@ -190,17 +249,43 @@ class StockFlowController extends Controller
             $stock->stock_type = $in_stock_type;
             $stock->qty = (int) $qty_items[$index];
             $stock->remaining_stock = (int) $product->stock;
-            $stock->price_type = 'retail';
-            $stock->price = $price_items[$index];
+    
+            $position = strpos($price_items[$index], ' (');
+            $price = substr($price_items[$index], 0 , $position);
+            $stock->price_type = priceType($price_items[$index]);
+
+            $stock->price = (float) rupiahNumber($price_items[$index]);
             if ($in_stock_type == 'in') {
+                if ($user->role == 'depo') {
+                    if ($productHO->stock < $qty_items[$index]) {
+                        return redirect()->route('stock.create')
+                        ->with('failed_message', 'Stock '. $product->name .' tidak cukup');
+                    }
+
+                    $productHO->stock -= (int) $qty_items[$index]; 
+
+                    if (!$productHO->update()) {
+                        return redirect()->route('stock.create')
+                            ->with('failed_message', 'Data prouct HO flow gagal disimpan.');
+                    }
+                }
+
                 $stock->stockin_category = $in_stock_category;
+                $stock->stockout_category = '';
                 $product->stock += (int) $qty_items[$index];
             } else {
+                if ($product->stock < $qty_items[$index]) {
+                    return redirect()->route('stock.create')
+                    ->with('failed_message', 'Stock '. $product->name .' tidak cukup');
+                }
+                
                 $stock->stockout_category = $in_stock_category;
+                $stock->stockin_category = '';
                 $product->stock -= (int) $qty_items[$index];
             }
 
-            $total_amount += $stock->price * (int) $qty_items[$index];
+            
+            $total_amount += (float) rupiahNumber($price_items[$index]) * (int) $qty_items[$index];
 
             if (!$stock->save()) {
                 return redirect()->route('stock.create')
@@ -218,7 +303,7 @@ class StockFlowController extends Controller
         if ($in_stock_type == 'out') {
             $cash = new CashFlow;
             $cash->depo_id = $in_depo;
-            if ($stock_date != null && $stock_time != null) {
+            if ($in_date != null && $in_time != null) {
                 $cash->input_date = $in_date . " " . $in_time . ":00";
             }
             $cash->cash_type = 'revenue';
@@ -234,37 +319,6 @@ class StockFlowController extends Controller
                     ->with('failed_message', 'Data cash flow gagal disimpan.');
             }
         }
-        
-        // foreach($product_items as $index => $item) {
-        //     $product = Product::where('products.product_id', '=', (int) $item)->first(); 
-
-        //     $stock_item = new stockItem;
-        //     $stock_item->stock_id = $stock->id;
-        //     $stock_item->product_id = $product->product_id;
-        //     $stock_item->qty = $qty_items[$index];
-        //     if ($notes_item[$index] == null) {
-        //         $notes_item[$index] = "-";
-        //     }
-        //     $stock_item->notes = $notes_item[$index];
-        //     $stock_item->sub_total = $product->selling_price * (int) $qty_items[$index];
-
-        //     if (!$stock_item->save()) {
-        //         return redirect()->route('stock.create')
-        //             ->with('failed_message', 'Data stock item gagal disimpan.');
-        //     }
-
-        //     $product->stock -= $stock_item->qty;
-        //     if (!$product->update()) {
-        //         return redirect()->route('stock.index')
-        //             ->with('failed_message', 'Data stok product gagal diupdate.');
-        //     }
-
-        // }
-
-        // if (!$this->printReceipt($stock->id)) {
-        //     return redirect()->route('stock.index')
-        //             ->with('success_message', 'Data berhasil disimpan. Gagal printing, printer tidak terkoneksi');
-        // }
 
         return redirect()->route('stock.index')
             ->with('success_message', 'Data berhasl disimpan.');
@@ -290,7 +344,7 @@ class StockFlowController extends Controller
             $row[] = $stock->stock_date;
             $row[] = $stock->total;
             $row[] = '<a href="#" onclick="editForm(' . $stock->id . ')" class="btn btn-success btn-sm btn-block" data-toggle="modal"><i class="far fa-edit"></i> Edit</a>
-            <a href="#" onclick="detailsView(' . $stock->id . ')" class="btn btn-warning btn-sm btn-block" data-toggle="modal"><i class="far fa-eye"></i> Details</a>';
+            <a href="#" onclick="detailsView(' . $stock->id . ')" class="btn btn-warning btn-sm btn-block" data-toggle="modal" ><i class="far fa-eye"></i> Details</a>';
             
             array_push($data, $row);
         }
@@ -307,11 +361,49 @@ class StockFlowController extends Controller
      */
     public function edit($id)
     {
-        $products = Product::orderBy('product_id', 'asc')->get();
-        $depos = Depo::orderBy('id', 'desc')->get();
+        $user = Auth::user();
 
-        $stock = stock::with(['customer', 'kasir', 'stock_items'])
-                    ->orderBy('id', 'asc')->where('id', '=', $id)->first();
+        if ($user->role == 'ho') {
+            $products = Product::orderBy('name', 'asc')->get();
+            $depos = Depo::leftJoin('users', 'user_id', '=', 'users.id')->get();
+        } else {
+            $products = ProductDepo::leftJoin('products', 'product_id', '=', 'products.id')
+                    ->select('products_depo.id', 'products.name', 'products_depo.stock', 'products_depo.depo_price')
+                    ->orderBy('name', 'asc')
+                    ->get();
+
+            $depos = Depo::leftJoin('users', 'user_id', '=', 'users.id')
+                    ->where('user_id', '=', $user->id)
+                    ->get();
+        }
+
+        $productDatas = array();
+        foreach ($products as $product) {
+            $depo = Depo::where('user_id', '=', $user->id)->first();
+            if ($depo->type == 'principle') {
+                $prices = array(
+                    rupiah($product->consument_price, TRUE) . ' (Consument)',
+                    rupiah($product->retail_price, TRUE) . ' (Retail)',
+                    rupiah($product->sub_whole_price, TRUE) . ' (Sub Whole)',
+                    rupiah($product->wholesales_price, TRUE). ' (Whole)');
+            } else {
+                $prices = array(
+                    rupiah($product->depo_price, TRUE) . ' (Depo)');
+            }
+
+            $productData = array(
+                'product_id' => $product->id,
+                'product_name' => $product->name,
+                'stock_remaining' => $product->stock,
+                'price' => $prices
+            );
+
+            $productDatas[] = $productData;
+        }
+
+        $stock = StockFlow::with(['depo', 'product'])
+                    ->where('input_date', '=', $id)
+                    ->first();
         
         // return response()->json($stock);
         return view('pages.stock.edit', [

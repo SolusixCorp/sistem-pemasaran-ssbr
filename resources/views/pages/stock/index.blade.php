@@ -44,8 +44,9 @@
                                     <th>Tanggal Transaksi</th>
                                     <th>Nama Depo</th>
                                     <th>Tipe Stok</th>
-                                    <th>Keterangan</th>
-                                    <th style="width:15%">Aksi</th>
+                                    <th>Kategori</th>
+                                    <th>Qty</th>
+                                    <th style="width:10%">Aksi</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -82,33 +83,29 @@
         
         });
 
-        // View Details Barang
-        function detailsView(id) {
+        // View Details
+        function detailsView(date) {
             $.ajax({
-                url: "{{ url('/') }}" + "/stock/" + id,
+                url: "{{ url('/') }}" + "/stock/date/" + date,
                 type: "GET",
                 dataType: "JSON",
                 success: function(data) {
-                    console.log(data)
-                    $('#modal-details-barang').modal('show');
+                    console.log(date)
+                    $('#modal-details').modal('show');
                     $('.modal-title').text('Detail Transaksi');
-                    // $('#vKodeTransaksi').text("#TRXAPP000" + data.id);
-                    // $('#vTanggalTransaksi').text(data.order_date);
-                    // $('#vNamaPembeli').text(data.customer.customer_name);
-                    // $('#vTotal').text(convertToRupiah(data.total));
-                    // $('#vDiscountPercentage').text(data.discount_percentage);
-                    // $('#vDiscountRp').text(convertToRupiah(data.discount_rp));
-                    // $('#vTotalWithDiscount').text(convertToRupiah(data.total_with_discount));
-                    // $('#vBayar').text(convertToRupiah(data.bayar));
-                    // $('#vKembalian').text(convertToRupiah(data.kembalian));
-                    // $('#vCatatan').text(data.notes);
+                    $('#vTanggalTransaksi').text(data.input_date);
+                    $('#vDepoNama').text(data.depo);
+                    $('#vStockType').text(data.type);
+                    $('#vDesc').text(data.desc);
 
-                    for(var i = 0; i < data.order_items.length; i++) {
-                        $('#data-detail-modal').append('<div class="message-item"><h6 id="vItems" class="message-item-user message-item-date" style="position:initial !important">' + data.order_items[i].barang.name  + ' => ' + data.order_items[i].qty + ' '  + ' x ' + data.order_items[i].barang.selling_price + ' = ' + data.order_items[i].sub_total + '</h6></div>');  
+                    $('#details_product').empty();
+                    for(var i = 0; i < data.products.length; i++) {
+                        var no = i+1;
+                        $('#details_product').append('<tr><th scope="row"> ' + no + ' </th><td>' + data.products[i].product_name + '</td><td>' + data.products[i].qty + '</td><td>' + data.products[i].remaining_stock + '</td></tr>');  
                     }
                     
-                    var base_url = "{{ url('/') }}";
-                    $('#data-detail-modal').append('<a href="'+ base_url +'/stock/print-invoice/' + data.id + '" class="btn btn-primary pull-right">Cetak Invoice</a>');
+                    // var base_url = "{{ url('/') }}";
+                    // $('#data-detail-modal').append('<a href="'+ base_url +'/stock/print-invoice/' + data.id + '" class="btn btn-primary pull-right">Cetak Invoice</a>');
                     
                 },
                 error: function() {

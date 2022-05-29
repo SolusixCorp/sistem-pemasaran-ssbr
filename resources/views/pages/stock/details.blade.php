@@ -18,70 +18,42 @@
 
                     <div class="message-item">
                         <h6 class="message-item-user">Tanggal Transaksi</h6>
-                        <h6 id="vTanggalTransaksi" class="message-item-date">2022-04-14 12:12:12</h6>
+                        <h6 id="vTanggalTransaksi" class="message-item-date"></h6>
                     </div>
 
                     <div class="message-item">
                         <h6 class="message-item-user">Nama Depo</h6>
-                        <h6 id="vNamaPembeli" class="message-item-date">Depo Malang</h6>
-                    </div>
-
-                    <div class="message-item">
-                        <h6 class="message-item-user">Produk</h6>
-                        <h6 id="vNamaPembeli" class="message-item-date">Gudang Garam Surya</h6>
+                        <h6 id="vDepoNama" class="message-item-date"></h6>
                     </div>
 
                     <div class="message-item">
                         <h6 class="message-item-user">Tipe Stok</h6>
-                        <h6 id="vNamaPembeli" class="message-item-date">IN</h6>
+                        <h6 id="vStockType" class="message-item-date">IN</h6>
                     </div>
 
                     <div class="message-item">
-                        <h6 class="message-item-user">Keterangan</h6>
-                        <h6 id="vNamaPembeli" class="message-item-date">Dropping</h6>
-                    </div>
-
-                    <div class="message-item">
-                        <h6 class="message-item-user">Tipe Harga</h6>
-                        <h6 id="vNamaPembeli" class="message-item-date">Depo</h6>
-                    </div>
-
-                    <div class="message-item">
-                        <h6 class="message-item-user">Harga</h6>
-                        <h6 id="vTotal" class="message-item-date">Rp. 14.000,-</h6>
+                        <h6 class="message-item-user">Kategori</h6>
+                        <h6 id="vDesc" class="message-item-date"></h6>
                     </div>
 
                     <div class="message-item">
                         <h6 class="message-item-user">Dikirim ?</h6>
-                        <h6 id="vDiscountPercentage" class="message-item-date">Ya</h6>
+                        <h6 id="vDelivered" class="message-item-date">Ya</h6>
                     </div>
 
+                    <table class="table table-responsive-xl table-bordered">
+                        <thead>
+                            <tr>
+                                <th scope="col" width="5%">#</th>
+                                <th scope="col" width="50%">Produk</th>
+                                <th scope="col" width="5%">Qty</th>
+                                <th scope="col" width="5%">Remaining Stock</th>
+                            </tr>
+                        </thead>
+                        <tbody id="details_product">
                            
-
-                        <table class="table table-responsive-xl table-bordered">
-                            <thead>
-                                <tr>
-                                    <th scope="col" width="5%">#</th>
-                                    <th scope="col" width="50%">Produk</th>
-                                    <th scope="col" width="5%">Qty</th>
-                                    <th scope="col" width="5%">Remaining Stock</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <th scope="row">1</th>
-                                    <td>Gudang Garam Surya</td>
-                                    <td>1</td>
-                                    <td>10</td>
-                                </tr>
-                                <tr>
-                                    <th scope="row">2</th>
-                                    <td>Mark</td>
-                                    <td>1</td>
-                                    <td>10</td>
-                                </tr>
-                            </tbody>
-                        </table>
+                        </tbody>
+                    </table>
 
                 </div>
             </div>

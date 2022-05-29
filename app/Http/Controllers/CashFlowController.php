@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Employee;
 use App\Models\Product;
 use Illuminate\Http\Request;
-use App\Models\Order;
+use App\Models\CashFlow;
 
 class CashFlowController extends Controller
 {
@@ -101,26 +101,26 @@ class CashFlowController extends Controller
     }
 
     public function getAllData() {
-        $orders =  Order::leftJoin('customer', 'customer.id', '=', 'orders.customer_id')
-                    ->leftJoin('users', 'users.id', '=', 'orders.kasir_id')
-                    ->select(['orders.id as order_id', 'orders.order_date', 'customer.customer_name', 'orders.total_with_discount'])
-                    ->orderBy('orders.order_date', 'desc')
+        $cashflows =  CashFlow::leftJoin('depos', 'depo_id', '=', 'depos.id')
+                    ->leftJoin('users', 'depos.user_id', '=', 'users.id')
+                    ->select('cash_flow.id', 'input_date', 'users.name', 'cash_type', 'notes', 'amount')
+                    ->orderBy('cash_flow.input_date', 'desc')
                     ->get(); 
         $no = 0;
         $status = "";
         $data = array();
-        foreach ($orders as $order) {
+        foreach ($cashflows as $cashflow) {
             $no++;
             $row = array();
             $row[] = $no;
-            $row[] = $order->order_date;
-            $row[] = 'Depo Malang';
-            $row[] = 'Pendapatan';
-            $row[] = 'Penjualan Produk';
-            $row[] = rupiah(100000000, true);
-            $row[] = '<a href="'. url("/") .'/cashflow/edit/' . $order->order_id . '" onclick="editForm(' . $order->order_id . ')" class="btn btn-warning btn-sm"><i class="far fa-edit"></i></a>
-            <a href="#" onclick="detailsView(' . $order->order_id . ')" class="btn btn-primary btn-sm" data-toggle="modal"  data-target="#modal-details"><i class="far fa-eye"></i></a>
-            <a href="'. url("/") .'/cashflow/print-invoice/' . $order->order_id . '" onclick="editForm(' . $order->order_id . ')" class="btn btn-dark btn-sm"><i class="far fa-file"></i></a>';
+            $row[] = $cashflow->input_date;
+            $row[] = $cashflow->name;
+            $row[] = strtoupper($cashflow->cash_type);
+            $row[] = $cashflow->notes;
+            $row[] = rupiah($cashflow->amount, TRUE);
+            $row[] = '<a href="'. url("/") .'/cashflow/edit/' . $cashflow->cashflow_id . '" onclick="editForm(' . $cashflow->cashflow_id . ')" class="btn btn-warning btn-sm"><i class="far fa-edit"></i></a>
+            <a href="#" onclick="detailsView(' . $cashflow->cashflow_id . ')" class="btn btn-primary btn-sm" data-toggle="modal"  data-target="#modal-details"><i class="far fa-eye"></i></a>
+            <a href="'. url("/") .'/cashflow/print-invoice/' . $cashflow->cashflow_id . '" onclick="editForm(' . $cashflow->cashflow_id . ')" class="btn btn-dark btn-sm"><i class="far fa-file"></i></a>';
             
             array_push($data, $row);
         }

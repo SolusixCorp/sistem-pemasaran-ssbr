@@ -35,7 +35,11 @@
         "files" : [
             "app/Helpers/tanggal.php",
             "app/Helpers/rupiah.php",
-            "app/Helpers/terbilang.php"
+            "app/Helpers/rupiahNumber.php",
+            "app/Helpers/terbilang.php",
+            "app/Helpers/numberToDate.php",
+            "app/Helpers/dateToNumber.php",
+            "app/Helpers/priceType.php"
         ]
         
     },

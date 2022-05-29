@@ -36,6 +36,7 @@
                         @csrf
                             <div class="modal-body">
                                 <div class="card-body">
+                                
                                     <div class="form-group" style="margin: 0;">
                                         <label for="trx_date">Tanggal Transaksi</label>       
                                     </div>
@@ -64,17 +65,17 @@
                                     <div class="form-group">
                                         <label for="stock_type">Tipe Stok</label>
                                         <select id="stock_type" name="stock_type" class="form-control js-example-basic-single">
-                                            <option value="in" >STOCK IN</option>
                                             <option value="out" >STOCK OUT</option>
+                                            @if (Auth::user()->role == 'ho')
+                                            <option value="in" >STOCK IN</option>
+                                            @endif
                                         </select>
                                     </div>
 
                                     <div class="form-group">
-                                        <label for="stock_category" id="stock_category_label">Kategori Stok (IN)</label>
+                                        <label for="stock_category" id="stock_category_label">Kategori Stok (OUT)</label>
                                         <select id="stock_category" name="stock_category" class="form-control js-example-basic-single">
-                                            <option value="dropping" >Dropping</option>
-                                            <option value="return" >Return</option>
-                                            <option value="stock" >Stock</option>
+                                            <option value="sales" >Sales</option>
                                             <option value="return" >Return</option>
                                         </select>
                                     </div>
@@ -97,7 +98,7 @@
                                                             </td>  
                                                             <td width="15%">
                                                                 <label for="item">Remaining Stok</label>
-                                                                <input type="text" name="remmaining_stock[]" id="remmaining_stock" placeholder="0" value="100" class="form-control" readonly>
+                                                                <input type="text" name="remmaining_stock[]" id="remmaining_stock" placeholder="0" value="{{ $products_item[0]['stock_remaining'] }}" class="form-control" readonly>
                                                             </td>  
                                                             <td width="10%">
                                                                 <label for="item">Qty</label>
@@ -106,8 +107,8 @@
                                                             <td>
                                                                 <label for="item">Harga</label>
                                                                 <select id="price" name="price[]" class="form-control price">
-                                                                    @foreach ($products_item as $b)
-                                                                        <option value="{{ $b['product_id'] }}" >{{ $b['product_name'] }}</option>
+                                                                    @foreach ($products_item['0']['price'] as $price)
+                                                                        <option value="{{ $price }}" >{{ $price }}</option>
                                                                     @endforeach
                                                                 </select>
                                                             </td>
@@ -184,7 +185,6 @@
                             for (let i = 0; i < data.price.length; i++) {
                                 priceOps.append('<option value="' + data.price[i] + '">'+ data.price[i] +'</option>');
                             }
-                            console.log(id)
                         }
                     })
                 }
@@ -245,12 +245,6 @@
 
                 console.log(element_val)
             });
-
-            
-
-            // $('input[name="qty"]').addEventListener('change', (e) => {  
-            //     console.log(e.target.value);  
-            // });
 
         });
 

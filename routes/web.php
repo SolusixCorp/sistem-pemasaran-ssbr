@@ -89,6 +89,7 @@ Route::middleware(['auth:sanctum', 'verified'])->group(function () {
     Route::get('stock/product/{id}', [StockFlowController::class, 'getProductById'])->name('stock.product.id');
     Route::get('stock/create', [StockFlowController::class, 'create'])->name('stock.create');
     Route::get('stock/{id}', [StockFlowController::class, 'getById'])->name('stock.byid');
+    Route::get('stock/date/{date}', [StockFlowController::class, 'getByDate'])->name('stock.bydate');
     Route::post('stock/create', [StockFlowController::class, 'store'])->name('stock.store');
     Route::get('stock/edit/{id}', [StockFlowController::class, 'edit'])->name('stock.edit');
     Route::post('stock/update/{id}', [StockFlowController::class, 'update'])->name('stock.update');

@@ -20,7 +20,7 @@ class CreateStockFlowTable extends Migration
             $table->integer('stock');
             $table->datetime('input_date');
             $table->enum('stock_type', ['in', 'out']);
-            $table->enum('stockin_category', ['droping', 'return']);
+            $table->enum('stockin_category', ['dropping', 'return']);
             $table->enum('stockout_category', ['sales', 'return']);
             $table->integer('qty');
             $table->enum('price_type', ['depo_price', 'consument', 'retail', 'sws', 'ws']);

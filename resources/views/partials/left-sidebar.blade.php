@@ -14,6 +14,7 @@
                     </a>
                 </li>
 
+                @if (Auth::user()->role == 'ho')
                 <li class="submenu">
                     <a id="tables">
                         <i class="fas fa-cube"></i>
@@ -41,14 +42,21 @@
                         </li>
                     </ul>
                 </li>
-            
                 <li class="submenu">
                     <a href="{{ url('/depo') }}">
                         <i class="fas fa-store"></i>
                         <span> Depo </span>
                     </a>
                 </li>
-
+                @else
+                <li class="submenu">
+                    <a href="{{ url('/data-product-depo') }}">
+                        <i class="fas fa-cube"></i>
+                        <span> Product </span>
+                    </a>
+                </li>
+                @endif
+            
                 <li class="submenu">
                     <a href="{{ url('/employee') }}">
                         <i class="fas fa-users"></i>

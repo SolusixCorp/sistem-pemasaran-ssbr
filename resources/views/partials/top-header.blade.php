@@ -14,7 +14,7 @@
         <ul class="list-inline float-right mb-0">
             <li class="list-inline-item dropdown notif">
                 <h6 class="text-white">
-                    Admin Head Office
+                    {{ Auth::user()->name }}
                 </h6>
             </li>
             
@@ -26,7 +26,7 @@
                     <!-- item-->
                     <div class="dropdown-item noti-title">
                         <h5 class="text-overflow">
-                            <small>Hello, Admin Head Office</small>
+                            <small>Hello, {{ Auth::user()->name }}</small>
                         </h5>
                     </div>
 

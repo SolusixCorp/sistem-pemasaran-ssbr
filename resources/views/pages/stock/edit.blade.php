@@ -5,7 +5,7 @@
 
 @section('content')
     <div class="row">
-        <div class="col-12" id="add-order">
+        <div class="col-12" id="add-stock">
             <div class="card mb-3">
                 <div class="card-header">
                     <h3><i class="fas fa-dolly-flatbed"></i> Edit Stock Flow</h3>
@@ -32,7 +32,7 @@
                         </div>
                     @endif
 
-                    <form method="POST" autocomplete="off" action="{{ route('stock.update', ['id' => $order->id]) }}" >
+                    <form method="POST" autocomplete="off" action="{{ route('stock.update', ['id' => $stock->id]) }}" >
                         @csrf
                             <div class="modal-body">
                                 <div class="card-body">
@@ -53,10 +53,13 @@
                                     </div>
                                     
                                     <div class="form-group">
-                                        <label for="customer_name">Nama Depo</label>
-                                        <select id="customer_name" name="customer_name" class="form-control js-example-basic-single">
-                                            @foreach ($customers as $customer)
-                                                <option value="{{ $customer->id }}" >{{ $customer->customer_name }}</option>
+                                        <label for="depo_name">Nama Depo</label>
+                                        <select id="depo_name" name="depo_name" class="form-control js-example-basic-single">
+                                            <option value="{{ $stock->depo->id }}" >{{ $stock->depo->user->name }}</option>
+                                            @foreach ($depos as $depo)
+                                                @if ($depo->id != $stock->depo->id)
+                                                    <option value="{{ $depo->id }}" >{{ $depo->name }}</option>
+                                                @endif
                                             @endforeach
                                         </select>
                                     </div>
@@ -64,32 +67,54 @@
                                     <div class="form-group">
                                         <label for="stock_type">Tipe Stok</label>
                                         <select id="stock_type" name="stock_type" class="form-control js-example-basic-single">
-                                            <option value="in" >STOCK IN</option>
-                                            <option value="out" >STOCK OUT</option>
+                                            @if (Auth::user()->role == 'ho')
+                                                @if ($stock->stock_type == 'in')
+                                                    <option value="in" >STOCK IN</option>
+                                                    <option value="out" >STOCK OUT</option>
+                                                @else 
+                                                    <option value="out" >STOCK OUT</option>
+                                                    <option value="in" >STOCK IN</option>
+                                                @endif
+                                            @else
+                                                <option value="out" >STOCK OUT</option>
+                                            @endif
                                         </select>
                                     </div>
 
                                     <div class="form-group">
-                                        <label for="stock_category">Kategori Stok (IN / OUT)</label>
+                                        <label for="stock_category">Kategori Stok @if ($stock->stock_type == 'in') {{ '(IN)' }} @else {{ '(OUT)' }} @endif</label>
                                         <select id="stock_category" name="stock_category" class="form-control js-example-basic-single">
-                                            <option value="dropping" >Dropping</option>
-                                            <option value="return" >Return</option>
-                                            <option value="stock" >stock</option>
-                                            <option value="return" >Return</option>
+                                            @if ($stock->stock_type == 'in')
+                                                @if ($stock->stockin_category == 'dropping')
+                                                    <option value="dropping" >Dropping</option>
+                                                    <option value="return" >Return</option>
+                                                @else 
+                                                    <option value="return" >Return</option>
+                                                    <option value="dropping" >Dropping</option>
+                                                @endif
+                                            @else 
+                                                @if ($stock->stockout_category == 'sales')
+                                                    <option value="sales" >Sales</option>
+                                                    <option value="return" >Return</option>
+                                                @else 
+                                                    <option value="return" >Return</option>
+                                                    <option value="sales" >Sales</option>
+                                                @endif
+                                            @endif
                                         </select>
                                     </div>
                                     
-                                    <div class="form-group" id="order_items">
+                                    <div class="form-group" id="stock_items">
                                         <!-- <div id="items">   -->
                                             <div class="table-responsive alert-primary">  
-                                                <table class="table table-bordered" id="" cellspacing="0" cellpadding="0" style="border:none; border-collapse: collapse;">  
+                                                <table class="table table-bstocked" id="" cellspacing="0" cellpadding="0" style="bstock:none; bstock-collapse: collapse;">  
                                                     <tbody id="dynamic_field">
                                                         <tr>  
                                                             <td width="50%">
                                                                 <div class="form-group">
                                                                 <label for="item">Item</label>
                                                                     <select id="barang_item_id" name="barang_item_id[]" class="form-control barang_item_id">
-                                                                        @foreach ($barangs_item as $b)
+                                                                        @foreach ($products_item as $b)
                                                                             <option value="{{ $b->barang_id }}" >{{ $b->name . ' (' . rupiah($b->selling_price, TRUE) . ')' }}</option>
                                                                         @endforeach
                                                                     </select>
@@ -140,15 +165,15 @@
 
     <style>
         table {
-            border: 1px solid #CCC;
-            border-collapse: collapse;
+            bstock: 1px solid #CCC;
+            bstock-collapse: collapse;
         }
 
         td {
-            border: none;
+            bstock: none;
         }
-        .table-bordered td, .table-bordered th {
-            border: 0px solid #dee2e6;
+        .table-bstocked td, .table-bstocked th {
+            bstock: 0px solid #dee2e6;
         }
     </style>
 @endsection
@@ -158,7 +183,7 @@
     <script>
         $('#add').click(function(){  
             i++;  
-            $('#dynamic_field').append('<tr id="row'+i+'"><td width="40%"><select id="barang_item_id" name="barang_item_id[]" class="form-control barang_item_id"> @foreach ($barangs_item as $barang) <option value="{{ $barang->barang_id }}" >{{ $barang->name . " (" . rupiah($b->selling_price, TRUE) . ")" }}</option> @endforeach </select></td>  <td width="15%"><input type="text" name="notes_item[]" id="notes_item" placeholder="0" value="100" class="form-control" >  <td width="10%"><input type="number" name="qty[]" id="qty" value="1" class="form-control" ></td><td><input type="number" name="price[]" id="price" value="0" class="form-control"></td><td><button type="button" name="remove" id="'+i+'" class="btn btn-danger btn_remove">X</button></td></tr>');  
+            $('#dynamic_field').append('<tr id="row'+i+'"><td width="40%"><select id="barang_item_id" name="barang_item_id[]" class="form-control barang_item_id"> @foreach ($products_item as $barang) <option value="{{ $barang->barang_id }}" >{{ $barang->name . " (" . rupiah($b->selling_price, TRUE) . ")" }}</option> @endforeach </select></td>  <td width="15%"><input type="text" name="notes_item[]" id="notes_item" placeholder="0" value="100" class="form-control" >  <td width="10%"><input type="number" name="qty[]" id="qty" value="1" class="form-control" ></td><td><input type="number" name="price[]" id="price" value="0" class="form-control"></td><td><button type="button" name="remove" id="'+i+'" class="btn btn-danger btn_remove">X</button></td></tr>');  
             
             $(document).ready(function(){
                 $('.barang_item_id').select2({
@@ -197,7 +222,7 @@
 
         $(document).ready(function(){
 
-            $('#customer_name').select2({
+            $('#depo_name').select2({
                 placeholder:'Pilih Pembeli',
                 theme:'bootstrap4',
                 tags:true,
@@ -208,9 +233,9 @@
                 console.log(element_val)
 
                 var isExist = false
-                for (i = 0; i < document.getElementById("customer_name").length - 1; ++i){
-                    console.log(i + ") " + document.getElementById("customer_name").options[i].text)
-                    if (document.getElementById("customer_name").options[i].value == element_val){
+                for (i = 0; i < document.getElementById("depo_name").length - 1; ++i){
+                    console.log(i + ") " + document.getElementById("depo_name").options[i].text)
+                    if (document.getElementById("depo_name").options[i].value == element_val){
                         console.log("exist")
                         isExist = true
                         break
@@ -219,11 +244,11 @@
                 
                 if(element_val != '' && !isExist) {
                     $.ajax({
-                        url: "{{ url('/') }}" + "/customer/add",
+                        url: "{{ url('/') }}" + "/depo/add",
                         method: "POST",
                         data: {
                             "_token": "{{ csrf_token() }}",
-                            "customerName" : element_val
+                            "depoName" : element_val
                         },
                         success: function(data) {
                             console.log(data)
