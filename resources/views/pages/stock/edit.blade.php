@@ -42,12 +42,12 @@
                                     <div class="row">
                                         <div class="col-xl-3 col-lg-4">
                                             <div class="form-group">
-                                                <input type="date" class="form-control"  name="date" />
+                                                <input type="date" class="form-control"  name="date" value="{{ $stock['input_date'] }}" />
                                             </div>
                                         </div>
                                         <div class="col-xl-2 col-lg-4">
                                             <div class="form-group">
-                                                <input type="time" class="form-control" name="time" />
+                                                <input type="time" class="form-control" name="time" value="{{ $stock['input_time'] }}"/>
                                             </div>
                                         </div>
                                     </div>

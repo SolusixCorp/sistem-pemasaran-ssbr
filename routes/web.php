@@ -93,14 +93,15 @@ Route::middleware(['auth:sanctum', 'verified'])->group(function () {
     Route::post('stock/create', [StockFlowController::class, 'store'])->name('stock.store');
     Route::get('stock/edit/{id}', [StockFlowController::class, 'edit'])->name('stock.edit');
     Route::post('stock/update/{id}', [StockFlowController::class, 'update'])->name('stock.update');
-    Route::get('stock/print-invoice/{order_id}', [StockFlowController::class, 'printReceiptHandler'])->name('stock.print');
     
     // Cash Flow
     Route::get('cashflow', [CashFlowController::class, 'index'])->name('cashflow.index');
     Route::get('cashflow/data', [CashFlowController::class, 'getAllData'])->name('cashflow.data');
     Route::get('cashflow/create', [CashFlowController::class, 'create'])->name('cashflow.create');
+    Route::get('cashflow/{id}', [CashFlowController::class, 'getById'])->name('cashflow.byid');
     Route::post('cashflow/create', [CashFlowController::class, 'store'])->name('cashflow.store');
     Route::get('cashflow/edit/{id}', [CashFlowController::class, 'edit'])->name('cashflow.edit');
+    Route::get('cashflow/receipt/{order_id}', [CashFlowController::class, 'printReceipt'])->name('stock.print');
     
     // Depo
     Route::get('supply', [SupplyController::class, 'index'])->name('supply.index');

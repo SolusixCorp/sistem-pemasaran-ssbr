@@ -32,7 +32,7 @@
                         </div>
                     @endif
 
-                    <form method="POST" autocomplete="off" action="{{ route('cashflow.store') }}" >
+                    <form method="POST" autocomplete="off" action="{{ route('cashflow.store') }}" enctype="multipart/form-data">
                         @csrf
                             <div class="modal-body">
                                 <div class="card-body">
@@ -55,34 +55,34 @@
                                     <div class="form-group">
                                         <label for="depo_name">Nama Depo</label>
                                         <select id="depo_name" name="depo_name" class="form-control js-example-basic-single">
-                                            @foreach ($customers as $customer)
-                                                <option value="{{ $customer->id }}" >{{ $customer->customer_name }}</option>
+                                            @foreach ($depos as $depo)
+                                                <option value="{{ $depo['id'] }}" >{{ $depo['name'] }}</option>
                                             @endforeach
                                         </select>
                                     </div>
 
                                     <div class="form-group">
-                                        <label for="Cashflow_type">Tipe Cash Flow</label>
-                                        <select id="Cashflow_type" name="Cashflow_type" class="form-control js-example-basic-single">
+                                        <label for="cash_type">Tipe Cash Flow</label>
+                                        <select id="cash_type" name="cash_type" class="form-control js-example-basic-single">
                                             <option value="revenue" >Pendapatan</option>
-                                            <option value="Expense" >Pengeluaran</option>
+                                            <option value="expense" >Pengeluaran</option>
                                         </select>
                                     </div>
 
                                     <div class="form-group">
-                                        <label for="cashflow_category">Kategori Cash Flow (Pendapatan / Pengeluaran)</label>
-                                        <select id="cashflow_category" name="cashflow_category" class="form-control js-example-basic-single">
+                                        <label for="cash_category" id="cash_category_label">Kategori Cash Flow (Pendapatan)</label>
+                                        <select id="cash_category" name="cash_category" class="form-control js-example-basic-single">
                                             <option value="petty_cash" >Kas Kecil</option>
-                                            <option value="another_revenue" >Pendapatan Lainnya</option>
                                             <option value="expense" >Pengeluaran</option>
                                             <option value="setor" >Setoran / Transfer</option>
+                                            <option value="another_revenue" >Pendapatan Lainnya</option>
                                         </select>
                                     </div>
 
                                     <div class="form-row">
                                         <div class="form-group col-md-12">
-                                            <label for="bayar">Nominal </label>
-                                            <input type="number" min="0" name="bayar" value="" class="form-control" id="discount" required placeholder="100000">
+                                            <label for="amount">Nominal </label>
+                                            <input type="number" min="0" name="amount" value="" class="form-control" id="discount" required placeholder="100000">
                                         </div>
                                     </div>
                                     
@@ -90,7 +90,7 @@
                                         <div class="form-group col-md-12">
                                             <label for="validatedCustomFile">Bukti Transaksi</label>
                                             <div class="custom-file">
-                                                <input type="file" class="custom-file-input" id="validatedCustomFile" required>
+                                                <input type="file" name="receipt" class="custom-file-input" id="validatedCustomFile" required>
                                                 <label class="custom-file-label" for="validatedCustomFile">Pilih
                                                     file...</label>
                                             </div>
@@ -132,8 +132,8 @@
 
         $(document).ready(function(){
 
-            $('#customer_name').select2({
-                placeholder:'Pilih Pembeli',
+            $('#depo_name').select2({
+                placeholder:'Pilih Depo',
                 theme:'bootstrap4',
                 tags:true,
             }).on('select2:close', function(){
@@ -143,9 +143,9 @@
                 console.log(element_val)
 
                 var isExist = false
-                for (i = 0; i < document.getElementById("customer_name").length - 1; ++i){
-                    console.log(i + ") " + document.getElementById("customer_name").options[i].text)
-                    if (document.getElementById("customer_name").options[i].value == element_val){
+                for (i = 0; i < document.getElementById("depo_name").length - 1; ++i){
+                    console.log(i + ") " + document.getElementById("depo_name").options[i].text)
+                    if (document.getElementById("depo_name").options[i].value == element_val){
                         console.log("exist")
                         isExist = true
                         break
@@ -154,11 +154,11 @@
                 
                 if(element_val != '' && !isExist) {
                     $.ajax({
-                        url: "{{ url('/') }}" + "/customer/add",
+                        url: "{{ url('/') }}" + "/depo/add",
                         method: "POST",
                         data: {
                             "_token": "{{ csrf_token() }}",
-                            "customerName" : element_val
+                            "depoName" : element_val
                         },
                         success: function(data) {
                             console.log(data)
@@ -168,14 +168,41 @@
                 }
             });
 
-            //Example 2
-            $('#validatedCustomFile').filer({
-                limit: 1,
-                maxSize: 3,
-                extensions: ['jpg', 'jpeg', 'png', 'gif', 'psd'],
-                changeInput: true,
-                showThumbs: true,
-                addMore: true
+            // //Example 2
+            // $('#validatedCustomFile').filer({
+            //     limit: 1,
+            //     maxSize: 3,
+            //     extensions: ['jpg', 'jpeg', 'png', 'gif', 'psd'],
+            //     changeInput: true,
+            //     showThumbs: true,
+            //     addMore: true
+            // });
+
+            //Select Cash Type
+            $('#cash_type').select2({
+                theme:'bootstrap4',
+                tags:true,
+            }).on('select2:close', function(){
+                var element = $(this);
+                var element_val = $.trim(element.val());
+                console.log(element_val);
+                if(element_val != '') {
+                    var cashCategoryOps = $('#cash_category');
+                    var cashCategoryLabel = $('#cash_category_label');
+                    cashCategoryOps.empty();
+                    if (element_val == 'revenue') {
+                        cashCategoryLabel.text('Kategori Cash (Pendapatan)');
+                        cashCategoryOps.append('<option value="product_sales">Penjualan</option>');
+                        cashCategoryOps.append('<option value="petty_cash">Kas Kecil</option>');
+                        cashCategoryOps.append('<option value="another_revenue">Lainnya</option>');
+                    } else {
+                        cashCategoryLabel.text('Kategori Cash (Pengeluaran)');
+                        cashCategoryOps.append('<option value="expense">Pengeluaran</option>');
+                        cashCategoryOps.append('<option value="transfer">Setor / Transfer</option>');
+                    }
+                }
+
+                console.log(element_val)
             });
 
         });

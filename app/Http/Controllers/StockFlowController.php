@@ -9,14 +9,7 @@ use App\Models\Depo;
 use App\Models\Stock;
 use App\Models\StockFlow;
 use App\Models\CashFlow;
-use App\Models\Settings;
-use App\Models\Income;
 use Illuminate\Support\Facades\Auth;
-use Mike42\Escpos\Printer;
-use Mike42\Escpos\PrintConnectors\WindowsPrintConnector;
-use Mike42\Escpos\EscposImage;
-use Mike42\Escpos\PrintConnectors\FilePrintConnector;
-use App\Models\Item;    
 use Exception;
 use DB;
 
@@ -212,7 +205,6 @@ class StockFlowController extends Controller
     public function store(Request $request)
     {
         $user = Auth::user();
-        $user_id = Auth::id();
         
         $in_date = $request['date'];
         $in_time = $request['time'];
@@ -308,8 +300,8 @@ class StockFlowController extends Controller
             }
             $cash->cash_type = 'revenue';
             $cash->revenue_type_in = 'product_sales';
-            $cash->expense_type = 'transfer';
-            $cash->notes = 'Product Sales';
+            $cash->expense_type = '';
+            $cash->notes = '';
             $cash->amount = $total_amount;
             $cash->is_matched = 'true';
             $cash->upload_file = '';
@@ -425,7 +417,8 @@ class StockFlowController extends Controller
 
         $stock = array(
             'id' => dateToNumber($stocks[0]->input_date),
-            'input_date' => $stocks[0]->input_date,
+            'input_date' => substr($stocks[0]->input_date, 0, 10),
+            'input_time' => substr($stocks[0]->input_date, 11, 5),
             'depo_id' => $stocks[0]->depo->id,
             'depo' => $stocks[0]->depo->user->name,
             'type' => strtoupper($stocks[0]->stock_type),

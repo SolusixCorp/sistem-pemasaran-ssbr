@@ -41,12 +41,12 @@
                             <thead>
                                 <tr>
                                     <th style="width:2%">No</th>
-                                    <th style="width:15%">Tgl Transaksi</th>
+                                    <th style="width:17%">Tgl Transaksi</th>
                                     <th>Nama Depo</th>
                                     <th style="width:13%">Tipe Kas</th>
-                                    <th style="width:15%">Keterangan</th>
+                                    <th style="width:17%">Keterangan</th>
                                     <th style="width:15%">Total</th>
-                                    <th style="width:15%">Aksi</th>
+                                    <th style="width:13%">Aksi</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -91,18 +91,14 @@
                 dataType: "JSON",
                 success: function(data) {
                     console.log(data)
-                    $('#modal-details-barang').modal('show');
-                    $('.modal-title').text('Detail Transaksi');
-                    $('#vKodeTransaksi').text("#TRXAPP000" + data.id);
-                    $('#vTanggalTransaksi').text(data.order_date);
-                    $('#vNamaPembeli').text(data.customer.customer_name);
-                    $('#vTotal').text(convertToRupiah(data.total));
-                    $('#vDiscountPercentage').text(data.discount_percentage);
-                    $('#vDiscountRp').text(convertToRupiah(data.discount_rp));
-                    $('#vTotalWithDiscount').text(convertToRupiah(data.total_with_discount));
-                    $('#vBayar').text(convertToRupiah(data.bayar));
-                    $('#vKembalian').text(convertToRupiah(data.kembalian));
-                    $('#vCatatan').text(data.notes);
+                    $('#modal-details').modal('show');
+                    $('.modal-title').text('Details Cash Flow');
+                    $('#vTanngalInput').text(data.input_date);
+                    $('#vDepoName').text(data.depo);
+                    $('#vCashType').text(data.type);
+                    $('#vCategory').text(data.category);
+                    $('#vNotes').text(data.notes);
+                    $('#vTotal').text(data.total);
 
                     for(var i = 0; i < data.order_items.length; i++) {
                         $('#data-detail-modal').append('<div class="message-item"><h6 id="vItems" class="message-item-user message-item-date" style="position:initial !important">' + data.order_items[i].barang.name  + ' => ' + data.order_items[i].qty + ' '  + ' x ' + data.order_items[i].barang.selling_price + ' = ' + data.order_items[i].sub_total + '</h6></div>');  

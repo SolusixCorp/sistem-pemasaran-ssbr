@@ -40,7 +40,8 @@
             "app/Helpers/numberToDate.php",
             "app/Helpers/dateToNumber.php",
             "app/Helpers/priceType.php",
-            "app/Helpers/priceTypeLabel.php"
+            "app/Helpers/priceTypeLabel.php",
+            "app/Helpers/cashCategoryLabel.php"
         ]
         
     },

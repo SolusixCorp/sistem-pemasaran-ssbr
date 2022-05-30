@@ -42,12 +42,12 @@
                                     <div class="row">
                                         <div class="col-xl-3 col-lg-4">
                                             <div class="form-group">
-                                                <input type="date" class="form-control"  name="date" />
+                                                <input type="date" class="form-control"  name="date" value="{{ $cash['input_date'] }}" />
                                             </div>
                                         </div>
                                         <div class="col-xl-2 col-lg-4">
                                             <div class="form-group">
-                                                <input type="time" class="form-control" name="time" />
+                                                <input type="time" class="form-control" name="time" value="{{ $cash['input_time'] }}" />
                                             </div>
                                         </div>
                                     </div>
@@ -55,34 +55,61 @@
                                     <div class="form-group">
                                         <label for="depo_name">Nama Depo</label>
                                         <select id="depo_name" name="depo_name" class="form-control js-example-basic-single">
-                                            @foreach ($customers as $customer)
-                                                <option value="{{ $customer->id }}" >{{ $customer->customer_name }}</option>
+                                            <option value="{{ $cash['depo_id'] }}" >{{ $cash['depo'] }}</option>
+                                            @foreach ($depos as $depo)
+                                                @if ($depo['id'] != $cash['depo_id']) 
+                                                    <option value="{{ $depo['id'] }}" >{{ $depo['name'] }}</option>
+                                                @endif
                                             @endforeach
                                         </select>
                                     </div>
 
                                     <div class="form-group">
-                                        <label for="Cashflow_type">Tipe Cash Flow</label>
-                                        <select id="Cashflow_type" name="Cashflow_type" class="form-control js-example-basic-single">
-                                            <option value="revenue" >Pendapatan</option>
-                                            <option value="Expense" >Pengeluaran</option>
+                                        <label for="cash_type">Tipe Cash Flow</label>
+                                        <select id="cash_type" name="cash_type" class="form-control js-example-basic-single">
+                                            @if ($cash['type'] == 'revenue') 
+                                                <option value="revenue" >Pendapatan</option>
+                                                <option value="expense" >Pengeluaran</option>
+                                            @else 
+                                                <option value="expense" >Pengeluaran</option>
+                                                <option value="revenue" >Pendapatan</option>
+                                            @endif
                                         </select>
                                     </div>
 
                                     <div class="form-group">
-                                        <label for="cashflow_category">Kategori Cash Flow (Pendapatan / Pengeluaran)</label>
-                                        <select id="cashflow_category" name="cashflow_category" class="form-control js-example-basic-single">
-                                            <option value="petty_cash" >Kas Kecil</option>
-                                            <option value="another_revenue" >Pendapatan Lainnya</option>
-                                            <option value="expense" >Pengeluaran</option>
-                                            <option value="setor" >Setoran / Transfer</option>
+                                        <label for="cash_category" id="cash_category_label">Kategori Cash Flow @if ($cash['type'] == 'revenue') (Pendapatan) @else (Pengeluaran) @endif</label>
+                                        <select id="cash_category" name="cash_category" class="form-control js-example-basic-single">
+                                            @if ($cash['type'] == 'revenue') 
+                                                @if ($cash['category'] == 'product_sales') 
+                                                    <option value="product_sales" >Penjualan</option>
+                                                    <option value="petty_cash" >Kas Kecil</option>
+                                                    <option value="another_revenue" >Lainnya</option>
+                                                @elseif ($cash['category'] == 'petty_cash') 
+                                                    <option value="petty_cash" >Kas Kecil</option>
+                                                    <option value="product_sales" >Penjualan</option>
+                                                    <option value="another_revenue" >Lainnya</option>
+                                                @else
+                                                    <option value="another_revenue" >Lainnya</option>
+                                                    <option value="product_sales" >Penjualan</option>
+                                                    <option value="petty_cash" >Kas Kecil</option>
+                                                @endif
+                                            @else 
+                                                @if ($cash['category'] == 'expense') 
+                                                    <option value="expense" >Pengeluaran</option>
+                                                    <option value="transfer" >Setoran / Transfer</option>
+                                                @else
+                                                    <option value="transfer" >Setoran / Transfer</option>
+                                                    <option value="expense" >Pengeluaran</option>
+                                                @endif
+                                            @endif
                                         </select>
                                     </div>
 
                                     <div class="form-row">
                                         <div class="form-group col-md-12">
                                             <label for="bayar">Nominal </label>
-                                            <input type="number" min="0" name="bayar" value="" class="form-control" id="discount" required placeholder="100000">
+                                            <input type="number" min="0" name="bayar" value="{{ $cash['total'] }}" class="form-control" id="discount" required placeholder="100000">
                                         </div>
                                     </div>
                                     
@@ -99,7 +126,7 @@
 
                                     <div class="form-group">
                                         <label for="notes">Catatan</label>
-                                        <textarea type="text" name="notes" class="form-control" id="notes"></textarea>
+                                        <textarea type="text" name="notes" class="form-control" id="notes">{{ $cash['notes'] }}</textarea>
                                     </div>
                                   
                                 </div>
@@ -141,40 +168,7 @@
 @section('custom_js')
     <script src="{{ asset('js/select2.js') }}"></script>
     <script>
-        $('#add').click(function(){  
-            i++;  
-            $('#dynamic_field').append('<tr id="row'+i+'"><td width="30%"><select id="barang_item_id" name="barang_item_id[]" class="form-control barang_item_id"> @foreach ($barangs_item as $barang) <option value="{{ $barang->barang_id }}" >{{ $barang->name . "(" . rupiah($barang->selling_price, TRUE) . ")" }}</option> @endforeach </select></td>  <td width="40%"><input type="text" name="notes_item[]" id="notes_item" placeholder="Catatan" value="" class="form-control" >  <td width="15%"><input type="number" name="qty[]" id="qty" value="1" class="form-control" ></td>    <td><button type="button" name="remove" id="'+i+'" class="btn btn-danger btn_remove">X</button></td></tr>');  
-       
-            
-            $(document).ready(function(){
-                $('.barang_item_id').select2({
-                    theme:'bootstrap4',
-                    tags:true,
-                }).on('select2:close', function(){
-                    var element = $(this);
-                    var element_val = $.trim(element.val());
-
-                    console.log(element_val)
-                })
-            })
-        });  
-        $(document).on('click', '.btn_remove', function(){  
-            var button_id = $(this).attr("id");   
-            $('#row'+button_id+'').remove();  
-        });  
-
-        $(document).ready(function(){
-            $('.barang_item_id').select2({
-                theme:'bootstrap4',
-                tags:true,
-            }).on('select2:close', function(){
-                var element = $(this);
-                var element_val = $.trim(element.val());
-
-                console.log(element_val)
-            })
-        })
-
+        
         // Single Date Picker
         $('input[name="singledatepicker"]').daterangepicker({
             singleDatePicker: true,
@@ -184,7 +178,7 @@
         $(document).ready(function(){
 
             $('#customer_name').select2({
-                placeholder:'Pilih Pembeli',
+                placeholder:'Pilih Depo',
                 theme:'bootstrap4',
                 tags:true,
             }).on('select2:close', function(){
@@ -221,6 +215,32 @@
                         }
                     })
                 }
+            });
+
+            $('#cash_type').select2({
+                theme:'bootstrap4',
+                tags:true,
+            }).on('select2:close', function(){
+                var element = $(this);
+                var element_val = $.trim(element.val());
+                console.log(element_val);
+                if(element_val != '') {
+                    var cashCategoryOps = $('#cash_category');
+                    var cashCategoryLabel = $('#cash_category_label');
+                    cashCategoryOps.empty();
+                    if (element_val == 'revenue') {
+                        cashCategoryLabel.text('Kategori Cash (Pendapatan)');
+                        cashCategoryOps.append('<option value="product_sales">Penjualan</option>');
+                        cashCategoryOps.append('<option value="petty_cash">Kas Kecil</option>');
+                        cashCategoryOps.append('<option value="another_revenue">Lainnya</option>');
+                    } else {
+                        cashCategoryLabel.text('Kategori Cash (Pengeluaran)');
+                        cashCategoryOps.append('<option value="expense">Pengeluaran</option>');
+                        cashCategoryOps.append('<option value="transfer">Setor / Transfer</option>');
+                    }
+                }
+
+                console.log(element_val)
             });
 
         });

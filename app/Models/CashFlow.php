@@ -8,4 +8,10 @@ use Illuminate\Database\Eloquent\Model;
 class CashFlow extends Model
 {
     use HasFactory;protected $table = "cash_flow";
+
+    public function depo()
+    {
+        return $this->hasOne(Depo::class, 'id', 'depo_id')->with('user');
+    }
+    
 }
