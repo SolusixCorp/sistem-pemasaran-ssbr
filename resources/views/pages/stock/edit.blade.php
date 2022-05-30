@@ -32,7 +32,7 @@
                         </div>
                     @endif
 
-                    <form method="POST" autocomplete="off" action="{{ route('stock.update', ['id' => $stock->id]) }}" >
+                    <form method="POST" autocomplete="off" action="{{ route('stock.update', ['id' => $stock['id']]) }}" >
                         @csrf
                             <div class="modal-body">
                                 <div class="card-body">
@@ -55,9 +55,9 @@
                                     <div class="form-group">
                                         <label for="depo_name">Nama Depo</label>
                                         <select id="depo_name" name="depo_name" class="form-control js-example-basic-single">
-                                            <option value="{{ $stock->depo->id }}" >{{ $stock->depo->user->name }}</option>
+                                            <option value="{{ $stock['depo_id'] }}" >{{ $stock['depo'] }}</option>
                                             @foreach ($depos as $depo)
-                                                @if ($depo->id != $stock->depo->id)
+                                                @if ($depo->id != $stock['depo_id'])
                                                     <option value="{{ $depo->id }}" >{{ $depo->name }}</option>
                                                 @endif
                                             @endforeach
@@ -68,7 +68,7 @@
                                         <label for="stock_type">Tipe Stok</label>
                                         <select id="stock_type" name="stock_type" class="form-control js-example-basic-single">
                                             @if (Auth::user()->role == 'ho')
-                                                @if ($stock->stock_type == 'in')
+                                                @if ($stock['type'] == 'in')
                                                     <option value="in" >STOCK IN</option>
                                                     <option value="out" >STOCK OUT</option>
                                                 @else 
@@ -82,10 +82,10 @@
                                     </div>
 
                                     <div class="form-group">
-                                        <label for="stock_category">Kategori Stok @if ($stock->stock_type == 'in') {{ '(IN)' }} @else {{ '(OUT)' }} @endif</label>
+                                        <label for="stock_category">Kategori Stok @if ($stock['type'] == 'in') {{ '(IN)' }} @else {{ '(OUT)' }} @endif</label>
                                         <select id="stock_category" name="stock_category" class="form-control js-example-basic-single">
-                                            @if ($stock->stock_type == 'in')
-                                                @if ($stock->stockin_category == 'dropping')
+                                            @if ($stock['type'] == 'in')
+                                                @if ($stock['desc'] == 'Dropping')
                                                     <option value="dropping" >Dropping</option>
                                                     <option value="return" >Return</option>
                                                 @else 
@@ -93,7 +93,7 @@
                                                     <option value="dropping" >Dropping</option>
                                                 @endif
                                             @else 
-                                                @if ($stock->stockout_category == 'sales')
+                                                @if ($stock['desc'] == 'Sales')
                                                     <option value="sales" >Sales</option>
                                                     <option value="return" >Return</option>
                                                 @else 
@@ -109,30 +109,42 @@
                                             <div class="table-responsive alert-primary">  
                                                 <table class="table table-bstocked" id="" cellspacing="0" cellpadding="0" style="bstock:none; bstock-collapse: collapse;">  
                                                     <tbody id="dynamic_field">
+                                                        @foreach ($stock['products'] as $product)
                                                         <tr>  
                                                             <td width="50%">
                                                                 <div class="form-group">
                                                                 <label for="item">Item</label>
                                                                     <select id="barang_item_id" name="barang_item_id[]" class="form-control barang_item_id">
+                                                                        <option value="{{ $product['product_id'] }}" >{{ $product['product_name'] }}</option>
                                                                         @foreach ($products_item as $b)
-                                                                            <option value="{{ $b->barang_id }}" >{{ $b->name . ' (' . rupiah($b->selling_price, TRUE) . ')' }}</option>
+                                                                            @if ($b['product_id'] != $product['product_id']) 
+                                                                                <option value="{{ $b['product_id'] }}" >{{ $b['product_name'] }}</option>
+                                                                            @endif
                                                                         @endforeach
                                                                     </select>
                                                                 </div>
                                                             </td>  
                                                             <td width="15%">
                                                                 <label for="item">Remaining Stok</label>
-                                                                <input type="text" name="notes_item[]" id="notes_item" placeholder="0" value="100" class="form-control" readonly>
+                                                                <input type="text" name="notes_item[]" id="notes_item" placeholder="0" value="100" class="form-control" value="{{ $product['remaining_stock'] }}" readonly>
                                                             </td>  
                                                             <td width="10%">
                                                                 <label for="item">Qty</label>
-                                                                <input type="number" name="qty[]" id="qty" value="1" class="form-control" >
+                                                                <input type="number" name="qty[]" id="qty" value="1" class="form-control" value="{{ $product['qty'] }}" >
                                                             </td> 
                                                             <td>
-                                                                <label for="item">Harga</label>
-                                                                <input type="number" name="price[]" id="price" value="0" class="form-control" >
+                                                            <label for="item">Harga</label>
+                                                                <select id="price" name="price[]" class="form-control price">
+                                                                <option value="{{ $product['price'] }}" >{{ $product['price'] }}</option>
+                                                                    @foreach ($products_item['0']['price'] as $price)
+                                                                        @if ($price != $product['price'])
+                                                                            <option value="{{ $price }}" >{{ $price }}</option>
+                                                                        @endif
+                                                                    @endforeach
+                                                                </select>
                                                             </td>
                                                         </tr>  
+                                                        @endforeach
                                                     </tbody>
                                                     <tfoot>
                                                         <td><button type="button" name="add" id="add" onclick="" class="btn btn-primary">Tambah Item</button></td>  
@@ -183,7 +195,7 @@
     <script>
         $('#add').click(function(){  
             i++;  
-            $('#dynamic_field').append('<tr id="row'+i+'"><td width="40%"><select id="barang_item_id" name="barang_item_id[]" class="form-control barang_item_id"> @foreach ($products_item as $barang) <option value="{{ $barang->barang_id }}" >{{ $barang->name . " (" . rupiah($b->selling_price, TRUE) . ")" }}</option> @endforeach </select></td>  <td width="15%"><input type="text" name="notes_item[]" id="notes_item" placeholder="0" value="100" class="form-control" >  <td width="10%"><input type="number" name="qty[]" id="qty" value="1" class="form-control" ></td><td><input type="number" name="price[]" id="price" value="0" class="form-control"></td><td><button type="button" name="remove" id="'+i+'" class="btn btn-danger btn_remove">X</button></td></tr>');  
+            $('#dynamic_field').append('<tr id="row'+i+'"><td width="40%"><select id="'+i+'" name="product_item_id[]" class="form-control product_item_id"> @foreach ($products_item as $product) <option value="{{ $product['product_id'] }}" >{{ $product['product_name'] }}</option> @endforeach </select></td>  <td width="15%"><input type="text" name="remmaining_stock[]" id="remmaining_stock'+i+'" placeholder="0" value="100" class="form-control" readonly><td width="10%"><input type="number" name="qty[]" id="qty" value="1" class="form-control" ></td><td><select id="price'+i+'" name="price[]" class="form-control price">@foreach ($product['price'] as $price) <option value="{{ $price }}" >{{ $price }}</option> @endforeach</select></td><td><button type="button" name="remove" id="'+i+'" class="btn btn-danger btn_remove">X</button></td></tr>');  
             
             $(document).ready(function(){
                 $('.barang_item_id').select2({

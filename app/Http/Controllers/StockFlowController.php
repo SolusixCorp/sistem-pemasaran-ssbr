@@ -61,7 +61,7 @@ class StockFlowController extends Controller
                 $row[] = ucfirst($stock->stockout_category);
             }
             $row[] = $stock->qty;
-            $row[] = '<a href="'. url("/") .'/stock/edit/' . $stock->input_date . '" onclick="editForm(' . $stock->stock_id . ')" class="btn btn-warning btn-sm"><i class="far fa-edit"></i></a>
+            $row[] = '<a href="'. url("/") .'/stock/edit/' . dateToNumber($stock->input_date) . '" onclick="editForm(' . $stock->stock_id . ')" class="btn btn-warning btn-sm"><i class="far fa-edit"></i></a>
             <a href="#" onclick="detailsView(' . dateToNumber($stock->input_date) . ')" class="btn btn-primary btn-sm" data-toggle="modal"><i class="far fa-eye"></i></a>';
             
             array_push($data, $row);
@@ -401,14 +401,42 @@ class StockFlowController extends Controller
             $productDatas[] = $productData;
         }
 
-        $stock = StockFlow::with(['depo', 'product'])
-                    ->where('input_date', '=', $id)
-                    ->first();
+        $stocks = StockFlow::with(['depo', 'product'])
+                    ->where('input_date', '=', numberToDate($id))
+                    ->get();
+
+        $products = array();
+        foreach($stocks as $stock) { 
+            $products[] = array(
+                'product_id' => $stock->product->id,
+                'product_name' => $stock->product->name,
+                'qty' => $stock->qty,
+                'remaining_stock' => $stock->remaining_stock,
+                'price' => rupiah($stock->price, TRUE) . ' (' . priceTypeLabel($stock->price_type) . ')'
+            ); 
+        }
+
+        $desc = "";
+        if ($stocks[0]->stockin_category != '') {
+            $desc = $stocks[0]->stockin_category;
+        } else {
+            $desc = $stocks[0]->stockout_category;
+        }
+
+        $stock = array(
+            'id' => dateToNumber($stocks[0]->input_date),
+            'input_date' => $stocks[0]->input_date,
+            'depo_id' => $stocks[0]->depo->id,
+            'depo' => $stocks[0]->depo->user->name,
+            'type' => strtoupper($stocks[0]->stock_type),
+            'desc' => ucfirst($desc),
+            'products' => $products,
+        );
         
         // return response()->json($stock);
         return view('pages.stock.edit', [
             "stock" => $stock,
-            "products_item" => $products,
+            "products_item" => $productDatas,
             "depos"  => $depos,   
         ]);
     }
