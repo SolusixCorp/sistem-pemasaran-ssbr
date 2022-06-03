@@ -1,5 +1,5 @@
 <!-- Modal -->
-<div class="modal fade custom-modal" id="modal-edit-expense" tabindex="-1" role="dialog" aria-labelledby="customModal" aria-hidden="true">
+<div class="modal fade custom-modal" id="modal-edit-report" tabindex="-1" role="dialog" aria-labelledby="customModal" aria-hidden="true">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
@@ -15,16 +15,16 @@
                     <div class="card-body">
                         <input name="id" type="hidden" class="form-control" id="id" placeholder="id">
                         <div class="form-group">
-                            <label for="expenseDateEdit">Tanggal</label>
-                            <input name="expenseDate" type="text" class="form-control" id="expenseDateEdit" placeholder="2021-01-01 12:12:12" autocomplete="off" required>
+                            <label for="reportDateEdit">Tanggal</label>
+                            <input name="reportDate" type="text" class="form-control" id="reportDateEdit" placeholder="2021-01-01 12:12:12" autocomplete="off" required>
                         </div>
                         <div class="form-group">
-                            <label for="expenseTypeEdit">Jenis Pengeluaran</label>
-                            <input name="expenseType" type="text" class="form-control" id="expenseTypeEdit" placeholder="Bayar Listrik" autocomplete="off" required>
+                            <label for="reportTypeEdit">Jenis Pengeluaran</label>
+                            <input name="reportType" type="text" class="form-control" id="reportTypeEdit" placeholder="Bayar Listrik" autocomplete="off" required>
                         </div>
                         <div class="form-group">
-                            <label for="expenseNominalEdit">Nominal</label>
-                            <input name="expenseNominal" type="number" class="form-control" id="expenseNominalEdit" placeholder="5000000" autocomplete="off" required>
+                            <label for="reportNominalEdit">Nominal</label>
+                            <input name="reportNominal" type="number" class="form-control" id="reportNominalEdit" placeholder="5000000" autocomplete="off" required>
                         </div>
                     </div>
                 </div>

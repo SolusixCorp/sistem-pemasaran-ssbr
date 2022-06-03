@@ -79,7 +79,7 @@
                 </li>
 
                 <li class="submenu">
-                    <a href="{{ url('/ar-ap-report') }}">
+                    <a href="{{ url('/report') }}">
                         <i class="fas fa-chart-line"></i>
                         <span> AR/AP Report </span>
                     </a>

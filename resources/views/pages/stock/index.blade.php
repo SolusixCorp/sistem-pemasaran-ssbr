@@ -41,7 +41,7 @@
                             <thead>
                                 <tr>
                                     <th style="width:2%">No</th>
-                                    <th>Tanggal Transaksi</th>
+                                    <th>Tanggal</th>
                                     <th>Nama Depo</th>
                                     <th>Tipe Stok</th>
                                     <th>Kategori</th>

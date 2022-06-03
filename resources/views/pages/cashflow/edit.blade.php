@@ -32,7 +32,7 @@
                         </div>
                     @endif
 
-                    <form method="POST" autocomplete="off" action="" >
+                    <form method="POST" autocomplete="off" action="{{ route('cashflow.update', ['id' => $cash['cash_id']]) }}" enctype="multipart/form-data" >
                         @csrf
                             <div class="modal-body">
                                 <div class="card-body">
@@ -108,8 +108,8 @@
 
                                     <div class="form-row">
                                         <div class="form-group col-md-12">
-                                            <label for="bayar">Nominal </label>
-                                            <input type="number" min="0" name="bayar" value="{{ $cash['total'] }}" class="form-control" id="discount" required placeholder="100000">
+                                            <label for="amount">Nominal </label>
+                                            <input type="number" min="0" name="amount" value="{{ $cash['total'] }}" class="form-control" id="discount" required placeholder="100000">
                                         </div>
                                     </div>
                                     
@@ -117,7 +117,7 @@
                                         <div class="form-group col-md-12">
                                             <label for="validatedCustomFile">Bukti Transaksi</label>
                                             <div class="custom-file">
-                                                <input type="file" class="custom-file-input" id="validatedCustomFile" required>
+                                                <input type="file" name="receipt" class="custom-file-input" id="validatedCustomFile">
                                                 <label class="custom-file-label" for="validatedCustomFile">Pilih
                                                     file...</label>
                                             </div>

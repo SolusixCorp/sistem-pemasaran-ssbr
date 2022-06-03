@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Carbon\Carbon;
-use App\Models\Income;
+use App\Models\CashFlow;
 use App\Models\Expense;
 use DB;
 
@@ -13,45 +13,47 @@ class DashboardController extends Controller
     public function index()
     {
         $currentDate = Carbon::now()->format('Y-m-d');
+        // $startDate = Carbon::now()->format('Y-m-d');
+
         $startDate = Carbon::now()->subDays(7)->format('Y-m-d');
 
-        // $purchaseCarts = Income::select(
-        //     DB::raw('sum(total) as nominals'))
-        //     ->whereBetween('date', [$startDate, $currentDate])
-        //     ->groupBy('date')
-        //     ->get();
+        $purchaseCarts = CashFlow::select(
+            DB::raw('sum(amount) as totals'))
+            ->whereBetween('input_date', [$startDate, $currentDate])
+            ->where('revenue_type_in', '=', 'product_sales')
+            ->get();
 
-        // $incomeCarts = Income::select(
-        //     DB::raw('sum(income) as nominals'))
-        //     ->whereBetween('date', [$startDate, $currentDate])
-        //     ->groupBy('date')
-        //     ->get();
+        $incomeCarts = CashFlow::select(
+            DB::raw('sum(amount) as nominals'))
+            ->whereBetween('input_date', [$startDate, $currentDate])
+            ->groupBy('input_date')
+            ->get();
 
-        // $dateCarts = Income::select(
-        //     DB::raw('date'))
-        //     ->whereBetween('date', [$startDate, $currentDate])
-        //     ->groupBy('date')
-        //     ->get();
+        $dateCarts = CashFlow::select(
+            DB::raw('input_date'))
+            ->whereBetween('input_date', [$startDate, $currentDate])
+            ->groupBy('input_date')
+            ->get();
 
-        // $income = array();
-        // foreach($incomeCarts as $nominal) {
-        //     $income[] = $nominal->nominals;
-        // }
+        $income = array();
+        foreach($incomeCarts as $nominal) {
+            $income[] = $nominal->nominals;
+        }
 
-        // $purchase = array();
-        // foreach($purchaseCarts as $nominal) {
-        //     $purchase[] = $nominal->nominals;
-        // }
+        $purchase = array();
+        foreach($purchaseCarts as $total) {
+            $purchase[] = $total->totals;
+        }
 
-        // $dates = array();
-        // foreach($dateCarts as $date) {
-        //     $dates[] = tanggal($date->date);
-        // }
+        $dates = array();
+        foreach($dateCarts as $date) {
+            $dates[] = tanggal($date->input_date);
+        }
 
-        // $incomeCartData = json_encode($income);
-        // $purchaseCartData = json_encode($purchase);
-        // $dateCartData = json_encode($dates);
-        // return view('index', compact('incomeCartData', 'purchaseCartData', 'dateCartData', 'startDate', 'currentDate'));
+        $incomeCartData = json_encode($income);
+        $purchaseCartData = json_encode($purchase);
+        $dateCartData = json_encode($dates);
+        return view('index', compact('incomeCartData', 'purchaseCartData', 'dateCartData', 'startDate', 'currentDate'));
         
         return view('index');
     }
@@ -63,37 +65,39 @@ class DashboardController extends Controller
         $currentDate = Carbon::now()->format('Y-m-d');
 
         if ($startDate == $endtDate) {
-            $purchaseCount = Income::where('date', $startDate)
+            $purchaseCount = CashFlow::where('input_date', $startDate)
             ->get()->count();
 
-            $purchaseSum = Income::where('date', $startDate)
-            ->get()->sum('total');
+            $purchaseSum = CashFlow::where('input_date', $startDate)
+                ->where('revenue_type_in', '=', 'product_sales')
+                ->get()
+                ->sum('amount');
 
             $dateRange = tanggal($startDate);
         } else {
-            $purchaseCount = Income::whereBetween('date', [$startDate, $endtDate])
+            $purchaseCount = CashFlow::whereBetween('input_date', [$startDate, $endtDate])
             ->get()->count();
 
-            $purchaseSum = Income::whereBetween('date', [$startDate, $endtDate])
-            ->get()->sum('total');
+            $purchaseSum = CashFlow::whereBetween('input_date', [$startDate, $endtDate])
+            ->get()->sum('amount');
 
             $dateRange = tanggal($startDate) . " - " . tanggal($endtDate);
         }
 
-        $incomeCarts = Income::select(
-            DB::raw('sum(income) as nominals'))
-            ->groupBy('date')
+        $incomeCarts = CashFlow::select(
+            DB::raw('sum(amount) as nominals'))
+            ->groupBy('input_date')
             ->get();
             
-        $purchaseCarts = Income::select(
-            DB::raw('sum(total) as nominals'))
-            ->groupBy('date')
+        $purchaseCarts = CashFlow::select(
+            DB::raw('sum(amount) as nominals'))
+            ->groupBy('input_date')
             ->get();
 
-        $dateCarts = Income::select(
-            DB::raw('date'))
-            ->whereBetween('date', [$startDate, $currentDate])
-            ->groupBy('date')
+        $dateCarts = CashFlow::select(
+            DB::raw('input_date'))
+            ->whereBetween('input_date', [$startDate, $currentDate])
+            ->groupBy('input_date')
             ->get();
 
         if ($purchaseSum != 0 && $purchaseSum != 0) {
@@ -109,7 +113,7 @@ class DashboardController extends Controller
 
         $dates = array();
         foreach($dateCarts as $date) {
-            $dates[] = tanggal($date->date);
+            $dates[] = tanggal($date->input_date);
         }
 
         $purchase = array();
@@ -137,7 +141,7 @@ class DashboardController extends Controller
         $currentDate = Carbon::now()->format('Y-m-d');
 
         if ($start == $end) {
-            $purchaseCount = Income::where('date', $endtDate)
+            $purchaseCount = CashFlow::where('date', $endtDate)
             ->get()->count();
         }
 
@@ -151,7 +155,7 @@ class DashboardController extends Controller
         $currentDate = Carbon::now()->format('Y-m-d');
 
         if ($start == $end) {
-            $purchaseSum = Income::where('date', $endtDate)
+            $purchaseSum = CashFlow::where('date', $endtDate)
             ->get()->sum('income');
         }
 
@@ -166,10 +170,10 @@ class DashboardController extends Controller
 
         if ($start == $end) {
        
-        $purchaseSum = Income::where('date', $endtDate)
+        $purchaseSum = CashFlow::where('date', $endtDate)
         ->get()->sum('income');
 
-        $purchaseCount = Income::where('date', $endtDate)
+        $purchaseCount = CashFlow::where('date', $endtDate)
         ->get()->count();
 
         }
@@ -188,13 +192,13 @@ class DashboardController extends Controller
         $startDate = date($start);
         $endtDate = date($end);
         if ($start == $end) {
-            $purchaseSum = Income::select(
+            $purchaseSum = CashFlow::select(
                 DB::raw('sum(income) as nominals'))
                 ->where('date', $startDate)
                 ->groupBy('date')
                 ->get();
         } else {
-            $purchaseSum = Income::select(
+            $purchaseSum = CashFlow::select(
                 DB::raw('sum(income) as nominals'))
                 ->whereBetween('date', [$startDate, $endtDate])
                 ->groupBy('date')

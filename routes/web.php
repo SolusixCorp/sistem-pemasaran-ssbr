@@ -9,7 +9,7 @@ use App\Http\Controllers\ProductDepoController;
 use App\Http\Controllers\DepoController;
 use App\Http\Controllers\EmployeeController;
 use App\Http\Controllers\ExpenseController;
-use App\Http\Controllers\IncomeController;
+use App\Http\Controllers\ReportController;
 use App\Http\Controllers\StockFlowController;
 use App\Http\Controllers\CashFlowController;
 use App\Http\Controllers\SettingsController;
@@ -68,21 +68,15 @@ Route::middleware(['auth:sanctum', 'verified'])->group(function () {
     Route::get('employee/data', [EmployeeController::class, 'listData'])->name('employee.data');
     Route::post('employee/add', [EmployeeController::class, 'add'])->name('employee.add');
     Route::resource('employee', EmployeeController::class);
-
-    // Report -> Expenses
-    Route::get('expense/data', [ExpenseController::class, 'listData'])->name('expense.data');
-    Route::get('expense/pdf', [ExpenseController::class, 'listDataPdf'])->name('expense.pdf');
-    Route::get('expense/{start}/{end}', [ExpenseController::class, 'listData'])->name('expense.data-by-date');
-    Route::resource('expense', ExpenseController::class);
-
-    // Report -> incomes
-    Route::get('income/export/{start}/{end}', [IncomeController::class, 'exportPdf'])->name('income.export');
-    Route::get('income/download/{start}/{end}', [IncomeController::class, 'downloadPdf'])->name('income.download');
-    Route::get('income/data', [IncomeController::class, 'listData'])->name('income.data');
-    Route::get('income/print', [IncomeController::class, 'printReceipt'])->name('income.print');
-    Route::get('income/{start}/{end}', [IncomeController::class, 'listData'])->name('income.data-by-date');
-    Route::resource('income', IncomeController::class);
-
+    
+    // Report
+    Route::get('report/export/{start}/{end}', [ReportController::class, 'exportPdf'])->name('report.export');
+    Route::get('report/download/{start}/{end}', [ReportController::class, 'downloadPdf'])->name('report.download');
+    Route::get('report/data', [ReportController::class, 'listData'])->name('report.data');
+    Route::get('report/print', [ReportController::class, 'printReceipt'])->name('report.print');
+    Route::get('report/{start}/{end}', [ReportController::class, 'listData'])->name('report.data-by-date');
+    Route::resource('report', ReportController::class); 
+    
     // Stock Flow
     Route::get('stock', [StockFlowController::class, 'index'])->name('stock.index');
     Route::get('stock/data', [StockFlowController::class, 'getAllData'])->name('stock.data');
@@ -100,6 +94,7 @@ Route::middleware(['auth:sanctum', 'verified'])->group(function () {
     Route::get('cashflow/create', [CashFlowController::class, 'create'])->name('cashflow.create');
     Route::get('cashflow/{id}', [CashFlowController::class, 'getById'])->name('cashflow.byid');
     Route::post('cashflow/create', [CashFlowController::class, 'store'])->name('cashflow.store');
+    Route::post('cashflow/update/{id}', [CashFlowController::class, 'update'])->name('cashflow.update');
     Route::get('cashflow/edit/{id}', [CashFlowController::class, 'edit'])->name('cashflow.edit');
     Route::get('cashflow/receipt/{order_id}', [CashFlowController::class, 'printReceipt'])->name('stock.print');
     
@@ -111,10 +106,6 @@ Route::middleware(['auth:sanctum', 'verified'])->group(function () {
     Route::post('supply', [SupplyController::class, 'store'])->name('supply.store');
     Route::get('supply/edit/{id}', [SupplyController::class, 'edit'])->name('supply.edit');
     Route::post('supply/update/{id}', [SupplyController::class, 'update'])->name('supply.update');
-    
-    // Settings
-    Route::get('settings/data', [SettingsController::class, 'getAllData'])->name('settings.data');
-    Route::resource('settings', SettingsController::class);
 
 });
 

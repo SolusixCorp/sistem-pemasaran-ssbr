@@ -1,18 +1,18 @@
 @extends('layouts.dashboard')
 
-@section('title', 'Pengeluaran')
-@section('breadcrumb', 'Pengeluaran')
+@section('title', 'Report')
+@section('breadcrumb', 'Report')
 
 @section('content')
     <div class="row">
 
-        <div class="col-12" id="list-expense">
+        <div class="col-12" id="list-report">
             <div class="card mb-3">
                 <div class="card-header">
-                    <span class="pull-right"><button class="btn btn-primary" onclick="addForm()"><i class="fas fa-plus" aria-hidden="true"></i> Pengeluaran</button></span>                   
-                    @include('pages/report/expense/add-expense')
-                    @include('pages/report/expense/edit-expense')
-                    <h3><i class="fas fa-upload"></i> Data Pengeluaran</h3>
+                    <span class="pull-right"><button class="btn btn-primary" onclick="addForm()"><i class="fas fa-plus" aria-hidden="true"></i> Report</button></span>                   
+                    @include('pages/report/add-report')
+                    @include('pages/report/edit-report')
+                    <h3><i class="fas fa-chart-line"></i> Data Report</h3>
                     <br>
                     <div id="reportrange" class="form-control col-4 pull-right" style="background: #fff; cursor: pointer; padding: 5px 10px; border: 1px solid #ccc; width: 100%">
                         <i class="fas fa-calendar"></i>&nbsp;
@@ -45,8 +45,9 @@
                                 <tr>
                                     <th style="width:2%">No</th>
                                     <th>Tanggal</th>
-                                    <th>Jenis Pengeluaran</th>
-                                    <th>Nominal</th>
+                                    <th>Tipe Pembayaran</th>
+                                    <th>Keterangan</th>
+                                    <th>Total</th>
                                     <th style="width:10%">Aksi</th>
                                 </tr>
                             </thead>
@@ -73,22 +74,11 @@
     var end = moment();
     var startDate, endDate;
     $(function() {
-        // Menampilkan data Pengeluaran
+        // Menampilkan data Report
         table = $('#dataTable').DataTable({
             data: dataSet,
-            columns: [{
-                title: "No"
-            }, {
-                title: "Tanggal"
-            }, {
-                title: "Jenis Pengeluaran"
-            }, {
-                title: "Nominal"
-            }, {
-                title: "Aksi"
-            }],
             ajax: {
-                "url": "/expense/" + start.format('YYYY-MM-D') + "/" + end.format('YYYY-MM-D'),
+                "url": "/report/" + start.format('YYYY-MM-D') + "/" + end.format('YYYY-MM-D'),
                 "type": "GET"
             }
         });
@@ -120,37 +110,37 @@
             endDate = end;
             $('#reportrange span')
             .html(start.format('MMMM D, YYYY') + ' - ' + end.format('MMMM D, YYYY'));
-            table.ajax.url("/expense/" + start.format('YYYY-MM-D') + "/" + end.format('YYYY-MM-D')).load();          
+            table.ajax.url("/report/" + start.format('YYYY-MM-D') + "/" + end.format('YYYY-MM-D')).load();          
         }
 
     });
 
-    // Form Tambah Pengeluaran
+    // Form Tambah Report
     function addForm() {
         save_method = "add";
         $('input[name = method]').val('POST');
-        $('#modal-add-expense').modal('show');
-        $('#modal-add-expense form')[0].reset();
-        $('.modal-title').text('Tambah Pengeluaran');
+        $('#modal-add-report').modal('show');
+        $('#modal-add-report form')[0].reset();
+        $('.modal-title').text('Tambah Report');
     }
 
-    // Form Edit Pengeluaran
+    // Form Edit Report
     function editForm($id) {
-        url = "expense/" + $id;
-        $('#modal-edit-expense form')[0].reset();
-        $('.modal-title').text('Edit Pengeluaran');
+        url = "report/" + $id;
+        $('#modal-edit-report form')[0].reset();
+        $('.modal-title').text('Edit Report');
         $.ajax({
-            url: "expense/" + $id + "/edit",
+            url: "report/" + $id + "/edit",
             type: "GET",
             dataType: "JSON",
             success: function(data) {
-                $('#modal-edit-expense').modal('show');
-                $('.modal-title').text('Edit Pengeluaran');
+                $('#modal-edit-report').modal('show');
+                $('.modal-title').text('Edit Report');
                 $('#formEdit').attr('action', url);
                 $('#id').val(data.id);
-                $('#expenseDateEdit').val(data.expense_date);
-                $('#expenseTypeEdit').val(data.expense_type);
-                $('#expenseNominalEdit').val(data.expense_nominal);
+                $('#reportDateEdit').val(data.report_date);
+                $('#reportTypeEdit').val(data.report_type);
+                $('#reportNominalEdit').val(data.report_nominal);
             },
             error: function() {
                 alert('Tidak dapat menampilkan Data');

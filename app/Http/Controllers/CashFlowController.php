@@ -219,11 +219,11 @@ class CashFlowController extends Controller
         }
 
         if (!$cash->update()) {
-            return redirect()->route('cashflow.create')
+            return redirect()->route('cashflow.index')
                 ->with('failed_message', 'Data cash flow gagal diperbarui.');
         }
 
-        return redirect()->route('cashflow.create')
+        return redirect()->route('cashflow.index')
                 ->with('success_message', 'Data cash flow berhasil diperbarui.');
     }
 

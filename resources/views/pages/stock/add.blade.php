@@ -43,12 +43,12 @@
                                     <div class="row">
                                         <div class="col-xl-3 col-lg-4">
                                             <div class="form-group">
-                                                <input type="date" class="form-control"  name="date" />
+                                                <input type="date" class="form-control"  name="date" value="{{ date('Y-m-d') }}" />
                                             </div>
                                         </div>
                                         <div class="col-xl-2 col-lg-4">
                                             <div class="form-group">
-                                                <input type="time" class="form-control" name="time" />
+                                                <input type="time" class="form-control" name="time" value="{{ date('H:i') }}"/>
                                             </div>
                                         </div>
                                     </div>

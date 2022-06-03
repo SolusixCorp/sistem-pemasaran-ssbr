@@ -2,6 +2,8 @@
 
 //Format -> tanggal("2021-01-01");
 function tanggal($date){
+	$date = substr($date, 0, 10);
+	// return $date;
 	$month = array (
 		1 =>   'Januari',
 		'Februari',

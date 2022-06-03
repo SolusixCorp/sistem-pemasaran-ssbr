@@ -41,7 +41,7 @@
                             <thead>
                                 <tr>
                                     <th style="width:2%">No</th>
-                                    <th style="width:17%">Tgl Transaksi</th>
+                                    <th style="width:17%">Tanggal</th>
                                     <th>Nama Depo</th>
                                     <th style="width:13%">Tipe Kas</th>
                                     <th style="width:17%">Keterangan</th>

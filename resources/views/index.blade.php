@@ -356,8 +356,8 @@
         }
     
         // comboBarLineChart
-        var income = [12, 19, 3, 5, 2, 3];
-        var expense = [12, 19, 3, 5, 2, 3];
+        var income = <?php echo $incomeCartData; ?>;
+        var expense = <?php echo $purchaseCartData; ?>;
         var date = '100';
         var ctx_combo_bar = document.getElementById("comboBarLineChart").getContext('2d');
         var comboBarLineChart = new Chart(ctx_combo_bar, {
@@ -547,6 +547,14 @@
         
         });
 
+        
+
 
     </script>
+
+    <!-- BEGIN Java Script for this page -->
+    <script src="{{ asset('assets/plugins/chart.js/Chart.min.js') }}"></script>
+    <!-- Charts data -->
+    <script src="{{ asset('assets/data/data_charts.js') }}"></script>
+    <!-- END Java Script for this page -->
 @endsection
