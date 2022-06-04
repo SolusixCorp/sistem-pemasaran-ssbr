@@ -283,7 +283,7 @@ class CashFlowController extends Controller
                 $row[] = '(' . cashCategoryLabel($cashflow->expense_type) . ')<br>' . $cashflow->notes;
             }
             $row[] = rupiah($cashflow->amount, TRUE);
-            $edit = '<a href="'. url("/") .'/cashflow/edit/' . $cashflow->id . '" onclick="editForm(' . $cashflow->cashflow_id . ')" class="btn btn-warning btn-sm"><i class="far fa-edit"></i></a>
+            $edit = '<a href="'. url("/") .'/cashflow/edit/' . $cashflow->id . '" class="btn btn-warning btn-sm"><i class="far fa-edit"></i></a>
                     <a href="#" onclick="detailsView(' . $cashflow->id . ')" class="btn btn-primary btn-sm" data-toggle="modal"  data-target="#modal-details"><i class="far fa-eye"></i></a>';
             $print = '<a href="'. url("/") . '/cash/'. $cashflow->upload_file . '"  target="_blank" class="btn btn-dark btn-sm"><i class="far fa-file"></i></a>';
             if ($cashflow->upload_file == '') {

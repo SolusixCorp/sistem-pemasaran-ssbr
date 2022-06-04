@@ -70,12 +70,13 @@ Route::middleware(['auth:sanctum', 'verified'])->group(function () {
     Route::resource('employee', EmployeeController::class);
     
     // Report
-    Route::get('report/export/{start}/{end}', [ReportController::class, 'exportPdf'])->name('report.export');
-    Route::get('report/download/{start}/{end}', [ReportController::class, 'downloadPdf'])->name('report.download');
-    Route::get('report/data', [ReportController::class, 'listData'])->name('report.data');
-    Route::get('report/print', [ReportController::class, 'printReceipt'])->name('report.print');
-    Route::get('report/{start}/{end}', [ReportController::class, 'listData'])->name('report.data-by-date');
-    Route::resource('report', ReportController::class); 
+    Route::get('report', [ReportController::class, 'index'])->name('report.index');
+    Route::get('report/create', [ReportController::class, 'create'])->name('report.create');
+    Route::get('report/data', [ReportController::class, 'getAllData'])->name('report.data');
+    Route::get('report/edit/{id}', [ReportController::class, 'edit'])->name('report.edit');
+    Route::get('report/{start}/{end}', [ReportController::class, 'getAllData'])->name('report.data-by-date');
+    Route::post('report/create', [ReportController::class, 'store'])->name('report.store');
+    Route::post('report/update/{id}', [ReportController::class, 'update'])->name('report.update');
     
     // Stock Flow
     Route::get('stock', [StockFlowController::class, 'index'])->name('stock.index');

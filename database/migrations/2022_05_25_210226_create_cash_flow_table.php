@@ -20,10 +20,10 @@ class CreateCashFlowTable extends Migration
             $table->enum('cash_type', ['revenue', 'expense']);
             $table->enum('revenue_type_in', ['product_sales', 'petty_cash', 'another_revenue']);
             $table->enum('expense_type', ['expense', 'transfer']);
-            $table->text('notes');
+            $table->text('notes')->nullable();
             $table->float('amount');
             $table->boolean('is_matched');
-            $table->text('upload_file');
+            $table->text('upload_file')->nullable();
             $table->timestamps();
         });
     }

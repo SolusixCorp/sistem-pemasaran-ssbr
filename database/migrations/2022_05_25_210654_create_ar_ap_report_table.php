@@ -18,8 +18,8 @@ class CreateArApReportTable extends Migration
             $table->integer('depo_id');
             $table->datetime('payment_date');
             $table->enum('payment_type', ['transfer', 'cash', 'return']);
-            $table->text('payment_desc');
-            $table->text('payment_file_upload');
+            $table->text('payment_desc')->nullable();
+            $table->text('payment_file_upload')->nullable();
             $table->float('amount');
             $table->timestamps();
         });

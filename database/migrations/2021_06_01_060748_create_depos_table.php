@@ -22,7 +22,7 @@ class CreateDeposTable extends Migration
                 $table->string('address');
                 $table->string('phone');
                 $table->float('ar_balance');
-                $table->string('email')->nullable();
+                $table->string('email')->nullable();    
                 $table->timestamps();
             });
         }
