@@ -67,24 +67,20 @@
                                     <div class="form-group">
                                         <label for="stock_type">Tipe Stok</label>
                                         <select id="stock_type" name="stock_type" class="form-control js-example-basic-single">
-                                            @if (Auth::user()->role == 'ho')
-                                                @if ($stock['type'] == 'in')
-                                                    <option value="in" >STOCK IN</option>
-                                                    <option value="out" >STOCK OUT</option>
-                                                @else 
-                                                    <option value="out" >STOCK OUT</option>
-                                                    <option value="in" >STOCK IN</option>
-                                                @endif
-                                            @else
+                                            @if ($stock['type'] == 'IN')
+                                                <option value="in" >STOCK IN</option>
                                                 <option value="out" >STOCK OUT</option>
+                                            @else 
+                                                <option value="out" >STOCK OUT</option>
+                                                <option value="in" >STOCK IN</option>
                                             @endif
                                         </select>
                                     </div>
 
                                     <div class="form-group">
-                                        <label for="stock_category">Kategori Stok @if ($stock['type'] == 'in') {{ '(IN)' }} @else {{ '(OUT)' }} @endif</label>
+                                        <label for="stock_category" id="stock_category_label">Kategori Stok @if ($stock['type'] == 'IN') {{ '(IN)' }} @else {{ '(OUT)' }} @endif</label>
                                         <select id="stock_category" name="stock_category" class="form-control js-example-basic-single">
-                                            @if ($stock['type'] == 'in')
+                                            @if ($stock['type'] == 'IN')
                                                 @if ($stock['desc'] == 'Dropping')
                                                     <option value="dropping" >Dropping</option>
                                                     <option value="return" >Return</option>
@@ -111,10 +107,10 @@
                                                     <tbody id="dynamic_field">
                                                         @foreach ($stock['products'] as $product)
                                                         <tr>  
-                                                            <td width="50%">
+                                                            <td width="40%">
                                                                 <div class="form-group">
                                                                 <label for="item">Item</label>
-                                                                    <select id="barang_item_id" name="barang_item_id[]" class="form-control barang_item_id">
+                                                                    <select id="product_item_id" name="product_item_id[]" class="form-control product_item_id">
                                                                         <option value="{{ $product['product_id'] }}" >{{ $product['product_name'] }}</option>
                                                                         @foreach ($products_item as $b)
                                                                             @if ($b['product_id'] != $product['product_id']) 
@@ -126,11 +122,11 @@
                                                             </td>  
                                                             <td width="15%">
                                                                 <label for="item">Remaining Stok</label>
-                                                                <input type="text" name="notes_item[]" id="notes_item" placeholder="0" value="100" class="form-control" value="{{ $product['remaining_stock'] }}" readonly>
+                                                                <input type="text" name="notes_item[]" id="notes_item" placeholder="0" value="{{ $b['stock_remaining'] }}" class="form-control" value="{{ $product['remaining_stock'] }}" readonly>
                                                             </td>  
                                                             <td width="10%">
                                                                 <label for="item">Qty</label>
-                                                                <input type="number" name="qty[]" id="qty" value="1" class="form-control" value="{{ $product['qty'] }}" >
+                                                                <input type="number" name="qty[]" id="qty" class="form-control" value="{{ $product['qty'] }}" >
                                                             </td> 
                                                             <td>
                                                             <label for="item">Harga</label>
@@ -195,36 +191,92 @@
     <script>
         $('#add').click(function(){  
             i++;  
-            $('#dynamic_field').append('<tr id="row'+i+'"><td width="40%"><select id="'+i+'" name="product_item_id[]" class="form-control product_item_id"> @foreach ($products_item as $product) <option value="{{ $product['product_id'] }}" >{{ $product['product_name'] }}</option> @endforeach </select></td>  <td width="15%"><input type="text" name="remmaining_stock[]" id="remmaining_stock'+i+'" placeholder="0" value="100" class="form-control" readonly><td width="10%"><input type="number" name="qty[]" id="qty" value="1" class="form-control" ></td><td><select id="price'+i+'" name="price[]" class="form-control price">@foreach ($product['price'] as $price) <option value="{{ $price }}" >{{ $price }}</option> @endforeach</select></td><td><button type="button" name="remove" id="'+i+'" class="btn btn-danger btn_remove">X</button></td></tr>');  
-            
+            $('#dynamic_field').append('<tr id="row'+i+'"><td width="40%"><select id="'+i+'" name="product_item_id[]" class="form-control product_item_id"> @foreach ($products_item as $product) <option value="{{ $product['product_id'] }}" >{{ $product['product_name'] }}</option> @endforeach </select></td>  <td width="15%"><input type="text" name="remmaining_stock[]" id="remmaining_stock'+i+'" placeholder="0" value="{{ $product['stock_remaining'] }}" class="form-control" readonly><td width="10%"><input type="number" name="qty[]" id="qty" value="1" class="form-control" ></td><td><select id="price'+i+'" name="price[]" class="form-control price">@foreach ($product['price'] as $price) <option value="{{ $price }}" >{{ $price }}</option> @endforeach</select></td><td><button type="button" name="remove" id="'+i+'" class="btn btn-danger btn_remove">X</button></td></tr>');  
+       
             $(document).ready(function(){
-                $('.barang_item_id').select2({
+                $('.product_item_id').select2({
                     theme:'bootstrap4',
                     tags:true,
                 }).on('select2:close', function(){
                     var element = $(this);
                     var element_val = $.trim(element.val());
+                    var id = $(this).attr("id");
 
                     console.log(element_val)
+                    
+                    if(element_val != '') {
+                    $.ajax({
+                        url: "{{ url('/') }}" + "/stock/product/" + element_val,
+                        method: "GET",
+                        success: function(data) {
+                            $('#remmaining_stock'+id+'').val(data.stock_remaining);
+                            var priceOps = $('#price'+id+'');
+                            priceOps.empty();
+                            for (let i = 0; i < data.price.length; i++) {
+                                priceOps.append('<option value="' + data.price[i] + '">'+ data.price[i] +'</option>');
+                            }
+                        }
+                    })
+                }
                 })
             })
         });  
+
         $(document).on('click', '.btn_remove', function(){  
             var button_id = $(this).attr("id");   
             $('#row'+button_id+'').remove();  
         });  
 
         $(document).ready(function(){
-            $('.barang_item_id').select2({
+            //Select Item
+            $('.product_item_id').select2({
                 theme:'bootstrap4',
                 tags:true,
             }).on('select2:close', function(){
                 var element = $(this);
                 var element_val = $.trim(element.val());
 
+                if(element_val != '') {
+                    $.ajax({
+                        url: "{{ url('/') }}" + "/stock/product/" + element_val,
+                        method: "GET",
+                        success: function(data) {
+                            console.log(data)
+                            $("#remmaining_stock").val(data.stock_remaining);
+                            
+                        }
+                    })
+                }
+
                 console.log(element_val)
-            })
-        })
+            });
+
+            //Select Stock Type
+            $('#stock_type').select2({
+                theme:'bootstrap4',
+                tags:true,
+            }).on('select2:close', function(){
+                var element = $(this);
+                var element_val = $.trim(element.val());
+
+                if(element_val != '') {
+                    var stockCategoryOps = $('#stock_category');
+                    var stockCategoryLabel = $('#stock_category_label');
+                    stockCategoryOps.empty();
+                    if (element_val == 'in') {
+                        stockCategoryLabel.text('Kategori Stok (IN)');
+                        stockCategoryOps.append('<option value="dropping">Dropping</option>');
+                    } else {
+                        stockCategoryLabel.text('Kategori Stok (OUT)');
+                        stockCategoryOps.append('<option value="sales">Sales</option>');
+                    }
+                    stockCategoryOps.append('<option value="return">Return</option>');
+                }
+
+                console.log(element_val)
+            });
+
+        });
 
         // Single Date Picker
         $('input[name="singledatepicker"]').daterangepicker({
@@ -232,10 +284,9 @@
             showDropdowns: true
         });
 
-        $(document).ready(function(){
-
+        $(document).ready(function() {
             $('#depo_name').select2({
-                placeholder:'Pilih Pembeli',
+                placeholder:'Pilih Depo',
                 theme:'bootstrap4',
                 tags:true,
             }).on('select2:close', function(){
@@ -264,11 +315,7 @@
                         },
                         success: function(data) {
                             console.log(data)
-                            if (data.error != null || data.error != undefined || data.error == true) {
-                                if(data == 'yes') {
-                                    element.append('<option value="'+ data.id +'">'+element_val+'</option>').val(data.id);
-                                }
-                            }
+                            element.append('<option value="'+ data.id +'">'+element_val+'</option>').val(data.id);
                         }
                     })
                 }

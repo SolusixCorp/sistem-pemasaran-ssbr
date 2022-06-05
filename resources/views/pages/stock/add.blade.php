@@ -66,9 +66,7 @@
                                         <label for="stock_type">Tipe Stok</label>
                                         <select id="stock_type" name="stock_type" class="form-control js-example-basic-single">
                                             <option value="out" >STOCK OUT</option>
-                                            @if (Auth::user()->role == 'ho')
-                                            <option value="in" >STOCK IN</option>
-                                            @endif
+                                            <option value="in" >STOCK IN</option>                
                                         </select>
                                     </div>
 
@@ -86,7 +84,7 @@
                                                 <table class="table table-bordered" id="" cellspacing="0" cellpadding="0" style="border:none; border-collapse: collapse;">  
                                                     <tbody id="dynamic_field">
                                                         <tr>  
-                                                            <td width="50%">
+                                                            <td width="40%">
                                                                 <div class="form-group">
                                                                 <label for="item">Item</label>
                                                                     <select id="product_item_id" name="product_item_id[]" class="form-control product_item_id">
@@ -163,7 +161,7 @@
     <script>
         $('#add').click(function(){  
             i++;  
-            $('#dynamic_field').append('<tr id="row'+i+'"><td width="40%"><select id="'+i+'" name="product_item_id[]" class="form-control product_item_id"> @foreach ($products_item as $product) <option value="{{ $product['product_id'] }}" >{{ $product['product_name'] }}</option> @endforeach </select></td>  <td width="15%"><input type="text" name="remmaining_stock[]" id="remmaining_stock'+i+'" placeholder="0" value="100" class="form-control" readonly><td width="10%"><input type="number" name="qty[]" id="qty" value="1" class="form-control" ></td><td><select id="price'+i+'" name="price[]" class="form-control price">@foreach ($product['price'] as $price) <option value="{{ $price }}" >{{ $price }}</option> @endforeach</select></td><td><button type="button" name="remove" id="'+i+'" class="btn btn-danger btn_remove">X</button></td></tr>');  
+            $('#dynamic_field').append('<tr id="row'+i+'"><td width="40%"><select id="'+i+'" name="product_item_id[]" class="form-control product_item_id"> @foreach ($products_item as $product) <option value="{{ $product['product_id'] }}" >{{ $product['product_name'] }}</option> @endforeach </select></td>  <td width="15%"><input type="text" name="remmaining_stock[]" id="remmaining_stock'+i+'" placeholder="0" value="{{ $product['stock_remaining'] }}" class="form-control" readonly><td width="10%"><input type="number" name="qty[]" id="qty" value="1" class="form-control" ></td><td><select id="price'+i+'" name="price[]" class="form-control price">@foreach ($product['price'] as $price) <option value="{{ $price }}" >{{ $price }}</option> @endforeach</select></td><td><button type="button" name="remove" id="'+i+'" class="btn btn-danger btn_remove">X</button></td></tr>');  
        
             $(document).ready(function(){
                 $('.product_item_id').select2({
@@ -172,15 +170,17 @@
                 }).on('select2:close', function(){
                     var element = $(this);
                     var element_val = $.trim(element.val());
+                    var id = $(this).attr("id");
 
                     console.log(element_val)
+                    
                     if(element_val != '') {
                     $.ajax({
                         url: "{{ url('/') }}" + "/stock/product/" + element_val,
                         method: "GET",
                         success: function(data) {
-                            $('#remmaining_stock'+i+'').val(data.stock_remaining);
-                            var priceOps = $('#price'+i+'');
+                            $('#remmaining_stock'+id+'').val(data.stock_remaining);
+                            var priceOps = $('#price'+id+'');
                             priceOps.empty();
                             for (let i = 0; i < data.price.length; i++) {
                                 priceOps.append('<option value="' + data.price[i] + '">'+ data.price[i] +'</option>');
@@ -247,12 +247,6 @@
             });
 
         });
-
-        // function qtyCheck() {
-        //     var element = $(this);
-        //     var element_val = $.trim(element.val());
-        //     console.log(element_val); 
-        // }
 
         // Single Date Picker
         $('input[name="singledatepicker"]').daterangepicker({
