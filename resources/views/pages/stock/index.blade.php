@@ -90,7 +90,6 @@
                 type: "GET",
                 dataType: "JSON",
                 success: function(data) {
-                    console.log(date)
                     $('#modal-details').modal('show');
                     $('.modal-title').text('Detail Transaksi');
                     $('#vTanggalTransaksi').text(data.input_date);

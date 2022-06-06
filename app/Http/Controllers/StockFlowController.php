@@ -125,7 +125,9 @@ class StockFlowController extends Controller
             $depos = Depo::leftJoin('users', 'user_id', '=', 'users.id')->get();
         } else {
             $products = ProductDepo::leftJoin('products', 'product_id', '=', 'products.id')
+                    ->leftJoin('depos', 'depo_id', '=', 'depos.id')
                     ->select('products_depo.id', 'products.name', 'products_depo.stock', 'products_depo.depo_price')
+                    ->where('user_id', '=', $user->id)
                     ->orderBy('name', 'asc')
                     ->get();
 
@@ -222,25 +224,36 @@ class StockFlowController extends Controller
         foreach($product_items as $index => $item) {
             $user = Auth::user();
             if ($user->role == 'ho') {
-                $product = Product::where('products.id', '=', (int) $item)->first(); 
+                $product = Product::where('products.id', '=', (int) $item)
+                    ->select('id', 'id as product_id', 'name', 'stock')
+                    ->first(); 
             } else {
-                $productHO = Product::where('products.id', '=', (int) $item)->first(); 
                 $product = ProductDepo::leftJoin('products', 'product_id', '=', 'products.id')
-                        ->select('products_depo.id', 'products.name', 'products_depo.stock', 'products_depo.depo_price')
-                        ->where('products.id', '=', (int) $item)
-                        ->first(); 
+                    ->select('products_depo.id', 'products_depo.product_id', 'products.name', 'products_depo.stock', 'products_depo.depo_price')
+                    ->where('products_depo.id', '=', (int) $item)
+                    ->first(); 
+
+                $productHO = Product::where('products.id', '=',  $product->product_id)->first(); 
             }
 
             $stock = new StockFlow;
             $stock->depo_id = (int) $in_depo;
-            $stock->product_id = (int) $item;
-            $stock->stock = (int) $product->stock + (int) $qty_items[$index];
+            $stock->product_id = (int) $product->id;
+            if ($stock->stock == null) {
+                $stock->stock = (int) $qty_items[$index];
+            } else {
+                $stock->stock += (int) $qty_items[$index];
+            }
             if ($in_date != null && $in_time != null) {
                 $stock->input_date = $in_date . " " . $in_time . ":00";
             }
             $stock->stock_type = $in_stock_type;
             $stock->qty = (int) $qty_items[$index];
-            $stock->remaining_stock = (int) $product->stock;
+            if ($stock->remaining_stock == null) {
+                $stock->remaining_stock = (int) $qty_items[$index];
+            } else {
+                $stock->remaining_stock = (int) $product->stock;
+            }
     
             $position = strpos($price_items[$index], ' (');
             $price = substr($price_items[$index], 0 , $position);
@@ -249,9 +262,10 @@ class StockFlowController extends Controller
             $stock->price = (float) rupiahNumber($price_items[$index]);
             if ($in_stock_type == 'in') {
                 if ($user->role == 'depo') {
+                    $productHO;
                     if ($productHO->stock < $qty_items[$index]) {
                         return redirect()->route('stock.create')
-                        ->with('failed_message', 'Stock '. $product->name .' tidak cukup');
+                        ->with('failed_message', 'Stock '. $product->name .' Head Office tidak cukup');
                     }
 
                     $productHO->stock -= (int) $qty_items[$index]; 
@@ -360,6 +374,7 @@ class StockFlowController extends Controller
             $depos = Depo::leftJoin('users', 'user_id', '=', 'users.id')->get();
         } else {
             $products = ProductDepo::leftJoin('products', 'product_id', '=', 'products.id')
+                    ->leftJoin('depos', 'depo_id', '=', 'depos.id')
                     ->select('products_depo.id', 'products.name', 'products_depo.stock', 'products_depo.depo_price')
                     ->orderBy('name', 'asc')
                     ->get();
@@ -463,22 +478,23 @@ class StockFlowController extends Controller
         foreach($product_items as $index => $item) {
             $user = Auth::user();
             if ($user->role == 'ho') {
-                $product = Product::where('products.id', '=', (int) $item)->first(); 
+                $product = Product::where('products.id', '=', (int) $item)
+                    ->select('id', 'id as product_id', 'name', 'stock')
+                    ->first(); 
             } else {
-                $productHO = Product::where('products.id', '=', (int) $item)->first(); 
                 $product = ProductDepo::leftJoin('products', 'product_id', '=', 'products.id')
-                        ->select('products_depo.id', 'products.name', 'products_depo.stock', 'products_depo.depo_price')
-                        ->where('products.id', '=', (int) $item)
-                        ->where('products_depo.depo_id', '=', (int) $item)
-                        ->first(); 
+                    ->select('products_depo.id', 'products_depo.product_id', 'products.name', 'products_depo.stock', 'products_depo.depo_price')
+                    ->where('products_depo.id', '=', (int) $item)
+                    ->first(); 
+
+                $productHO = Product::where('products.id', '=',  $product->product_id)->first(); 
             }
 
             $stock = StockFlow::where('input_date', '=', $date)
-                    ->where('product_id', '=', (int) $item)
                     ->first();
 
             $stock->depo_id = (int) $in_depo;
-            $stock->product_id = (int) $item;
+            $stock->product_id = (int) $product->id;
             $stock->stock = (int) $product->stock + (int) $qty_items[$index];
             if ($in_date != null && $in_time != null) {
                 $stock->input_date = $in_date . " " . $in_time . ":00";

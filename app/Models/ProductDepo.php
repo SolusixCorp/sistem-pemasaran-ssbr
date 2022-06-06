@@ -11,4 +11,9 @@ class ProductDepo extends Model
     protected $table = 'products_depo';
     protected $primaryKey = 'id';
 
+    public function product()
+    {
+        return $this->hasOne(Product::class, 'id', 'product_id');
+    }
+
 }

@@ -19,6 +19,13 @@
                             <label for="upProductName">Nama Produk</label>
                             <input type="text" name="upProductName" class="form-control" id="upProductName" placeholder="Gudang Garam Surya" autocomplete="off" required readonly>
                         </div>
+
+                        @if (Auth::user()->role == 'freelance')
+                        <div class="form-group">
+                            <label for="upDepoPrice">Harga Depo</label>
+                            <input type="number" min="0" name="inDepoPrice" class="form-control" id="inDepoPrice" required placeholder="50000">
+                        </div>
+                        @endif
                         
                         <div class="form-group">
                             <label for="upStatus">Status</label>
