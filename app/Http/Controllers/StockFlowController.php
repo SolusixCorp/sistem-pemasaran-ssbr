@@ -18,12 +18,14 @@ use Illuminate\Http\Request;
 class StockFlowController extends Controller
 {
     public function index() {
+        $user = Auth::user();
+
         $categories = CategoryProduct::orderBy('category.category_name', 'asc')->get();
         $depos = Depo::leftJoin('users', 'user_id', '=', 'users.id')->get();
-
+        
         return view('pages.stock.index', [
             "categories" => $categories,
-            "depos"  => $depos,   
+            "depos"  => $depos  
         ]);
     }
 
@@ -249,11 +251,6 @@ class StockFlowController extends Controller
             }
             $stock->stock_type = $in_stock_type;
             $stock->qty = (int) $qty_items[$index];
-            if ($stock->remaining_stock == null) {
-                $stock->remaining_stock = (int) $qty_items[$index];
-            } else {
-                $stock->remaining_stock = (int) $product->stock;
-            }
     
             $position = strpos($price_items[$index], ' (');
             $price = substr($price_items[$index], 0 , $position);
@@ -289,8 +286,9 @@ class StockFlowController extends Controller
                 $stock->stockin_category = '';
                 $product->stock -= (int) $qty_items[$index];
             }
+        
+            $stock->remaining_stock = (int) $product->stock;
 
-            
             $total_amount += (float) rupiahNumber($price_items[$index]) * (int) $qty_items[$index];
 
             if (!$stock->save()) {

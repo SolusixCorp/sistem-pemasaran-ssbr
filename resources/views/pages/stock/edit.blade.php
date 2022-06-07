@@ -124,7 +124,7 @@
                                                                 <label for="item">Remaining Stok</label>
                                                                 <input type="text" name="notes_item[]" id="notes_item" placeholder="0" value="{{ $b['stock_remaining'] }}" class="form-control" value="{{ $product['remaining_stock'] }}" readonly>
                                                             </td>  
-                                                            <td width="10%">
+                                                            <td width="12%">
                                                                 <label for="item">Qty</label>
                                                                 <input type="number" name="qty[]" id="qty" class="form-control" value="{{ $product['qty'] }}" >
                                                             </td> 
@@ -191,7 +191,7 @@
     <script>
         $('#add').click(function(){  
             i++;  
-            $('#dynamic_field').append('<tr id="row'+i+'"><td width="40%"><select id="'+i+'" name="product_item_id[]" class="form-control product_item_id"> @foreach ($products_item as $product) <option value="{{ $product['product_id'] }}" >{{ $product['product_name'] }}</option> @endforeach </select></td>  <td width="15%"><input type="text" name="remmaining_stock[]" id="remmaining_stock'+i+'" placeholder="0" value="{{ $product['stock_remaining'] }}" class="form-control" readonly><td width="10%"><input type="number" name="qty[]" id="qty" value="1" class="form-control" ></td><td><select id="price'+i+'" name="price[]" class="form-control price">@foreach ($product['price'] as $price) <option value="{{ $price }}" >{{ $price }}</option> @endforeach</select></td><td><button type="button" name="remove" id="'+i+'" class="btn btn-danger btn_remove">X</button></td></tr>');  
+            $('#dynamic_field').append('<tr id="row'+i+'"><td width="40%"><select id="'+i+'" name="product_item_id[]" class="form-control product_item_id"> @foreach ($products_item as $product) <option value="{{ $product['product_id'] }}" >{{ $product['product_name'] }}</option> @endforeach </select></td>  <td width="15%"><input type="text" name="remmaining_stock[]" id="remmaining_stock'+i+'" placeholder="0" value="{{ $product['stock_remaining'] }}" class="form-control" readonly><td width="12%"><input type="number" name="qty[]" id="qty" value="1" class="form-control" ></td><td><select id="price'+i+'" name="price[]" class="form-control price">@foreach ($product['price'] as $price) <option value="{{ $price }}" >{{ $price }}</option> @endforeach</select></td><td><button type="button" name="remove" id="'+i+'" class="btn btn-danger btn_remove">X</button></td></tr>');  
        
             $(document).ready(function(){
                 $('.product_item_id').select2({

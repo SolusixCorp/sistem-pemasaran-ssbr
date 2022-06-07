@@ -32,7 +32,7 @@
                             </select>
                         </div>
 
-                        @if (Auth::user()->role == 'freelance')
+                        @if ($depoType->type == 'freelance')
                         <div class="form-group">
                             <label for="inDepoPrice">Harga Depo</label>
                             <input type="number" min="0" name="inDepoPrice" class="form-control" id="inDepoPrice" required placeholder="50000">

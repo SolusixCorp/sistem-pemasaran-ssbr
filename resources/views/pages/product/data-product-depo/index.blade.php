@@ -8,11 +8,13 @@
         <div class="col-12" id="list-product">
             <div class="card mb-3">
                 <div class="card-header">
+                    @if (Auth::user()->role == 'depo')
                     <span class="pull-right">
                         <button class="btn btn-primary" data-toggle="modal" data-target="#modal-add-product">
                             <i class="fas fa-plus-circle" aria-hidden="true"></i> Produk Baru
                         </button>
                     </span>
+                    @endif
                     <h3><i class="fas fa-cubes"></i> Produk Depo</h3>
                     @include('pages/product/data-product-depo/add-product')
                     @include('pages/product/data-product-depo/edit-product')
@@ -41,21 +43,21 @@
 
                     <div class="form-row col-7 pull-right">
                         <div class="form-group col-md-4">
-                        <label for="inCategorySearch">Kategori</label>
-                            <select id="inCategorySearch" name="inCategorySearch" class="form-control">
-                            <option value="0" selected>Semua</option>    
-                                @foreach ($categories as $category)
-                                    <option value="{{ $category->category_id }}" >{{ $category->category_name }}</option>
-                                @endforeach
-                            </select>
-                        </div>
-
-                        <div class="form-group col-md-4">
                         <label for="inDepoSearch">Depo</label>
                             <select id="inDepoSearch" name="inDepoSearch" class="form-control">
                                 <option value="0" selected>Semua</option>
                                 @foreach ($depos as $depo)
                                     <option value="{{ $depo->depo_id }}" >{{ $depo->depo_name }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        
+                        <div class="form-group col-md-4">
+                        <label for="inCategorySearch">Kategori</label>
+                            <select id="inCategorySearch" name="inCategorySearch" class="form-control">
+                            <option value="0" selected>Semua</option>    
+                                @foreach ($categories as $category)
+                                    <option value="{{ $category->category_id }}" >{{ $category->category_name }}</option>
                                 @endforeach
                             </select>
                         </div>
@@ -104,13 +106,13 @@
     
     <script>
     var table;
-    var categoryId = 0, DepoId = 0, status = 0; 
+    var categoryId = 0, depoId = 0, status = 0; 
     $(function() {
         // Menampilkan data product
         table = $('#dataTable').DataTable({
             data: dataSet,
             ajax: {
-                url: "data-product-depo/data/" + categoryId + "/" + DepoId + "/" + status,
+                url: "data-product-depo/data/" + categoryId + "/" + depoId + "/" + status,
                 type: "GET"
             }
         });
@@ -121,9 +123,9 @@
         {
             categoryId = $(this).val();
             $.ajax({
-                url: "data-product-depo/data/" + categoryId + "/" + DepoId + "/" + status,
+                url: "data-product-depo/data/" + categoryId + "/" + depoId + "/" + status,
                 success: function(response){
-                    table.ajax.url("data-product-depo/data/" + categoryId + "/" + DepoId + "/" + status).load(); 
+                    table.ajax.url("data-product-depo/data/" + categoryId + "/" + depoId + "/" + status).load(); 
                     } ,
                 error: function() {
                     alert('Tidak dapat menampilkan Data');
@@ -183,6 +185,7 @@
                 $('.modal-title').text('Edit Product');
                 $('#formEdit').attr('action', url);
                 $('#upProductName').val(data.product_name);
+                $('#upDepoPrice').val(data.depo_price);
                 $('#upStatus').val(data.product_status);
             },
             error: function() {

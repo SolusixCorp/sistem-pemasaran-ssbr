@@ -37,137 +37,152 @@ class ProductDepoController extends Controller
                     ->get();
         }
 
+        $depoType = Depo::leftJoin('users', 'user_id', '=', 'users.id')
+                ->where('user_id', '=', $user->id)
+                ->first();
+
         $categories = CategoryProduct::orderBy('category.category_name', 'asc')
                     ->where('category.status', '=', "Aktif")
                     ->select('category.id as category_id', 'category.category_name')
                     ->get();
 
         return view('pages.product.data-product-depo.index', compact('products'), compact('depos'))
-                ->with(['categories' => $categories]);
+                ->with(['categories' => $categories])
+                ->with(['depoType' => $depoType]);
     }
 
     public function listData($categoryId, $depoId, $status) {
         $user = Auth::user();
         if ($status != 0 && $categoryId != 0 && $depoId == 0) {
             if ($user->role == 'ho') {
-                $products = Product::leftJoin('products', 'product_id', '=', 'products.id')
-                        ->leftJoin('depos', 'depo_id', '=', 'depos.id')
-                        ->leftJoin('users', 'user_id', '=', 'users.id')
-                        ->leftJoin('category', 'category.id', '=', 'products.category_id')
-                        ->select('category.category_name', 'products.id as product_id', 'users.name as depo_name', 'products.name' , 'products.retail_price', 'products.sub_whole_price', 'products.wholesales_price', 'products_depo.depo_price' , 'products_depo.stock')
-                        ->where('products.category_id', '=', $categoryId)
-                        ->where('status', '=', $status)
-                        ->get();
-            } else {
-                $products = ProductDepo::leftJoin('products', 'product_id', '=', 'products.id')
-                        ->leftJoin('depos', 'depo_id', '=', 'depos.id')
-                        ->leftJoin('users', 'user_id', '=', 'users.id')
-                        ->leftJoin('category', 'category.id', '=', 'products.category_id')
-                        ->select('category.category_name', 'products.id as product_id', 'users.name as depo_name', 'products.name' , 'products.retail_price', 'products.sub_whole_price', 'products.wholesales_price', 'products_depo.depo_price' , 'products_depo.stock')
-                        ->where('products.category_id', '=', $categoryId)
-                        ->where('status', '=', $status)
-                        ->where('depos.user_id', '=', $user->id)
-                        ->get();
-            }
-        } else if ($status != 0 && $categoryId == 0 && $depoId != 0) { 
-            if ($user->role == 'ho') {
-                $products = Product::leftJoin('products', 'product_id', '=', 'products.id')
-                        ->leftJoin('depos', 'depo_id', '=', 'depos.id')
-                        ->leftJoin('users', 'user_id', '=', 'users.id')
-                        ->leftJoin('category', 'category.id', '=', 'products.category_id')
-                        ->select('category.category_name', 'products.id as product_id', 'users.name as depo_name', 'products.name' , 'products.retail_price', 'products.sub_whole_price', 'products.wholesales_price', 'products_depo.depo_price' , 'products_depo.stock')
-                        ->where('depo_id', '=', $depoId)
-                        ->where('status', '=', $status)
-                        ->get();
+            $products = ProductDepo::leftJoin('products', 'product_id', '=', 'products.id')
+                    ->leftJoin('depos', 'depo_id', '=', 'depos.id')
+                    ->leftJoin('users', 'user_id', '=', 'users.id')
+                    ->leftJoin('category', 'category.id', '=', 'products.category_id')
+                    ->select('category.category_name', 'products_depo.id as product_id', 'users.name as depo_name', 'products.name' , 'products.retail_price', 'products.sub_whole_price', 'products.wholesales_price', 'products_depo.depo_price' , 'products_depo.stock')
+                    ->where('products.category_id', '=', $categoryId)
+                    ->where('product_depo.status', '=', $status)
+                    ->get();
             } else {
                 $products = ProductDepo::leftJoin('products', 'product_id', '=', 'products.id')
                     ->leftJoin('depos', 'depo_id', '=', 'depos.id')
                     ->leftJoin('users', 'user_id', '=', 'users.id')
                     ->leftJoin('category', 'category.id', '=', 'products.category_id')
-                    ->select('category.category_name', 'products.id as product_id', 'users.name as depo_name', 'products.name' , 'products.retail_price', 'products.sub_whole_price', 'products.wholesales_price', 'products_depo.depo_price' , 'products_depo.stock')
-                    ->where('status', '=', $status)
+                    ->select('category.category_name', 'products_depo.id as product_id', 'users.name as depo_name', 'products.name' , 'products.retail_price', 'products.sub_whole_price', 'products.wholesales_price', 'products_depo.depo_price' , 'products_depo.stock')
+                    ->where('products.category_id', '=', $categoryId)
+                    ->where('product_depo.status', '=', $status)
+                    ->where('depos.user_id', '=', $user->id)
+                    ->get();
+            }
+        } else if ($status != 0 && $categoryId == 0 && $depoId != 0) { 
+            if ($user->role == 'ho') {
+                $products = ProductDepo::leftJoin('products', 'product_id', '=', 'products.id')
+                    ->leftJoin('depos', 'depo_id', '=', 'depos.id')
+                    ->leftJoin('users', 'user_id', '=', 'users.id')
+                    ->leftJoin('category', 'category.id', '=', 'products.category_id')
+                    ->select('category.category_name', 'products_depo.id as product_id', 'users.name as depo_name', 'products.name' , 'products.retail_price', 'products.sub_whole_price', 'products.wholesales_price', 'products_depo.depo_price' , 'products_depo.stock')
+                    ->where('products_depo.status', '=', $status)
+                    ->where('depo_id', '=', $depoId)
+                    ->get(); 
+            } else {
+                $products = ProductDepo::leftJoin('products', 'product_id', '=', 'products.id')
+                    ->leftJoin('depos', 'depo_id', '=', 'depos.id')
+                    ->leftJoin('users', 'user_id', '=', 'users.id')
+                    ->leftJoin('category', 'category.id', '=', 'products.category_id')
+                    ->select('category.category_name', 'products_depo.id as product_id', 'users.name as depo_name', 'products.name' , 'products.retail_price', 'products.sub_whole_price', 'products.wholesales_price', 'products_depo.depo_price' , 'products_depo.stock')
+                    ->where('products_depo.status', '=', $status)
                     ->where('depo_id', '=', $depoId)
                     ->where('depos.user_id', '=', $user->id)
                     ->get(); 
             }
-            
         } else if ($status != 0 && $categoryId != 0 && $depoId != 0) {
             if ($user->role == 'ho') {
-                $products = Product::leftJoin('products', 'product_id', '=', 'products.id')
-                        ->leftJoin('depos', 'depo_id', '=', 'depos.id')
-                        ->leftJoin('users', 'user_id', '=', 'users.id')
-                        ->leftJoin('category', 'category.id', '=', 'products.category_id')
-                        ->select('category.category_name', 'products.id as product_id', 'users.name as depo_name', 'products.name' , 'products.retail_price', 'products.sub_whole_price', 'products.wholesales_price', 'products_depo.depo_price' , 'products_depo.stock')
-                        ->where('products.category_id', '=', $categoryId)
-                        ->where('depo_id', '=', $depoId)
-                        ->where('status', '=', $status)
-                        ->get();
+                $products = ProductDepo::leftJoin('products', 'product_id', '=', 'products.id')
+                    ->leftJoin('depos', 'depo_id', '=', 'depos.id')
+                    ->leftJoin('users', 'user_id', '=', 'users.id')
+                    ->leftJoin('category', 'category.id', '=', 'products.category_id')
+                    ->select('category.category_name', 'products_depo.id as product_id', 'users.name as depo_name', 'products.name' , 'products.retail_price', 'products.sub_whole_price', 'products.wholesales_price', 'products_depo.depo_price' , 'products_depo.stock')
+                    ->where('products.category_id', '=', $categoryId)
+                    ->where('products_depo.status', '=', $status)
+                    ->where('depo_id', '=', $depoId)
+                    ->get(); 
             } else {
                 $products = ProductDepo::leftJoin('products', 'product_id', '=', 'products.id')
                     ->leftJoin('depos', 'depo_id', '=', 'depos.id')
                     ->leftJoin('users', 'user_id', '=', 'users.id')
                     ->leftJoin('category', 'category.id', '=', 'products.category_id')
-                    ->select('category.category_name', 'products.id as product_id', 'users.name as depo_name', 'products.name' , 'products.retail_price', 'products.sub_whole_price', 'products.wholesales_price', 'products_depo.depo_price' , 'products_depo.stock')
+                    ->select('category.category_name', 'products_depo.id as product_id', 'users.name as depo_name', 'products.name' , 'products.retail_price', 'products.sub_whole_price', 'products.wholesales_price', 'products_depo.depo_price' , 'products_depo.stock')
                     ->where('products.category_id', '=', $categoryId)
-                    ->where('status', '=', $status)
+                    ->where('products_depo.status', '=', $status)
                     ->where('depo_id', '=', $depoId)
                     ->where('depos.user_id', '=', $user->id)
                     ->get(); 
             }
         } else if ($status == 0 && $categoryId != 0 && $depoId == 0) {
             if ($user->role == 'ho') {
-                $products = Product::leftJoin('products', 'product_id', '=', 'products.id')
-                        ->leftJoin('depos', 'depo_id', '=', 'depos.id')
-                        ->leftJoin('users', 'user_id', '=', 'users.id')
-                        ->leftJoin('category', 'category.id', '=', 'products.category_id')
-                        ->select('category.category_name', 'products.id as product_id', 'users.name as depo_name', 'products.name' , 'products.retail_price', 'products.sub_whole_price', 'products.wholesales_price', 'products_depo.depo_price' , 'products_depo.stock')
-                        ->where('products.category_id', '=', $categoryId)
-                        ->get();
-            } else {
-            $products = ProductDepo::leftJoin('products', 'product_id', '=', 'products.id')
+                $products = ProductDepo::leftJoin('products', 'product_id', '=', 'products.id')
                     ->leftJoin('depos', 'depo_id', '=', 'depos.id')
                     ->leftJoin('users', 'user_id', '=', 'users.id')
                     ->leftJoin('category', 'category.id', '=', 'products.category_id')
-                    ->select('category.category_name', 'products.id as product_id', 'users.name as depo_name', 'products.name' , 'products.retail_price', 'products.sub_whole_price', 'products.wholesales_price', 'products_depo.depo_price' , 'products_depo.stock')
+                    ->select('category.category_name', 'products_depo.id as product_id', 'users.name as depo_name', 'products.name' , 'products.retail_price', 'products.sub_whole_price', 'products.wholesales_price', 'products_depo.depo_price' , 'products_depo.stock')
+                    ->where('products.category_id', '=', $categoryId)
+                    ->get(); 
+            } else {
+                $products = ProductDepo::leftJoin('products', 'product_id', '=', 'products.id')
+                    ->leftJoin('depos', 'depo_id', '=', 'depos.id')
+                    ->leftJoin('users', 'user_id', '=', 'users.id')
+                    ->leftJoin('category', 'category.id', '=', 'products.category_id')
+                    ->select('category.category_name', 'products_depo.id as product_id', 'users.name as depo_name', 'products.name' , 'products.retail_price', 'products.sub_whole_price', 'products.wholesales_price', 'products_depo.depo_price' , 'products_depo.stock')
                     ->where('products.category_id', '=', $categoryId)
                     ->where('depos.user_id', '=', $user->id)
                     ->get(); 
             }
         } else if ($status == 0 && $categoryId == 0 && $depoId != 0) { 
             if ($user->role == 'ho') {
-                $products = Product::leftJoin('products', 'product_id', '=', 'products.id')
-                        ->leftJoin('depos', 'depo_id', '=', 'depos.id')
-                        ->leftJoin('users', 'user_id', '=', 'users.id')
-                        ->leftJoin('category', 'category.id', '=', 'products.category_id')
-                        ->select('category.category_name', 'products.id as product_id', 'users.name as depo_name', 'products.name' , 'products.retail_price', 'products.sub_whole_price', 'products.wholesales_price', 'products_depo.depo_price' , 'products_depo.stock')
-                        ->where('depo_id', '=', $depoId)
-                        ->get();
+                $products = ProductDepo::leftJoin('products', 'product_id', '=', 'products.id')
+                    ->leftJoin('depos', 'depo_id', '=', 'depos.id')
+                    ->leftJoin('users', 'user_id', '=', 'users.id')
+                    ->leftJoin('category', 'category.id', '=', 'products.category_id')
+                    ->select('category.category_name', 'products_depo.id as product_id', 'users.name as depo_name', 'products.name' , 'products.retail_price', 'products.sub_whole_price', 'products.wholesales_price', 'products_depo.depo_price' , 'products_depo.stock')
+                    ->where('depo_id', '=', $depoId)
+                    ->get(); 
             } else {
                 $products = ProductDepo::leftJoin('products', 'product_id', '=', 'products.id')
                     ->leftJoin('depos', 'depo_id', '=', 'depos.id')
                     ->leftJoin('users', 'user_id', '=', 'users.id')
                     ->leftJoin('category', 'category.id', '=', 'products.category_id')
-                    ->select('category.category_name', 'products.id as product_id', 'users.name as depo_name', 'products.name' , 'products.retail_price', 'products.sub_whole_price', 'products.wholesales_price', 'products_depo.depo_price' , 'products_depo.stock')
+                    ->select('category.category_name', 'products_depo.id as product_id', 'users.name as depo_name', 'products.name' , 'products.retail_price', 'products.sub_whole_price', 'products.wholesales_price', 'products_depo.depo_price' , 'products_depo.stock')
                     ->where('depo_id', '=', $depoId)
                     ->where('depos.user_id', '=', $user->id)
                     ->get(); 
             }
         } else if ($status != 0 && $categoryId == 0 && $depoId == 0) { 
-            $products = ProductDepo::leftJoin('products', 'product_id', '=', 'products.id')
+            if ($user->role == 'ho') {
+                $products = ProductDepo::leftJoin('products', 'product_id', '=', 'products.id')
                     ->leftJoin('depos', 'depo_id', '=', 'depos.id')
                     ->leftJoin('users', 'user_id', '=', 'users.id')
                     ->leftJoin('category', 'category.id', '=', 'products.category_id')
-                    ->select('category.category_name', 'products.id as product_id', 'users.name as depo_name', 'products.name' , 'products.retail_price', 'products.sub_whole_price', 'products.wholesales_price', 'products_depo.depo_price' , 'products_depo.stock')
-                    ->where('status', '=', $status)
+                    ->select('category.category_name', 'products_depo.id as product_id', 'users.name as depo_name', 'products.name' , 'products.retail_price', 'products.sub_whole_price', 'products.wholesales_price', 'products_depo.depo_price' , 'products_depo.stock')
+                    ->where('products_depo.status', '=', $status)
+                    ->get(); 
+            } else {
+                $products = ProductDepo::leftJoin('products', 'product_id', '=', 'products.id')
+                    ->leftJoin('depos', 'depo_id', '=', 'depos.id')
+                    ->leftJoin('users', 'user_id', '=', 'users.id')
+                    ->leftJoin('category', 'category.id', '=', 'products.category_id')
+                    ->select('category.category_name', 'products_depo.id as product_id', 'users.name as depo_name', 'products.name' , 'products.retail_price', 'products.sub_whole_price', 'products.wholesales_price', 'products_depo.depo_price' , 'products_depo.stock')
+                    ->where('products_depo.status', '=', $status)
                     ->where('depos.user_id', '=', $user->id)
                     ->get(); 
+            }
+                
         } else if ($status == 0 && $categoryId != 0 && $depoId != 0) { 
             if ($user->role == 'ho') {
-                $products = Product::leftJoin('products', 'product_id', '=', 'products.id')
+                $products = ProductDepo::leftJoin('products', 'product_id', '=', 'products.id')
                         ->leftJoin('depos', 'depo_id', '=', 'depos.id')
                         ->leftJoin('users', 'user_id', '=', 'users.id')
                         ->leftJoin('category', 'category.id', '=', 'products.category_id')
-                        ->select('category.category_name', 'products.id as product_id', 'users.name as depo_name', 'products.name' , 'products.retail_price', 'products.sub_whole_price', 'products.wholesales_price', 'products_depo.depo_price' , 'products_depo.stock')
+                        ->select('category.category_name', 'products_depo.id as product_id', 'users.name as depo_name', 'products.name' , 'products.retail_price', 'products.sub_whole_price', 'products.wholesales_price', 'products_depo.depo_price' , 'products_depo.stock')
                         ->where('products.category_id', '=', $categoryId)
                         ->where('depo_id', '=', $depoId)
                         ->get();
@@ -176,7 +191,7 @@ class ProductDepoController extends Controller
                         ->leftJoin('depos', 'depo_id', '=', 'depos.id')
                         ->leftJoin('users', 'user_id', '=', 'users.id')
                         ->leftJoin('category', 'category.id', '=', 'products.category_id')
-                        ->select('category.category_name', 'products.id as product_id', 'users.name as depo_name', 'products.name' , 'products.retail_price', 'products.sub_whole_price', 'products.wholesales_price', 'products_depo.depo_price' , 'products_depo.stock')
+                        ->select('category.category_name', 'products_depo.id as product_id', 'users.name as depo_name', 'products.name' , 'products.retail_price', 'products.sub_whole_price', 'products.wholesales_price', 'products_depo.depo_price' , 'products_depo.stock')
                         ->where('products.category_id', '=', $categoryId)
                         ->where('depo_id', '=', $depoId)
                         ->where('depos.user_id', '=', $user->id)
@@ -184,21 +199,22 @@ class ProductDepoController extends Controller
             }
         } else {
             if ($user->role == 'ho') {
-                $products = Product::leftJoin('products', 'product_id', '=', 'products.id')
-                        ->leftJoin('depos', 'depo_id', '=', 'depos.id')
-                        ->leftJoin('users', 'user_id', '=', 'users.id')
-                        ->leftJoin('category', 'category.id', '=', 'products.category_id')
-                        ->select('category.category_name', 'products.id as product_id', 'users.name as depo_name', 'products.name' , 'products.retail_price', 'products.sub_whole_price', 'products.wholesales_price', 'products_depo.depo_price' , 'products_depo.stock')
-                        ->get();
+                $products = ProductDepo::leftJoin('products', 'product_id', '=', 'products.id')
+                    ->leftJoin('depos', 'depo_id', '=', 'depos.id')
+                    ->leftJoin('users', 'depo_id', '=', 'users.id')
+                    ->leftJoin('category', 'category.id', '=', 'products.category_id')
+                    ->select('category.category_name', 'products_depo.id as product_id', 'users.name as depo_name', 'products.name' , 'products.retail_price', 'products.sub_whole_price', 'products.wholesales_price', 'products_depo.depo_price' , 'products_depo.stock')
+                    ->get(); 
             } else {
                 $products = ProductDepo::leftJoin('products', 'product_id', '=', 'products.id')
                     ->leftJoin('depos', 'depo_id', '=', 'depos.id')
                     ->leftJoin('users', 'depo_id', '=', 'users.id')
                     ->leftJoin('category', 'category.id', '=', 'products.category_id')
-                    ->select('category.category_name', 'products.id as product_id', 'users.name as depo_name', 'products.name' , 'products.retail_price', 'products.sub_whole_price', 'products.wholesales_price', 'products_depo.depo_price' , 'products_depo.stock')
+                    ->select('category.category_name', 'products_depo.id as product_id', 'users.name as depo_name', 'products.name' , 'products.retail_price', 'products.sub_whole_price', 'products.wholesales_price', 'products_depo.depo_price' , 'products_depo.stock')
                     ->where('depos.user_id', '=', $user->id)
                     ->get(); 
             }
+                
         }
 
         $no = 0;
@@ -212,8 +228,14 @@ class ProductDepoController extends Controller
             $row[] = $products->depo_name;
             $row[] = rupiah($products->depo_price, TRUE);
             $row[] = $products->stock;
-            $row[] = '<a href="#" onclick="editForm(' . $products->product_id . ')" class="btn btn-warning btn-sm" data-toggle="modal"><i class="far fa-edit"></i></a>
-            <a href="#" onclick="detailsView(' . $products->product_id . ')" class="btn btn-primary btn-sm" data-toggle="modal"><i class="far fa-eye"></i></a>';
+            $edit = '<a href="#" onclick="editForm(' . $products->product_id . ')" class="btn btn-warning btn-sm" data-toggle="modal"><i class="far fa-edit"></i></a>';
+            $view = '<a href="#" onclick="detailsView(' . $products->product_id . ')" class="btn btn-primary btn-sm" data-toggle="modal"><i class="far fa-eye"></i></a>';
+            if ($user->type == 'ho') {
+                $row[] = $edit . $view;
+            } else {
+                $row[] = $view;
+            }
+            $row[] = 
             $data[] = $row;
         }
 
@@ -277,8 +299,8 @@ class ProductDepoController extends Controller
     {
         $product = ProductDepo::leftJoin('products', 'product_id', '=', 'products.id')
                 ->leftJoin('category', 'category.id', '=', 'products.category_id')
-                ->select('category.category_name', 'products.id as product_id', 'products.name', 'products.consument_price', 'products.retail_price', 'products.sub_whole_price', 'products.wholesales_price', 'products.image', 'products_depo.status', 'products_depo.depo_price', 'products_depo.stock')
-                ->where('products.id', '=', $id)
+                ->select('category.category_name', 'products_depo.id as product_id', 'products.name', 'products.consument_price', 'products.retail_price', 'products.sub_whole_price', 'products.wholesales_price', 'products.image', 'products_depo.status', 'products_depo.depo_price', 'products_depo.stock')
+                ->where('products_depo.id', '=', $id)
                 ->first();
 
                 $image = $product->image;
@@ -315,12 +337,13 @@ class ProductDepoController extends Controller
         //
         $product = ProductDepo::leftJoin('products', 'product_id', '=', 'products.id')
                 ->leftJoin('category', 'category.id', '=', 'products.category_id')
-                ->select('category.category_name', 'products.id as product_id', 'products.name' , 'products.retail_price', 'products.sub_whole_price', 'products.wholesales_price', 'products.image', 'products_depo.status', 'products_depo.depo_price', 'products_depo.stock')
-                ->where('products.id', '=', $id)
+                ->select('category.category_name', 'products.name' , 'products.retail_price', 'products.sub_whole_price', 'products.wholesales_price', 'products.image', 'products_depo.status', 'products_depo.depo_price', 'products_depo.stock')
+                ->where('products_depo.id', '=', $id)
                 ->first();
 
                 $productData = array(
                     'product_name' => $product->name,
+                    'depo_price' => $product->depo_price,
                     'product_status' => $product->status
                 );
         echo json_encode($productData);
@@ -337,6 +360,7 @@ class ProductDepoController extends Controller
     {
         //
         $products = ProductDepo::find($id);
+        $products->depo_price = $request['upDepoPrice'];
         $products->status = $request['upStatus'];
         $products->update();
 

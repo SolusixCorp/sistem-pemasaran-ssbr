@@ -20,10 +20,10 @@
                             <input type="text" name="upProductName" class="form-control" id="upProductName" placeholder="Gudang Garam Surya" autocomplete="off" required readonly>
                         </div>
 
-                        @if (Auth::user()->role == 'freelance')
+                        @if ($depoType->type == 'freelance')
                         <div class="form-group">
                             <label for="upDepoPrice">Harga Depo</label>
-                            <input type="number" min="0" name="inDepoPrice" class="form-control" id="inDepoPrice" required placeholder="50000">
+                            <input type="number" min="0" name="upDepoPrice" class="form-control" id="upDepoPrice" required placeholder="50000">
                         </div>
                         @endif
                         
