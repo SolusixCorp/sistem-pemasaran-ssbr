@@ -16,18 +16,18 @@
     <div class="row">
 
         <div class="col-xs-12 col-md-6 col-lg-6 col-xl-4">
-            <div class="card-box noradius noborder bg-dark" id="sum">
-                <i class="fas fa-wallet float-right text-white"></i>
-                <h6 class="text-white text-uppercase m-b-20">Total Penjualan</h6>
+            <div class="card-box noradius noborder bg-warning" id="count">
+                <i class="fas fa-shopping-cart float-right text-white"></i>
+                <h6 class="text-white text-uppercase m-b-20">Total Transaksi</h6>
                 <h2 class="m-b-20 text-white"></h2>
                 <span class="text-white">Hari Ini</span>
             </div>
         </div>
 
         <div class="col-xs-12 col-md-6 col-lg-6 col-xl-4">
-            <div class="card-box noradius noborder bg-warning" id="count">
-                <i class="fas fa-shopping-cart float-right text-white"></i>
-                <h6 class="text-white text-uppercase m-b-20">Total Transaksi</h6>
+            <div class="card-box noradius noborder bg-dark" id="sum">
+                <i class="fas fa-wallet float-right text-white"></i>
+                <h6 class="text-white text-uppercase m-b-20">Total Penjualan</h6>
                 <h2 class="m-b-20 text-white"></h2>
                 <span class="text-white">Hari Ini</span>
             </div>
@@ -356,7 +356,7 @@
         }
     
         // comboBarLineChart
-        var income = <?php echo $incomeCartData; ?>;
+        var income = [10,10];
         var expense = <?php echo $purchaseCartData; ?>;
         var date = '100';
         var ctx_combo_bar = document.getElementById("comboBarLineChart").getContext('2d');
