@@ -128,6 +128,19 @@
                                         <label for="notes">Catatan</label>
                                         <textarea type="text" name="notes" class="form-control" id="notes">{{ $cash['notes'] }}</textarea>
                                     </div>
+
+                                    <div class="form-group">
+                                        <label for="match">Is Matched ?</label>
+                                        <select id="match" name="match" class="form-control js-example-basic-single">
+                                            @if ($cash['match'] == '0') 
+                                                <option value="0" >Not Match</option>
+                                                <option value="1" >Match</option>
+                                            @else 
+                                                <option value="1" >Match</option>
+                                                <option value="0" >Not Match</option>
+                                            @endif
+                                        </select>
+                                    </div>
                                   
                                 </div>
                             </div>

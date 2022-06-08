@@ -46,38 +46,6 @@
 
     <div class="row">
 
-        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-6 col-xl-6">
-            <div class="card mb-3">
-                <div class="card-header">
-                    <h3><i class="fas fa-chart-bar"></i> Grafik Cash Flow</h3>
-                </div>
-
-                <div class="card-body">
-                    <canvas id="comboBarLineChart"></canvas>
-                </div>
-                <!-- <div class="card-footer small text-muted">Updated yesterday at 11:59 PM</div> -->
-            </div>
-            <!-- end card-->
-        </div>
-
-        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-6 col-xl-6">
-            <div class="card mb-3">
-                <div class="card-header">
-                    <h3><i class="fas fa-chart-bar"></i> Grafik Stock Flow</h3>
-                </div>
-
-                <div class="card-body">
-                    <canvas id="comboBarLineChart2"></canvas>
-                </div>
-                <!-- <div class="card-footer small text-muted">Updated yesterday at 11:59 PM</div> -->
-            </div>
-            <!-- end card-->
-        </div>
-
-    </div>
-
-    <div class="row">
-
         <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-6">
             <div class="card mb-3">
                 <div class="card-header">
@@ -153,53 +121,16 @@
                 <div class="card-body">
 
                     <div class="widget-messages nicescroll" style="height: 400px;">
+                        @foreach ($depoCashFlowNewDatas as $depoCashFlowNewData)
                         <a href="#">
                             <div class="message-item">
-                                <p class="message-item-user">Depo Malang</p>
-                                <p class="message-item-msg">CASH IN (Rp. 1.000.000,-)</p>
-                                <p class="message-item-date">11:50 PM</p>
+                                <p class="message-item-user">{{ $depoCashFlowNewData['depo_name'] }}</p>
+                                <p class="message-item-msg">{{ $depoCashFlowNewData['desc'] }}</p>
+                                <p class="message-item-date">{{ $depoCashFlowNewData['date'] }}</p>
                             </div>
                         </a>
 
-                        <a href="#">
-                            <div class="message-item">
-                                <p class="message-item-user">Depo Malang</p>
-                                <p class="message-item-msg">CASH IN (Rp. 1.000.000,-)</p>
-                                <p class="message-item-date">11:50 PM</p>
-                            </div>
-                        </a>
-
-                        <a href="#">
-                            <div class="message-item">
-                                <p class="message-item-user">Depo Malang</p>
-                                <p class="message-item-msg">CASH IN (Rp. 1.000.000,-)</p>
-                                <p class="message-item-date">11:50 PM</p>
-                            </div>
-                        </a>
-
-                        <a href="#">
-                            <div class="message-item">
-                                <p class="message-item-user">Depo Malang</p>
-                                <p class="message-item-msg">CASH IN (Rp. 1.000.000,-)</p>
-                                <p class="message-item-date">11:50 PM</p>
-                            </div>
-                        </a>
-                        <a href="#">
-                            <div class="message-item">
-                                <p class="message-item-user">Depo Malang</p>
-                                <p class="message-item-msg">CASH IN (Rp. 1.000.000,-)</p>
-                                <p class="message-item-date">11:50 PM</p>
-                            </div>
-                        </a>
-
-                        <a href="#">
-                            <div class="message-item">
-                                <p class="message-item-user">Depo Malang</p>
-                                <p class="message-item-msg">CASH IN (Rp. 1.000.000,-)</p>
-                                <p class="message-item-date">11:50 PM</p>
-                            </div>
-                        </a>
-                        
+                        @endforeach
                     </div>
 
                 </div>
@@ -218,61 +149,15 @@
                 <div class="card-body">
 
                     <div class="widget-messages nicescroll" style="height: 400px;">
+                        @foreach ($depoStockFlowNewDatas as $depoStockFlowNewData)
                         <a href="#">
                             <div class="message-item">
-                                <p class="message-item-user">Depo Malang</p>
-                                <p class="message-item-msg">STOCK IN : Gudang Garam Surya (10 Item)</p>
-                                <p class="message-item-date">11:50 PM</p>
+                                <p class="message-item-user">{{ $depoStockFlowNewData['depo_name'] }}</p>
+                                <p class="message-item-msg">{{ $depoStockFlowNewData['desc'] }}</p>
+                                <p class="message-item-date">{{ $depoStockFlowNewData['date'] }}</p>
                             </div>
                         </a>
-
-                        <a href="#">
-                            <div class="message-item">
-                                <p class="message-item-user">Depo Malang</p>
-                                <p class="message-item-msg">STOCK IN : Gudang Garam Surya (10 Item)</p>
-                                <p class="message-item-date">11:50 PM</p>
-                            </div>
-                        </a>
-
-                        <a href="#">
-                            <div class="message-item">
-                                <p class="message-item-user">Depo Malang</p>
-                                <p class="message-item-msg">STOCK IN : Gudang Garam Surya (10 Item)</p>
-                                <p class="message-item-date">11:50 PM</p>
-                            </div>
-                        </a>
-
-                        <a href="#">
-                            <div class="message-item">
-                                <p class="message-item-user">Depo Malang</p>
-                                <p class="message-item-msg">STOCK IN : Gudang Garam Surya (10 Item)</p>
-                                <p class="message-item-date">11:50 PM</p>
-                            </div>
-                        </a>
-
-                        <a href="#">
-                            <div class="message-item">
-                                <p class="message-item-user">Depo Malang</p>
-                                <p class="message-item-msg">STOCK IN : Gudang Garam Surya (10 Item)</p>
-                                <p class="message-item-date">11:50 PM</p>
-                            </div>
-                        </a>
-
-                        <a href="#">
-                            <div class="message-item">
-                                <p class="message-item-user">Depo Malang</p>
-                                <p class="message-item-msg">STOCK IN : Gudang Garam Surya (10 Item)</p>
-                                <p class="message-item-date">11:50 PM</p>
-                            </div>
-                        </a>
-
-                        <a href="#">
-                            <div class="message-item">
-                                <p class="message-item-user">Depo Malang</p>
-                                <p class="message-item-msg">STOCK IN : Gudang Garam Surya (10 Item)</p>
-                                <p class="message-item-date">11:50 PM</p>
-                            </div>
-                        </a>
+                        @endforeach
                     </div>
 
                 </div>
@@ -280,12 +165,7 @@
             </div>
             <!-- end card-->
         </div>
-
     </div>
-
-@endsection
-
-@section('custom_css')
 
 @endsection
 
@@ -354,81 +234,14 @@
                 }
             });
         }
-    
-        // comboBarLineChart
-        var income = [10,10];
-        var expense = <?php echo $purchaseCartData; ?>;
-        var date = '100';
-        var ctx_combo_bar = document.getElementById("comboBarLineChart").getContext('2d');
-        var comboBarLineChart = new Chart(ctx_combo_bar, {
-            type: 'bar',
-            data: {
-                labels: date,
-                datasets: [{
-                        type: 'bar',
-                        label: 'CASH IN',
-                        backgroundColor: '#0065c4',
-                        data: expense
-                    }, {
-                        type: 'bar',
-                        label: 'CASH OUT',
-                        backgroundColor: '#ffd000',
-                        data: income
-                    }], 
-                    borderWidth: 1
-            },
-            options: {
-                scales: {
-                    yAxes: [{
-                        ticks: {
-                            beginAtZero:true
-                        }
-                    }]
-                }
-            }
-        });
 
-        // comboBarLineChart2
-        var income = [12, 19, 3, 5, 2, 3];
-        var expense = [12, 19, 3, 5, 2, 3];
-        var date = '100';
-
-        var ctx_combo_bar = document.getElementById("comboBarLineChart2").getContext('2d');
-        var comboBarLineChart = new Chart(ctx_combo_bar, {
-            type: 'bar',
-            data: {
-                labels: date,
-                datasets: [{
-                        type: 'bar',
-                        label: 'STOCK IN',
-                        backgroundColor: '#0065c4',
-                        data: expense
-                    }, {
-                        type: 'bar',
-                        label: 'STOCK OUT',
-                        backgroundColor: '#ffd000',
-                        data: income
-                    }], 
-                    borderWidth: 1
-            },
-            options: {
-                scales: {
-                    yAxes: [{
-                        ticks: {
-                            beginAtZero:true
-                        }
-                    }]
-                }
-            }
-        });
-
-        // pieChartCashIn
+        // pieChart Cash In
         var ctx_pie_chart = document.getElementById("pieChartCashIn").getContext('2d');
         var pieChart = new Chart(ctx_pie_chart, {
             type: 'pie',
             data: {
                     datasets: [{
-                        data: [12, 19, 3, 5, 2, 3],
+                        data: <?php echo $cashInCartsData; ?>,
                         backgroundColor: [
                             'rgba(255,99,132,1)',
                             'rgba(54, 162, 235, 1)',
@@ -439,13 +252,7 @@
                         ],
                         label: 'Dataset 1'
                     }],
-                    labels: [
-                        "Red",
-                        "Orange",
-                        "Yellow",
-                        "Green",
-                        "Blue"
-                    ]
+                    labels: <?php echo $depoCartsCashInData; ?>
                 },
                 options: {
                     responsive: true
@@ -453,14 +260,13 @@
         
         });
 
-
-        // pieChartCashOut
+        // pieChart Cash Out
         var ctx_pie_chart = document.getElementById("pieChartCashOut").getContext('2d');
         var pieChart = new Chart(ctx_pie_chart, {
             type: 'pie',
             data: {
                     datasets: [{
-                        data: [12, 19, 3, 5, 2, 3],
+                        data: <?php echo $cashOutCartsData; ?>,
                         backgroundColor: [
                             'rgba(255,99,132,1)',
                             'rgba(54, 162, 235, 1)',
@@ -471,13 +277,7 @@
                         ],
                         label: 'Dataset 1'
                     }],
-                    labels: [
-                        "Red",
-                        "Orange",
-                        "Yellow",
-                        "Green",
-                        "Blue"
-                    ]
+                    labels: <?php echo $depoCartsCashOutData; ?>
                 },
                 options: {
                     responsive: true
@@ -485,13 +285,13 @@
         
         });
 
-        // doughnutChartStockIn
+        // doughnutChart Stock In
         var ctx_doughnut_chart = document.getElementById("doughnutChartStockIn").getContext('2d');
         var doughnutChart = new Chart(ctx_doughnut_chart, {
             type: 'doughnut',
             data: {
                     datasets: [{
-                        data: [12, 19, 3, 5, 2, 3],
+                        data: <?php echo $stockInCartsData ?>,
                         backgroundColor: [
                             'rgba(255,99,132,1)',
                             'rgba(54, 162, 235, 1)',
@@ -502,13 +302,7 @@
                         ],
                         label: 'Dataset 1'
                     }],
-                    labels: [
-                        "Red",
-                        "Orange",
-                        "Yellow",
-                        "Green",
-                        "Blue"
-                    ]
+                    labels: <?php echo $depoCartsStockInData ?>
                 },
                 options: {
                     responsive: true
@@ -516,13 +310,13 @@
         
         });
 
-        // doughnutChartStockOut
+        // doughnutChart Stock In
         var ctx_doughnut_chart = document.getElementById("doughnutChartStockOut").getContext('2d');
         var doughnutChart = new Chart(ctx_doughnut_chart, {
             type: 'doughnut',
             data: {
                     datasets: [{
-                        data: [12, 19, 3, 5, 2, 3],
+                        data: <?php echo $stockOutCartsData ?>,
                         backgroundColor: [
                             'rgba(255,99,132,1)',
                             'rgba(54, 162, 235, 1)',
@@ -533,13 +327,7 @@
                         ],
                         label: 'Dataset 1'
                     }],
-                    labels: [
-                        "Red",
-                        "Orange",
-                        "Yellow",
-                        "Green",
-                        "Blue"
-                    ]
+                    labels: <?php echo $depoCartsStockOutData ?>
                 },
                 options: {
                     responsive: true
@@ -547,14 +335,6 @@
         
         });
 
-        
-
-
     </script>
 
-    <!-- BEGIN Java Script for this page -->
-    <script src="{{ asset('assets/plugins/chart.js/Chart.min.js') }}"></script>
-    <!-- Charts data -->
-    <script src="{{ asset('assets/data/data_charts.js') }}"></script>
-    <!-- END Java Script for this page -->
 @endsection

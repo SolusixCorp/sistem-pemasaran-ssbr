@@ -46,6 +46,7 @@
                                     <th style="width:13%">Tipe Kas</th>
                                     <th style="width:17%">Keterangan</th>
                                     <th style="width:15%">Total</th>
+                                    <th style="width:10%">Status</th>
                                     <th style="width:13%">Aksi</th>
                                 </tr>
                             </thead>
@@ -90,7 +91,7 @@
                 type: "GET",
                 dataType: "JSON",
                 success: function(data) {
-                    console.log(data)
+                    console.log(data.match)
                     $('#modal-details').modal('show');
                     $('.modal-title').text('Details Cash Flow');
                     $('#vTanngalInput').text(data.input_date);
@@ -99,6 +100,7 @@
                     $('#vCategory').text(data.category);
                     $('#vNotes').text(data.notes);
                     $('#vTotal').text(data.total);
+                    $('#vStatus').text(data.match);
 
                     for(var i = 0; i < data.order_items.length; i++) {
                         $('#data-detail-modal').append('<div class="message-item"><h6 id="vItems" class="message-item-user message-item-date" style="position:initial !important">' + data.order_items[i].barang.name  + ' => ' + data.order_items[i].qty + ' '  + ' x ' + data.order_items[i].barang.selling_price + ' = ' + data.order_items[i].sub_total + '</h6></div>');  

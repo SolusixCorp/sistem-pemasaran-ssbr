@@ -62,6 +62,7 @@ class CashFlowController extends Controller
         $in_amount = $request['amount'];
         $in_receipt = $request['receipt'];
         $in_notes = $request['notes'];
+        $in_is_matched = $request['match'];
 
         $cash = new CashFlow;
         $cash->depo_id = $in_depo;
@@ -78,7 +79,7 @@ class CashFlowController extends Controller
         }
         $cash->notes = $in_notes;
         $cash->amount = $in_amount;
-        $cash->is_matched = false;
+        $cash->is_matched = $in_is_matched;
 
         if ($in_receipt) {
             $receipt_name = time().'.' . $request->receipt->extension();
@@ -87,11 +88,11 @@ class CashFlowController extends Controller
         $cash->upload_file = $receipt_name;
 
         if (!$cash->save()) {
-            return redirect()->route('cashflow.create')
+            return redirect()->route('cashflow.index')
                 ->with('failed_message', 'Data cash flow gagal disimpan.');
         }
 
-        return redirect()->route('cashflow.create')
+        return redirect()->route('cashflow.index')
                 ->with('success_message', 'Data cash flow berhasil disimpan.');
     }
 
@@ -113,6 +114,13 @@ class CashFlowController extends Controller
             $category = cashCategoryLabel($cashData->expense_type);
         } 
 
+        $status = '';
+        if ($cashData->is_matched > 0) {
+            $status = '<span class="label radius-circle bg-success">Match</span>';
+        } else {
+            $status = '<span class="label radius-circle bg-danger">Not Match</span>';
+        }
+
         $cash = array(
             'cash_id' => $cashData->id,
             'input_date' => $cashData->input_date,
@@ -121,6 +129,7 @@ class CashFlowController extends Controller
             'category' => $category,
             'notes' => $cashData->notes,
             'total' => rupiah($cashData->amount, TRUE),
+            'match' => $status,
         );
 
         return response()->json($cash);
@@ -166,7 +175,8 @@ class CashFlowController extends Controller
             'type' => $cashData->cash_type,
             'category' => $category,
             'notes' => $cashData->notes,
-            'total' => $cashData->amount,
+            'total' => (int) $cashData->amount,
+            'match' => $cashData->is_matched,
         );
 
         return view('pages.cashflow.edit', [
@@ -193,6 +203,7 @@ class CashFlowController extends Controller
         $in_amount = $request['amount'];
         $in_receipt = $request['receipt'];
         $in_notes = $request['notes'];
+        $in_is_matched = $request['match'];
 
         $cash = CashFlow::find($id);
         $cash->depo_id = $in_depo;
@@ -209,7 +220,7 @@ class CashFlowController extends Controller
         }
         $cash->notes = $in_notes;
         $cash->amount = $in_amount;
-        $cash->is_matched = false;
+        $cash->is_matched = $in_is_matched;
 
         if ($in_receipt) {
             $receipt_name = time().'.' . $request->receipt->extension();
@@ -248,6 +259,13 @@ class CashFlowController extends Controller
             $category = cashCategoryLabel($cashData->expense_type);
         } 
 
+        $status = '';
+        if ($cashData->is_matched > 0) {
+            $status = 'Match';
+        } else {
+            $status = 'Not Match';
+        }
+
         $cash = array(
             'cash_id' => $cashData->id,
             'input_date' => $cashData->input_date,
@@ -256,6 +274,7 @@ class CashFlowController extends Controller
             'category' => $category,
             'notes' => $cashData->notes,
             'total' => rupiah($cashData->amount, TRUE),
+            'match' => $status,
         );
 
         return response()->json($cash);
@@ -264,7 +283,7 @@ class CashFlowController extends Controller
     public function getAllData() {
         $cashflows =  CashFlow::leftJoin('depos', 'depo_id', '=', 'depos.id')
                     ->leftJoin('users', 'depos.user_id', '=', 'users.id')
-                    ->select('cash_flow.id', 'input_date', 'users.name', 'cash_type', 'revenue_type_in', 'expense_type', 'notes', 'amount', 'upload_file')
+                    ->select('cash_flow.id', 'input_date', 'users.name', 'cash_type', 'revenue_type_in', 'expense_type', 'is_matched', 'notes', 'amount', 'upload_file')
                     ->orderBy('cash_flow.input_date', 'desc')
                     ->get(); 
         $no = 0;
@@ -283,6 +302,12 @@ class CashFlowController extends Controller
                 $row[] = '(' . cashCategoryLabel($cashflow->expense_type) . ')<br>' . $cashflow->notes;
             }
             $row[] = rupiah($cashflow->amount, TRUE);
+            if ($cashflow->is_matched > 0) {
+                $row[] = '<span class="label radius-circle bg-success">Match</span>';
+            } else {
+                $row[] = '<span class="label radius-circle bg-danger">Not Match</span>';
+            }
+            
             $edit = '<a href="'. url("/") .'/cashflow/edit/' . $cashflow->id . '" class="btn btn-warning btn-sm"><i class="far fa-edit"></i></a>
                     <a href="#" onclick="detailsView(' . $cashflow->id . ')" class="btn btn-primary btn-sm" data-toggle="modal"  data-target="#modal-details"><i class="far fa-eye"></i></a>';
             $print = '<a href="'. url("/") . '/cash/'. $cashflow->upload_file . '"  target="_blank" class="btn btn-dark btn-sm"><i class="far fa-file"></i></a>';

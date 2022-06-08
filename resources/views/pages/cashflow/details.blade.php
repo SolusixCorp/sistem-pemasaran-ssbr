@@ -43,7 +43,7 @@
 
                     <div class="message-item">
                         <h6 class="message-item-user">Status</h6>
-                        <h6 id="vStatus" class="message-item-date">Matched</h6>
+                        <h6 id="vStatus" class="message-item-date"></h6>
                     </div>
 
                 </div>
