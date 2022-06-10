@@ -18,12 +18,12 @@
                         
                         <div class="form-group">
                             <label for="editCategoryName">Nama Kategori</label>
-                            <input name="categoryName" type="text" class="form-control" id="editCategoryName" placeholder="Kretek" autocomplete="off" required>
+                            <input name="editCategoryName" type="text" class="form-control" id="editCategoryName" placeholder="Kretek" autocomplete="off" required>
                             
                         </div>
                         <div class="form-group">
                             <label for="editInputStatus">Status</label>
-                            <select id="editInputStatus" name="inputStatus" class="form-control">
+                            <select id="editInputStatus" name="editInputStatus" class="form-control">
                                 <option selected>Aktif</option>
                                 <option>Tidak Aktif</option>
                             </select>

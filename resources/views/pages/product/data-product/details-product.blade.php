@@ -11,7 +11,7 @@
             <div class="modal-body">
                 <div class="row">
                     <div class="col-xs-12 col-sm-12 col-md-12">
-                        <img id="vPhoto" class="img-fluid" data-toggle="magnify" src="https://via.placeholder.com/600x350" alt="Sample Image">
+                        <img id="vPhoto" class="img-fluid margin-auto" data-toggle="magnify" src="https://via.placeholder.com/600x350" alt="Sample Image">
                     </div>
                 </div>
                 <div class="widget-messages" style="margin-top: 20px;">

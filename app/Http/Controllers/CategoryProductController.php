@@ -48,7 +48,7 @@ class CategoryProductController extends Controller
             $row[] = $no;
             $row[] = $category->category_name;
             $row[] = $category->status;
-            $row[] = '<a onclick="editForm(' . $category->category_id . ')" class="btn btn-warning btn-sm"><i class="far fa-edit"></i></a>';
+            $row[] = '<a onclick="editForm(' . $category->id . ')" class="btn btn-warning btn-sm"><i class="far fa-edit"></i></a>';
             $data[] = $row;
         }
 
@@ -126,8 +126,8 @@ class CategoryProductController extends Controller
     {
         //
         $category = CategoryProduct::find($id);
-        $category->category_name = $request['categoryName'];
-        $category->status = $request['inputStatus'];
+        $category->category_name = $request['editCategoryName'];
+        $category->status = $request['editInputStatus'];
         
         if (!$category->update()) {
             return redirect()->route('category-product.index')

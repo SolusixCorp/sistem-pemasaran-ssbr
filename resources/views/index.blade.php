@@ -19,7 +19,7 @@
             <div class="card-box noradius noborder bg-warning" id="count">
                 <i class="fas fa-shopping-cart float-right text-white"></i>
                 <h6 class="text-white text-uppercase m-b-20">Total Transaksi</h6>
-                <h2 class="m-b-20 text-white"></h2>
+                <h4 class="m-b-20 text-white"></h4>
                 <span class="text-white">Hari Ini</span>
             </div>
         </div>
@@ -28,7 +28,7 @@
             <div class="card-box noradius noborder bg-dark" id="sum">
                 <i class="fas fa-wallet float-right text-white"></i>
                 <h6 class="text-white text-uppercase m-b-20">Total Penjualan</h6>
-                <h2 class="m-b-20 text-white"></h2>
+                <h4 class="m-b-20 text-white"></h4>
                 <span class="text-white">Hari Ini</span>
             </div>
         </div>
@@ -37,7 +37,7 @@
             <div class="card-box noradius noborder bg-primary" id="average">
                 <i class="fas fa-hand-holding-usd float-right text-white"></i>
                 <h6 class="text-white text-uppercase m-b-20">Rata - rata Penjualan</h6>
-                <h2 class="m-b-20 text-white"></h2>
+                <h4 class="m-b-20 text-white"></h4>
                 <span class="text-white">Hari Ini</span>
             </div>
         </div>
@@ -55,7 +55,7 @@
                 <div class="card-body">
                     <canvas id="pieChartCashIn"></canvas>
                 </div>
-                <div class="card-footer small text-muted">Updated yesterday at 11:59 PM</div>
+                <div class="card-footer small text-muted"></div>
             </div>
             <!-- end card-->
         </div>
@@ -69,7 +69,7 @@
                 <div class="card-body">
                     <canvas id="pieChartCashOut"></canvas>
                 </div>
-                <div class="card-footer small text-muted">Updated yesterday at 11:59 PM</div>
+                <div class="card-footer small text-muted"></div>
             </div>
             <!-- end card-->
         </div>
@@ -87,7 +87,7 @@
                 <div class="card-body">
                     <canvas id="doughnutChartStockIn"></canvas>
                 </div>
-                <div class="card-footer small text-muted">Updated yesterday at 11:59 PM</div>
+                <div class="card-footer small text-muted"></div>
             </div>
             <!-- end card-->
         </div>
@@ -101,7 +101,7 @@
                 <div class="card-body">
                     <canvas id="doughnutChartStockOut"></canvas>
                 </div>
-                <div class="card-footer small text-muted">Updated yesterday at 11:59 PM</div>
+                <div class="card-footer small text-muted"></div>
             </div>
             <!-- end card-->
         </div>
@@ -115,13 +115,12 @@
             <div class="card mb-3">
                 <div class="card-header">
                     <h3><i class="fas fa-balance-scale"></i> Cash Flow Terbaru</h3>
-                    Lorem ipsum dolor sit amet, consectetur adipiscing elit.
                 </div>
 
                 <div class="card-body">
 
                     <div class="widget-messages nicescroll" style="height: 400px;">
-                        @foreach ($depoCashFlowNewDatas as $depoCashFlowNewData)
+                        @foreach ($data['depoCashFlowNewDatas'] as $depoCashFlowNewData)
                         <a href="#">
                             <div class="message-item">
                                 <p class="message-item-user">{{ $depoCashFlowNewData['depo_name'] }}</p>
@@ -134,7 +133,7 @@
                     </div>
 
                 </div>
-                <div class="card-footer small text-muted">Updated today at 11:59 PM</div>
+                <div class="card-footer small text-muted"></div>
             </div>
             <!-- end card-->
         </div>
@@ -143,13 +142,12 @@
             <div class="card mb-3">
                 <div class="card-header">
                     <h3><i class="fas fa-dolly-flatbed"></i> Stock Flow Terbaru</h3>
-                    Lorem ipsum dolor sit amet, consectetur adipiscing elit.
                 </div>
 
                 <div class="card-body">
 
                     <div class="widget-messages nicescroll" style="height: 400px;">
-                        @foreach ($depoStockFlowNewDatas as $depoStockFlowNewData)
+                        @foreach ($data['depoStockFlowNewDatas'] as $depoStockFlowNewData)
                         <a href="#">
                             <div class="message-item">
                                 <p class="message-item-user">{{ $depoStockFlowNewData['depo_name'] }}</p>
@@ -171,8 +169,15 @@
 
 @section('custom_js')
     <script>
-        var start = moment().subtract(6, 'days');
-        var end = moment();
+        
+        var start = "<?php echo $data['startDate'] ?>";
+        var end = "<?php echo $data['endDate']; ?>";
+        var dateRange = "<?php echo $data['dateRange']; ?>";
+
+        var trxCount = <?php echo $data['countCashIn']; ?>;
+        var trxSum = "<?php echo $data['sumCashIn']; ?>";
+        var trxAv = "<?php echo $data['avCashIn']; ?>";
+
         
         $(document).on('ready', function() {
 
@@ -192,13 +197,11 @@
                     'Bulan Lalu': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1,
                         'month').endOf('month')]
                 }
-            }, cb)
+            }, filter)
 
-            cb(start, end);
-
-            function cb(start, end) {
-                $('#reportrange span')
-                .html(start.format('YYYY-MM-DD') + ' - ' + end.format('YYYY-MM-DD'));
+            $('#reportrange span').html(start + ' - ' + end);
+            
+            function filter(start, end) {
                 showFilterData(start, end);
             }
 
@@ -208,40 +211,33 @@
                 time: 600
             });
 
-            showFilterData(start, end);
-
         });
 
         // Form Edit Pengeluaran
         function showFilterData(start, end) {
-            var startDate = start.format('YYYY-MM-D');
-            var endDate = end.format('YYYY-MM-D');
-            url = "{{ url('/') }}" + "/home/" + startDate + "/" + endDate;
-            $.ajax({
-                url: url,
-                type: "GET",
-                dataType: "JSON",
-                success: function(data) {
-                    $('#sum h2').html(data.sumData.sum)
-                    $('#sum span').html(data.sumData.date)
-                    $('#count h2').html(data.countData.count)
-                    $('#count span').html(data.countData.date)
-                    $('#average h2').html(data.averageData.average)
-                    $('#average span').html(data.averageData.date)
-                },
-                error: function() {
-                    alert('Tidak dapat menampilkan Data');
-                }
-            });
+            var startDate = start.format('YYYY-MM-DD');
+            var endDate = end.format('YYYY-MM-DD');
+            window.location = "{{ url('/') }}" + "/home/" + startDate + "/" + endDate;
         }
 
+        $('#count h4').html(trxCount);
+        $('#count span').html(dateRange);
+        $('#sum h4').html(trxSum);
+        $('#sum span').html(dateRange);
+        $('#average h4').html(trxAv);
+        $('#average span').html(dateRange);
+        $('.card-footer').html(dateRange);
+
         // pieChart Cash In
+        var dataCashIn = <?php echo $data['cashinCart']; ?>;
+        var depoCashIn = <?php echo $data['cashinCartDepo']; ?>;
+
         var ctx_pie_chart = document.getElementById("pieChartCashIn").getContext('2d');
         var pieChart = new Chart(ctx_pie_chart, {
             type: 'pie',
             data: {
                     datasets: [{
-                        data: <?php echo $cashInCartsData; ?>,
+                        data: dataCashIn,
                         backgroundColor: [
                             'rgba(255,99,132,1)',
                             'rgba(54, 162, 235, 1)',
@@ -252,21 +248,24 @@
                         ],
                         label: 'Dataset 1'
                     }],
-                    labels: <?php echo $depoCartsCashInData; ?>
+                    labels: depoCashIn
                 },
                 options: {
                     responsive: true
                 }
         
         });
-
+    
         // pieChart Cash Out
+        var dataCashOut = <?php echo $data['cashoutCart']; ?>;
+        var depoCashOut = <?php echo $data['cashoutCartDepo']; ?>;
+
         var ctx_pie_chart = document.getElementById("pieChartCashOut").getContext('2d');
         var pieChart = new Chart(ctx_pie_chart, {
             type: 'pie',
             data: {
                     datasets: [{
-                        data: <?php echo $cashOutCartsData; ?>,
+                        data: dataCashOut,
                         backgroundColor: [
                             'rgba(255,99,132,1)',
                             'rgba(54, 162, 235, 1)',
@@ -277,7 +276,7 @@
                         ],
                         label: 'Dataset 1'
                     }],
-                    labels: <?php echo $depoCartsCashOutData; ?>
+                    labels: depoCashOut
                 },
                 options: {
                     responsive: true
@@ -286,12 +285,15 @@
         });
 
         // doughnutChart Stock In
+        var dataStockIn = <?php echo $data['stockinCart']; ?>;
+        var depoStockIn = <?php echo $data['stockinCartDepo']; ?>;
+
         var ctx_doughnut_chart = document.getElementById("doughnutChartStockIn").getContext('2d');
         var doughnutChart = new Chart(ctx_doughnut_chart, {
             type: 'doughnut',
             data: {
                     datasets: [{
-                        data: <?php echo $stockInCartsData ?>,
+                        data: dataStockIn,
                         backgroundColor: [
                             'rgba(255,99,132,1)',
                             'rgba(54, 162, 235, 1)',
@@ -302,7 +304,7 @@
                         ],
                         label: 'Dataset 1'
                     }],
-                    labels: <?php echo $depoCartsStockInData ?>
+                    labels: depoStockIn
                 },
                 options: {
                     responsive: true
@@ -310,13 +312,16 @@
         
         });
 
-        // doughnutChart Stock In
+        // doughnutChart Stock Out
+        var dataStockOut = <?php echo $data['stockoutCart']; ?>;
+        var depoStockOut = <?php echo $data['stockoutCartDepo']; ?>;
+        
         var ctx_doughnut_chart = document.getElementById("doughnutChartStockOut").getContext('2d');
         var doughnutChart = new Chart(ctx_doughnut_chart, {
             type: 'doughnut',
             data: {
                     datasets: [{
-                        data: <?php echo $stockOutCartsData ?>,
+                        data: dataStockOut,
                         backgroundColor: [
                             'rgba(255,99,132,1)',
                             'rgba(54, 162, 235, 1)',
@@ -327,7 +332,7 @@
                         ],
                         label: 'Dataset 1'
                     }],
-                    labels: <?php echo $depoCartsStockOutData ?>
+                    labels: depoStockOut
                 },
                 options: {
                     responsive: true
