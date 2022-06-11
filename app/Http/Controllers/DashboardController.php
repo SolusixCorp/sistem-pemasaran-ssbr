@@ -191,7 +191,7 @@ class DashboardController extends Controller
         $stockin_depo = array();
         foreach($stockInCart as $stockIn) {
             $stockin[] = round(($stockIn->totals / $totStockIn) * 100, 2);
-            $stockin_depo[] = $cashIn->name;
+            $stockin_depo[] = $stockIn->name;
         }
 
         $stockinCartData = json_encode($stockin);

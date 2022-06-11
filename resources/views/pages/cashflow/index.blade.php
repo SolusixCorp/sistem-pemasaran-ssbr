@@ -36,6 +36,15 @@
                         </div>
                     @endif
 
+                    <div class="row">
+                        <div class="col-xs-12 col-md-12 col-lg-12 col-xl-12 mb-3">
+                            <div id="reportrange" class="form-control col-3 pull-right" style="background: #fff; cursor: pointer; padding: 5px 10px; border: 1px solid #ccc; width: 100%">
+                                <i class="fas fa-calendar"></i>&nbsp;
+                                <span></span> <b class="caret"></b>
+                            </div>  
+                        </div>  
+                    </div>
+
                     <div class="table-responsive">
                         <table id="dataTable" class="table table-bordered table-hover" style="width:100%">
                             <thead>
@@ -72,19 +81,22 @@
 @section('custom_js')
     <script>
         var table;
+        var start = "<?php echo $data['startDate'] ?>";
+        var end = "<?php echo $data['endDate']; ?>";
+
         $(function() {
             // Menampilkan data kategori
             table = $('#dataTable').DataTable({
                 data: dataSet,
                 ajax: {
-                    "url": "{{ route('cashflow.data') }}",
+                    "url": "{{ url('/') }}" + "/cashflow/data/" + start + "/" + end,
                     "type": "GET"
                 }
             });
         
         });
 
-        // View Details Barang
+        // View Details
         function detailsView(id) {
             $.ajax({
                 url: "{{ url('/') }}" + "/cashflow/" + id,
@@ -101,13 +113,6 @@
                     $('#vNotes').text(data.notes);
                     $('#vTotal').text(data.total);
                     $('#vStatus').text(data.match);
-
-                    for(var i = 0; i < data.order_items.length; i++) {
-                        $('#data-detail-modal').append('<div class="message-item"><h6 id="vItems" class="message-item-user message-item-date" style="position:initial !important">' + data.order_items[i].barang.name  + ' => ' + data.order_items[i].qty + ' '  + ' x ' + data.order_items[i].barang.selling_price + ' = ' + data.order_items[i].sub_total + '</h6></div>');  
-                    }
-                    
-                    var base_url = "{{ url('/') }}";
-                    $('#data-detail-modal').append('<a href="'+ base_url +'/cashflow/print-invoice/' + data.id + '" class="btn btn-primary pull-right">Cetak Invoice</a>');
                     
                 },
                 error: function() {
@@ -116,12 +121,57 @@
             });
         }
 
-        function convertToRupiah(angka)
-        {
-            var rupiah = '';		
-            var angkarev = angka.toString().split('').reverse().join('');
-            for(var i = 0; i < angkarev.length; i++) if(i%3 == 0) rupiah += angkarev.substr(i,3)+'.';
-            return 'Rp. '+rupiah.split('',rupiah.length-1).reverse().join('');
+        $(document).on('ready', function() {
+
+            $('#reportrange').daterangepicker({
+                onSelect: function(dateText) {
+                    console.log("Selected date: " + dateText + "; input's current value: " + this.value);
+                },
+                change: function() {
+                    alert('date has changed!');
+                }, 
+                ranges: {
+                    'Hari Ini': [moment(), moment()],
+                    'Kemarin': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
+                    '7 Hari Lalu': [moment().subtract(6, 'days'), moment()],
+                    '30 hari Lalu': [moment().subtract(29, 'days'), moment()],
+                    'Bulan Ini': [moment().startOf('month'), moment().endOf('month')],
+                    'Bulan Lalu': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1,
+                        'month').endOf('month')]
+                }
+            }, filter)
+
+            $('#reportrange span').html(start + ' - ' + end);
+
+            function filter(start, end) {
+                showFilterData(start, end);
+            }
+
+            // counter-up
+            $('.counter').counterUp({
+                delay: 10,
+                time: 600
+            });
+
+        });
+
+        function showFilterData(start, end) {
+            var startDate = start.format('YYYY-MM-DD');
+            var endDate = end.format('YYYY-MM-DD');
+
+            $('#reportrange span').html(startDate + ' - ' + endDate);
+
+            $.ajax({
+                url: "{{ url('/') }}" + "/cashflow/data/" + startDate + "/" + endDate,
+                type: "GET",
+                dataType: "JSON",
+                success: function(data) {
+                    table.ajax.url("{{ url('/') }}" + "/cashflow/data/" + startDate + "/" + endDate).load();
+                },
+                error: function() {
+                    alert('Tidak dapat menampilkan Data');
+                }
+            });
         }
     </script>
 @endsection

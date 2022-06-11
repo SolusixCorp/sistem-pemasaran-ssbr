@@ -6,7 +6,7 @@
 @section('content')
     <div class="row">
         <div class="col-xs-12 col-md-12 col-lg-12 col-xl-12 mb-3">
-                <div id="reportrange" class="form-control col-4 pull-right" style="background: #fff; cursor: pointer; padding: 5px 10px; border: 1px solid #ccc; width: 100%">
+                <div id="reportrange" class="form-control col-3 pull-right" style="background: #fff; cursor: pointer; padding: 5px 10px; border: 1px solid #ccc; width: 100%">
                     <i class="fas fa-calendar"></i>&nbsp;
                     <span></span> <b class="caret"></b>
                 </div>  
@@ -247,7 +247,6 @@
 
         });
 
-        // Form Edit Pengeluaran
         function showFilterData(start, end) {
             var startDate = start.format('YYYY-MM-DD');
             var endDate = end.format('YYYY-MM-DD');

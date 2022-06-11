@@ -5,7 +5,7 @@
     <div class="headerbar-left">
         <a href="/" class="logo">
             <!-- <img alt="Logo" src="{{ asset('nura-admin/assets/images/logo.png') }}" /> -->
-            <span>PT.SSBR</span>
+            <span>PT. SSBR</span>
         </a>
     </div>
 

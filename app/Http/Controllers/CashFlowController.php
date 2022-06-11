@@ -7,6 +7,7 @@ use App\Models\Product;
 use App\Models\ProductDepo;
 use Illuminate\Http\Request;
 use App\Models\CashFlow;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 
 class CashFlowController extends Controller
@@ -19,7 +20,15 @@ class CashFlowController extends Controller
     public function index()
     {
         //
-        return view('pages.cashflow.index');
+        $endDate = Carbon::now()->format('Y-m-d');
+        $startDate = Carbon::now()->format('Y-m-d');
+
+        $data = array(
+            'startDate' => $startDate,
+            'endDate' => $endDate,
+        );
+
+        return view('pages.cashflow.index', compact('data'));
     }
 
     /**
@@ -280,12 +289,30 @@ class CashFlowController extends Controller
         return response()->json($cash);
     }
 
-    public function getAllData() {
-        $cashflows =  CashFlow::leftJoin('depos', 'depo_id', '=', 'depos.id')
+    public function getAllData($start, $end) {
+        $startDate = date('Y-m-d', strtotime($start));
+        $endDate = date('Y-m-d', strtotime($end . "+1 days"));
+
+        $user = Auth::user();
+        $depo = Depo::where('user_id', '=', $user->id)->first();
+
+        if ($user->role == 'ho') {
+            $cashflows =  CashFlow::leftJoin('depos', 'depo_id', '=', 'depos.id')
                     ->leftJoin('users', 'depos.user_id', '=', 'users.id')
                     ->select('cash_flow.id', 'input_date', 'users.name', 'cash_type', 'revenue_type_in', 'expense_type', 'is_matched', 'notes', 'amount', 'upload_file')
+                    ->whereBetween('input_date', [$startDate . '%', $endDate . '%'])
                     ->orderBy('cash_flow.input_date', 'desc')
                     ->get(); 
+        } else {
+            $cashflows =  CashFlow::leftJoin('depos', 'depo_id', '=', 'depos.id')
+                    ->leftJoin('users', 'depos.user_id', '=', 'users.id')
+                    ->select('cash_flow.id', 'input_date', 'users.name', 'cash_type', 'revenue_type_in', 'expense_type', 'is_matched', 'notes', 'amount', 'upload_file')
+                    ->whereBetween('input_date', [$startDate . '%', $endDate . '%'])
+                    ->where('depo_id', '=', $depo->id)
+                    ->orderBy('cash_flow.input_date', 'desc')
+                    ->get(); 
+        }
+
         $no = 0;
         $status = "";
         $data = array();

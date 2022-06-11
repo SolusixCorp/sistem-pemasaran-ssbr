@@ -9,6 +9,7 @@ use App\Models\Depo;
 use App\Models\Stock;
 use App\Models\StockFlow;
 use App\Models\CashFlow;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Exception;
 use DB;
@@ -23,22 +24,46 @@ class StockFlowController extends Controller
         $categories = CategoryProduct::orderBy('category.category_name', 'asc')->get();
         $depos = Depo::leftJoin('users', 'user_id', '=', 'users.id')->get();
         
+        $endDate = Carbon::now()->format('Y-m-d');
+        $startDate = Carbon::now()->format('Y-m-d');
+
+        $data = array(
+            'startDate' => $startDate,
+            'endDate' => $endDate,
+        );
+
         return view('pages.stock.index', [
             "categories" => $categories,
-            "depos"  => $depos  
+            "depos"  => $depos,
+            "data"  => $data    
         ]);
     }
 
-    public function getAllData() {
-        $user = Auth::user();
+    public function getAllData($start, $end) {
+        $startDate = date('Y-m-d', strtotime($start));
+        $endDate = date('Y-m-d', strtotime($end . "+1 days"));
 
-        $stocks =  StockFlow::leftJoin('depos', 'depo_id', '=', 'depos.id')
-                ->leftJoin('users', 'depos.user_id', '=', 'users.id')
-                ->select('stock_flow.id as stock_id', 'stock_flow.input_date', 'name', 'stock_type', 'stockin_category', 'stockout_category', DB::raw('sum(qty) as qty'))
-                ->groupBy('input_date')
-                ->where('depos.user_id', '=', $user->id)
-                ->orderBy('stock_flow.input_date', 'desc')
-                ->get(); 
+        $user = Auth::user();
+        $depo = Depo::where('user_id', '=', $user->id)->first();
+
+        if ($user->role == 'ho') {
+            $stocks =  StockFlow::leftJoin('depos', 'depo_id', '=', 'depos.id')
+                    ->leftJoin('users', 'depos.user_id', '=', 'users.id')
+                    ->select('stock_flow.id as stock_id', 'stock_flow.input_date', 'name', 'stock_type', 'stockin_category', 'stockout_category', DB::raw('sum(qty) as qty'))
+                    ->whereBetween('input_date', [$startDate . '%', $endDate . '%'])
+                    ->groupBy('input_date')
+                    ->orderBy('stock_flow.input_date', 'desc')
+                    ->get(); 
+        } else {
+            $stocks =  StockFlow::leftJoin('depos', 'depo_id', '=', 'depos.id')
+                    ->leftJoin('users', 'depos.user_id', '=', 'users.id')
+                    ->select('stock_flow.id as stock_id', 'stock_flow.input_date', 'name', 'stock_type', 'stockin_category', 'stockout_category', DB::raw('sum(qty) as qty'))
+                    ->whereBetween('input_date', [$startDate . '%', $endDate . '%'])
+                    ->groupBy('input_date')
+                    ->where('depos.user_id', '=', $user->id)
+                    ->orderBy('stock_flow.input_date', 'desc')
+                    ->get(); 
+        }
        
         $no = 0;
         $status = "";

@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Depo;
 use App\Models\Report;
+use Carbon\Carbon;
 
 class ReportController extends Controller
 {
@@ -17,7 +18,15 @@ class ReportController extends Controller
     public function index()
     {
         //
-        return view('pages.report.index');
+        $endDate = Carbon::now()->format('Y-m-d');
+        $startDate = Carbon::now()->format('Y-m-d');
+
+        $data = array(
+            'startDate' => $startDate,
+            'endDate' => $endDate,
+        );
+
+        return view('pages.report.index', compact('data'));
     }
 
     /**
@@ -194,12 +203,29 @@ class ReportController extends Controller
         //
     }
 
-    public function getAllData() {
-        $reports =  Report::leftJoin('depos', 'depo_id', '=', 'depos.id')
+    public function getAllData($start, $end) {
+        $startDate = date('Y-m-d', strtotime($start));
+        $endDate = date('Y-m-d', strtotime($end . "+1 days"));
+
+        $user = Auth::user();
+        $depo = Depo::where('user_id', '=', $user->id)->first();
+
+        if ($user->role == 'ho') {
+            $reports =  Report::leftJoin('depos', 'depo_id', '=', 'depos.id')
                     ->leftJoin('users', 'depos.user_id', '=', 'users.id')
                     ->select('ar_ap_report.id', 'payment_date', 'users.name', 'payment_type', 'payment_desc', 'amount', 'payment_file_upload')
+                    ->whereBetween('payment_date', [$startDate . '%', $endDate . '%'])
                     ->orderBy('ar_ap_report.payment_date', 'desc')
                     ->get(); 
+        } else {
+            $reports =  Report::leftJoin('depos', 'depo_id', '=', 'depos.id')
+                    ->leftJoin('users', 'depos.user_id', '=', 'users.id')
+                    ->select('ar_ap_report.id', 'payment_date', 'users.name', 'payment_type', 'payment_desc', 'amount', 'payment_file_upload')
+                    ->whereBetween('payment_date', [$startDate . '%', $endDate . '%'])
+                    ->where('depos.user_id', '=', $user->id)
+                    ->orderBy('ar_ap_report.payment_date', 'desc')
+                    ->get();
+        }
         $no = 0;
         $status = "";
         $data = array();

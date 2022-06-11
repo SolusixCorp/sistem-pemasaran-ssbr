@@ -70,13 +70,11 @@ Route::middleware(['auth:sanctum', 'verified'])->group(function () {
     Route::get('employee/edit/{id}', [EmployeeController::class, 'edit'])->name('employee.edit');
     Route::post('employee/update/{id}', [EmployeeController::class, 'update'])->name('employee.update');
     Route::post('employee/create', [EmployeeController::class, 'store'])->name('employee.store');
-    Route::get('employee/create', [EmployeeController::class, 'create'])->name('employee.create');
-    // Route::resource('employee', EmployeeController::class);
     
     // Report
     Route::get('report', [ReportController::class, 'index'])->name('report.index');
     Route::get('report/create', [ReportController::class, 'create'])->name('report.create');
-    Route::get('report/data', [ReportController::class, 'getAllData'])->name('report.data');
+    Route::get('report/data/{start}/{end}', [ReportController::class, 'getAllData'])->name('report.data-by-date');
     Route::get('report/edit/{id}', [ReportController::class, 'edit'])->name('report.edit');
     Route::get('report/{start}/{end}', [ReportController::class, 'getAllData'])->name('report.data-by-date');
     Route::post('report/create', [ReportController::class, 'store'])->name('report.store');
@@ -84,7 +82,7 @@ Route::middleware(['auth:sanctum', 'verified'])->group(function () {
     
     // Stock Flow
     Route::get('stock', [StockFlowController::class, 'index'])->name('stock.index');
-    Route::get('stock/data', [StockFlowController::class, 'getAllData'])->name('stock.data');
+    Route::get('stock/data/{start}/{end}', [StockFlowController::class, 'getAllData'])->name('stock.data-by-date');
     Route::get('stock/product/{id}', [StockFlowController::class, 'getProductById'])->name('stock.product.id');
     Route::get('stock/create', [StockFlowController::class, 'create'])->name('stock.create');
     Route::get('stock/{id}', [StockFlowController::class, 'getById'])->name('stock.byid');
@@ -95,7 +93,7 @@ Route::middleware(['auth:sanctum', 'verified'])->group(function () {
     
     // Cash Flow
     Route::get('cashflow', [CashFlowController::class, 'index'])->name('cashflow.index');
-    Route::get('cashflow/data', [CashFlowController::class, 'getAllData'])->name('cashflow.data');
+    Route::get('cashflow/data/{start}/{end}', [CashFlowController::class, 'getAllData'])->name('cashflow.data-by-date');
     Route::get('cashflow/create', [CashFlowController::class, 'create'])->name('cashflow.create');
     Route::get('cashflow/{id}', [CashFlowController::class, 'getById'])->name('cashflow.byid');
     Route::post('cashflow/create', [CashFlowController::class, 'store'])->name('cashflow.store');
