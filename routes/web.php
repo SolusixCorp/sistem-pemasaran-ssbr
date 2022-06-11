@@ -65,9 +65,13 @@ Route::middleware(['auth:sanctum', 'verified'])->group(function () {
     Route::resource('depo', DepoController::class);
 
     // Employyee
+    Route::get('employee', [EmployeeController::class, 'index'])->name('employee.index');
     Route::get('employee/data', [EmployeeController::class, 'listData'])->name('employee.data');
-    Route::post('employee/add', [EmployeeController::class, 'add'])->name('employee.add');
-    Route::resource('employee', EmployeeController::class);
+    Route::get('employee/edit/{id}', [EmployeeController::class, 'edit'])->name('employee.edit');
+    Route::post('employee/update/{id}', [EmployeeController::class, 'update'])->name('employee.update');
+    Route::post('employee/create', [EmployeeController::class, 'store'])->name('employee.store');
+    Route::get('employee/create', [EmployeeController::class, 'create'])->name('employee.create');
+    // Route::resource('employee', EmployeeController::class);
     
     // Report
     Route::get('report', [ReportController::class, 'index'])->name('report.index');

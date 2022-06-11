@@ -21,10 +21,10 @@ class CreateProductsTable extends Migration
                 $table->text('description')->nullable();
                 $table->text('image')->nullable();
                 $table->integer('stock');
-                $table->float('consument_price');
-                $table->float('retail_price');
-                $table->float('sub_whole_price');
-                $table->float('wholesales_price');
+                $table->float('consument_price', 12, 2);
+                $table->float('retail_price', 12, 2);
+                $table->float('sub_whole_price', 12, 2);
+                $table->float('wholesales_price', 12, 2);
                 $table->string('status');
                 $table->timestamps();
             });

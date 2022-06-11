@@ -14,11 +14,8 @@ use Illuminate\Support\Facades\Auth;
 class DashboardController extends Controller
 {
     public function index()
-    {
-        $user = Auth::user();
-        $depo = Depo::where('user_id', '=', $user->id)->first();
-        
-        $endDate = Carbon::now()->subDays(-1)->format('Y-m-d');
+    {        
+        $endDate = Carbon::now()->format('Y-m-d');
         $startDate = Carbon::now()->format('Y-m-d');
 
         return $this->data($startDate, $endDate);
@@ -26,8 +23,119 @@ class DashboardController extends Controller
 
     public function data($start, $end)
     {
+        $user = Auth::user();
+        $depo = Depo::where('user_id', '=', $user->id)->first();
+        
         $startDate = date('Y-m-d', strtotime($start));
         $endDate = date('Y-m-d', strtotime($end . "+1 days"));
+
+        // Cash In Depo
+        $cashInLineCarts = CashFlow::leftJoin('depos', 'depo_id', '=', 'depos.id')
+            ->leftJoin('users', 'depos.user_id', '=', 'users.id')
+            ->select(DB::raw('sum(amount) as totals, name, MONTH(input_date) month'))
+            ->whereBetween('input_date', [$startDate . '%', $endDate . '%'])
+            ->where('revenue_type_in', '=', 'product_sales')
+            ->where('depo_id', '=', $depo->id)
+            ->groupBy('month')
+            ->get();
+
+        $cashinLineCarts = array();
+        for ($i=1; $i < 12; $i++) {
+            $month = false;
+            foreach ($cashInLineCarts as $cashInLineCart) {
+                if ($cashInLineCart->month == $i) {
+                    $cashinLineCarts[] = $cashInLineCart->totals;
+                    break;
+                }
+            }
+
+            if (!$month) {
+                $cashinLineCarts[] = 0; 
+            }
+        }
+
+        $cashInLineCartData = json_encode($cashinLineCarts);
+
+        // Cash Out Depo
+        $cashOutLineCarts = CashFlow::leftJoin('depos', 'depo_id', '=', 'depos.id')
+            ->leftJoin('users', 'depos.user_id', '=', 'users.id')
+            ->select(DB::raw('sum(amount) as totals, name, MONTH(input_date) month'))
+            ->whereBetween('input_date', [$startDate . '%', $endDate . '%'])
+            ->where('expense_type', '=', 'expense')
+            ->where('depo_id', '=', $depo->id)
+            ->groupBy('month')
+            ->get();
+
+        $cashoutLineCarts = array();
+        for ($i=1; $i < 12; $i++) {
+            $month = false;
+            foreach ($cashOutLineCarts as $cashOutLineCart) {
+                if ($cashOutLineCart->month == $i) {
+                    $cashoutLineCarts[] = $cashOutLineCart->totals;
+                    break;
+                }
+            }
+
+            if (!$month) {
+                $cashoutLineCarts[] = 0; 
+            }
+        }
+
+        $cashOutLineCartData = json_encode($cashoutLineCarts);
+
+        // Stock In Depo
+        $stockInLineCarts = StockFlow::leftJoin('depos', 'depo_id', '=', 'depos.id')
+                ->leftJoin('users', 'depos.user_id', '=', 'users.id')
+                ->select(DB::raw('sum(qty) as totals, name, MONTH(input_date) month'))
+                ->whereBetween('input_date', [$startDate . '%', $endDate . '%'])
+                ->where('stock_type', '=', 'in')
+                ->where('depo_id', '=', $depo->id)
+                ->groupBy('month')
+                ->get();
+
+        $stockinLineCarts = array();
+        for ($i=1; $i < 12; $i++) {
+            $month = false;
+            foreach ($stockInLineCarts as $stockInLineCart) {
+                if ($stockInLineCart->month == $i) {
+                    $stockinLineCarts[] = $stockInLineCart->totals;
+                    break;
+                }
+            }
+
+            if (!$month) {
+                $stockinLineCarts[] = 0; 
+            }
+        }
+
+        $stockInLineCartData = json_encode($stockinLineCarts);
+
+        // Stock Out Depo
+        $stockOutLineCarts = StockFlow::leftJoin('depos', 'depo_id', '=', 'depos.id')
+                ->leftJoin('users', 'depos.user_id', '=', 'users.id')
+                ->select(DB::raw('sum(qty) as totals, name, MONTH(input_date) month'))
+                ->whereBetween('input_date', [$startDate . '%', $endDate . '%'])
+                ->where('stock_type', '=', 'out')
+                ->where('depo_id', '=', $depo->id)
+                ->groupBy('month')
+                ->get();
+
+        $stockoutLineCarts = array();
+        for ($i=1; $i < 12; $i++) {
+            $month = false;
+            foreach ($stockOutLineCarts as $stockOutLineCart) {
+                if ($stockOutLineCart->month == $i) {
+                    $stockoutLineCarts[] = $stockOutLineCart->totals;
+                    break;
+                }
+            }
+
+            if (!$month) {
+                $stockoutLineCarts[] = 0; 
+            }
+        }
+
+        $stockOutLineCartData = json_encode($stockoutLineCarts);
 
         // Cash In
         $cashInCart = CashFlow::leftJoin('depos', 'depo_id', '=', 'depos.id')
@@ -109,15 +217,62 @@ class DashboardController extends Controller
         $stockoutCartData = json_encode($stockout);
         $stockoutCartDepo = json_encode($stockout_depo);
 
-        //Cash Flow Terbaru
-        $depoCashFlows = CashFlow::leftJoin('depos', 'depo_id', '=', 'depos.id')
-                ->leftJoin('users', 'depos.user_id', '=', 'users.id')
-                ->select('users.name', 'input_date', 'amount', 'cash_type', 'revenue_type_in', 'expense_type')
-                ->whereBetween('input_date', [$startDate . '%', $endDate . '%'])
-                ->orderBy('input_date', 'desc')
-                ->limit(10)
-                ->get();
+        $dateRange = tanggal($startDate) . ' - ' . tanggal(date('Y-m-d', strtotime($end)));
+        
+        if ($user->role == 'ho') {
+            $cashInCard = CashFlow::select('amount')
+                    ->whereBetween('input_date', [$startDate . '%', $endDate . '%'])
+                    ->where('revenue_type_in', '=', 'product_sales')
+                    ->get();
 
+            //Cash Flow Terbaru
+            $depoCashFlows = CashFlow::leftJoin('depos', 'depo_id', '=', 'depos.id')
+                    ->leftJoin('users', 'depos.user_id', '=', 'users.id')
+                    ->select('users.name', 'input_date', 'amount', 'cash_type', 'revenue_type_in', 'expense_type')
+                    ->whereBetween('input_date', [$startDate . '%', $endDate . '%'])
+                    ->orderBy('input_date', 'desc')
+                    ->limit(10)
+                    ->get();
+
+            //Stock Flow Terbaru
+            $depoStockFlows = StockFlow::leftJoin('depos', 'depo_id', '=', 'depos.id')
+                    ->leftJoin('users', 'depos.user_id', '=', 'users.id')
+                    ->leftJoin('products', 'product_id', '=', 'products.id')
+                    ->select('users.name', 'products.name as product', 'input_date', 'qty', 'stock_type', 'stockin_category', 'stockout_category')
+                    ->whereBetween('input_date', [$startDate . '%', $endDate . '%'])
+                    ->orderBy('input_date', 'desc')
+                    ->limit(10)
+                    ->get();
+        } else {
+            $cashInCard = CashFlow::select('amount')
+                    ->whereBetween('input_date', [$startDate . '%', $endDate . '%'])
+                    ->where('revenue_type_in', '=', 'product_sales')
+                    ->where('depo_id', '=', $depo->id)
+                    ->get();
+
+            //Cash Flow Terbaru
+            $depoCashFlows = CashFlow::leftJoin('depos', 'depo_id', '=', 'depos.id')
+                    ->leftJoin('users', 'depos.user_id', '=', 'users.id')
+                    ->select('users.name', 'input_date', 'amount', 'cash_type', 'revenue_type_in', 'expense_type')
+                    ->whereBetween('input_date', [$startDate . '%', $endDate . '%'])
+                    ->where('depo_id', '=', $depo->id)
+                    ->orderBy('input_date', 'desc')
+                    ->limit(10)
+                    ->get();
+
+            //Stock Flow Terbaru
+            $depoStockFlows = StockFlow::leftJoin('depos', 'depo_id', '=', 'depos.id')
+                    ->leftJoin('users', 'depos.user_id', '=', 'users.id')
+                    ->leftJoin('products', 'product_id', '=', 'products.id')
+                    ->select('users.name', 'products.name as product', 'input_date', 'qty', 'stock_type', 'stockin_category', 'stockout_category')
+                    ->whereBetween('input_date', [$startDate . '%', $endDate . '%'])
+                    ->where('depo_id', '=', $depo->id)
+                    ->orderBy('input_date', 'desc')
+                    ->limit(10)
+                    ->get();
+        }
+
+        //Cash Flow Terbaru
         $depoCashFlowNewDatas = array();
         foreach ($depoCashFlows as $depoCashFlow) {
             $category = '';
@@ -135,15 +290,6 @@ class DashboardController extends Controller
         }
 
         //Stock Flow Terbaru
-        $depoStockFlows = StockFlow::leftJoin('depos', 'depo_id', '=', 'depos.id')
-                ->leftJoin('users', 'depos.user_id', '=', 'users.id')
-                ->leftJoin('products', 'product_id', '=', 'products.id')
-                ->select('users.name', 'products.name as product', 'input_date', 'qty', 'stock_type', 'stockin_category', 'stockout_category')
-                ->whereBetween('input_date', [$startDate . '%', $endDate . '%'])
-                ->orderBy('input_date', 'desc')
-                ->limit(10)
-                ->get();
-
         $depoStockFlowNewDatas = array();
         foreach ($depoStockFlows as $depoStockFlow) {
             $category = '';
@@ -159,13 +305,6 @@ class DashboardController extends Controller
                 'date' => $depoStockFlow->input_date,
             );
         }
-   
-        $dateRange = tanggal($startDate) . ' - ' . tanggal(date('Y-m-d', strtotime($end)));
-        
-        $cashInCard = CashFlow::select('amount')
-                    ->whereBetween('input_date', [$startDate . '%', $endDate . '%'])
-                    ->where('revenue_type_in', '=', 'product_sales')
-                    ->get();
 
         $countCashIn = $cashInCard->count();
         $sumCashIn = round($cashInCard->sum('amount'), 0);
@@ -183,6 +322,10 @@ class DashboardController extends Controller
             'avCashIn' => rupiah($aveCashIn, TRUE),
             'depoCashFlowNewDatas' => $depoCashFlowNewDatas,
             'depoStockFlowNewDatas' => $depoStockFlowNewDatas,
+            'cashInLineCartData' => $cashInLineCartData,
+            'cashOutLineCartData' => $cashOutLineCartData,
+            'stockInLineCartData' => $stockInLineCartData,
+            'stockOutLineCartData' => $stockOutLineCartData,
             'cashinCart' => $cashinCartData,
             'cashinCartDepo' => $cashinCartDepo,
             'cashoutCart' => $cashoutCartData,

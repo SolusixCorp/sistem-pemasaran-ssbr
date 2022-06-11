@@ -18,7 +18,7 @@ class CreateProductsDepoTable extends Migration
             $table->integer('depo_id');
             $table->integer('product_id');
             $table->integer('stock');
-            $table->float('depo_price')->nullable();
+            $table->float('depo_price', 12, 2)->nullable();
             $table->string('status');
             $table->timestamps();
         });

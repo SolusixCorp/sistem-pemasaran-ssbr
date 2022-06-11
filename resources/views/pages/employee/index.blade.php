@@ -10,9 +10,9 @@
             <div class="card mb-3">
                 <div class="card-header">
                     <span class="pull-right">
-                        <button class="btn btn-primary" onclick="addForm()">
+                        <a class="btn btn-primary" href="{{ url('/employee/create') }}">
                             <i class="fas fa-plus-circle" aria-hidden="true"></i> Employee
-                        </button>
+                        </a>
                     </span>    
                     <h3><i class="fas fa-users"></i> Data Employee</h3>
                 </div>
@@ -62,8 +62,6 @@
             <!-- end card-->
         </div>
 
-    @include('pages/employee/add')
-    @include('pages/employee/edit')
     </div>
     <!-- end row-->
 @endsection
@@ -95,35 +93,6 @@
                     alert('Tidak dapat menampilkan Data');
                 }
             });
-        });
-    
-        function addForm() {
-            $('#modal-add').modal('show');
-            $('.modal-title').text('Tambah Employee');
-        }
-
-        // Form Edit 
-        function editForm($id) {
-            url = "employee/" + $id;
-            $('.modal-title').text('Edit Employee');
-            $.ajax({
-                url: "employee/" + $id + "/edit",
-                type: "GET",
-                dataType: "JSON",
-                success: function(data) {
-                    $('#modal-edit-employee').modal('show');
-                    $('.modal-title').text('Edit Employee');
-                    $('#formEdit').attr('action', url);
-                    $('#upEmployeeName').val(data.employee_name);
-                    $('#upEmployeeNIK').val(data.employee_nik);
-                    $('#upEmployeePosition').val(data.employee_position);
-                },
-                error: function() {
-                    alert('Tidak dapat menampilkan Data');
-                }
-            });
-        }
-    
-    
+        });    
     </script>
 @endsection

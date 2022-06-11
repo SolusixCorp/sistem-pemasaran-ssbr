@@ -41,10 +41,10 @@
                             <thead>
                                 <tr>
                                     <th style="width:2%">No</th>
-                                    <th style="width:17%">Tanggal</th>
+                                    <th style="width:16%">Tanggal</th>
                                     <th>Nama Depo</th>
                                     <th style="width:13%">Tipe Kas</th>
-                                    <th style="width:17%">Keterangan</th>
+                                    <th style="width:14%">Keterangan</th>
                                     <th style="width:15%">Total</th>
                                     <th style="width:10%">Status</th>
                                     <th style="width:13%">Aksi</th>

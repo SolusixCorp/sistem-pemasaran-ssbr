@@ -32,7 +32,7 @@ class EmployeeController extends Controller
             $row[] = $employee->ktp_number;
             $row[] = $employee->date_of_entry; 
             $row[] = $employee->outdate;
-            $row[] = '<a onclick="editForm(' . $employee->id . ')" class="btn btn-warning btn-sm"><i class="far fa-edit"></i></a>';
+            $row[] = '<a href="'. url("/") .'/employee/edit/' . $employee->id . '" class="btn btn-warning btn-sm"><i class="far fa-edit"></i></a>';
             $data[] = $row;
         }
 
@@ -68,6 +68,7 @@ class EmployeeController extends Controller
     public function create()
     {
         //
+        return view('pages.employee.add');
     }
 
     /**
@@ -79,7 +80,19 @@ class EmployeeController extends Controller
     public function store(Request $request)
     {
         //
+        $dateIn = $request['inDateIn'];
+        $dateOut = $request['inDateOut'];
+
+        if ($dateIn == null) {
+            $dateIn = '0000-00-00';
+        }
+        if ($dateOut == null) {
+            $dateOut = '0000-00-00';
+        }
+
         $employee = new Employee;
+        $employee->date_of_entry = $dateIn;
+        $employee->outdate = $dateOut;
         $employee->name = $request['inEmployeeName'];
         $employee->position = $request['inEmployeePosition'];
         $employee->ktp_number = $request['inEmployeeNIK'];
@@ -116,11 +129,15 @@ class EmployeeController extends Controller
         //
         $employee = Employee::find($id);
         $employeeData = array(
+            'id' => $id,
+            'date_in' => substr($employee->date_of_entry, 0, 10),
+            'date_out' => substr($employee->outdate, 0, 10), 
             'employee_name' => $employee->name, 
             'employee_nik' => $employee->ktp_number,
             'employee_position' => $employee->position
         );
-        echo json_encode($employeeData);
+
+        return view('pages.employee.edit', compact('employeeData'));
     }
 
     /**
@@ -134,10 +151,22 @@ class EmployeeController extends Controller
     {
         
         //
+        $dateIn = $request['inDateIn'];
+        $dateOut = $request['inDateOut'];
+
+        if ($dateIn == null) {
+            $dateIn = '0000-00-00';
+        }
+        if ($dateOut == null) {
+            $dateOut = '0000-00-00';
+        }
+
         $employee = Employee::find($id);
-        $employee->name = $request['upEmployeeName'];
-        $employee->position = $request['upEmployeePosition'];
-        $employee->ktp_number = $request['upEmployeeNIK'];
+        $employee->date_of_entry = $dateIn;
+        $employee->outdate = $dateOut;
+        $employee->name = $request['inEmployeeName'];
+        $employee->position = $request['inEmployeePosition'];
+        $employee->ktp_number = $request['inEmployeeNIK'];
         
         if (!$employee->update()) {
             return redirect()->route('employee.index')

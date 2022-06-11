@@ -24,7 +24,7 @@ class CreateStockFlowTable extends Migration
             $table->enum('stockout_category', ['sales', 'return']);
             $table->integer('qty');
             $table->enum('price_type', ['depo_price', 'consument', 'retail', 'sws', 'ws']);
-            $table->float('price');
+            $table->float('price', 12, 2);
             $table->integer('remaining_stock');
             $table->boolean('is_delivered');
             $table->timestamps();

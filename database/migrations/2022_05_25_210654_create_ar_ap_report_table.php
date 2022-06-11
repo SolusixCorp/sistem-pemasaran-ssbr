@@ -20,7 +20,7 @@ class CreateArApReportTable extends Migration
             $table->enum('payment_type', ['transfer', 'cash', 'return']);
             $table->text('payment_desc')->nullable();
             $table->text('payment_file_upload')->nullable();
-            $table->float('amount');
+            $table->float('amount', 12, 2);
             $table->timestamps();
         });
     }
