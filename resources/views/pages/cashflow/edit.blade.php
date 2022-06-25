@@ -117,8 +117,8 @@
                                         <div class="form-group col-md-12">
                                             <label for="validatedCustomFile">Bukti Transaksi</label>
                                             <div class="custom-file">
-                                                <input type="file" name="receipt" class="custom-file-input" id="validatedCustomFile">
-                                                <label class="custom-file-label" for="validatedCustomFile">Pilih
+                                                <input type="file" name="receipt" class="custom-file-input" id="validatedCustomFile" >
+                                                <label id="fileLabel" class="custom-file-label" for="validatedCustomFile">Pilih
                                                     file...</label>
                                             </div>
                                         </div>
@@ -145,7 +145,7 @@
                                 </div>
                             </div>
                             <div class="modal-footer">
-                                <a href="/cashflow" class="btn btn-secondary">Batal</a>
+                                <a href="{{ route('cashflow.index') }}" class="btn btn-secondary">Batal</a>
                                 <button type="submit" class="btn btn-primary">Edit Transaksi</button>
                             </div>
                         </form>
@@ -186,6 +186,11 @@
         $('input[name="singledatepicker"]').daterangepicker({
             singleDatePicker: true,
             showDropdowns: true
+        });
+
+        $('#validatedCustomFile').on('change', function(){
+            var value = $(this).val();
+            $("#fileLabel").text(value);
         });
 
         $(document).ready(function(){

@@ -52,21 +52,23 @@
                                             </div>
                                         </div>
                                     </div>
-                                    
-                                    <div class="form-group">
-                                        <label for="depo_name">Nama Depo</label>
-                                        <select id="depo_name" name="depo_name" class="form-control js-example-basic-single">
-                                            @foreach ($depos as $depo)
-                                                <option value="{{ $depo->id }}" >{{ $depo->name }}</option>
-                                            @endforeach
-                                        </select>
-                                    </div>
 
                                     <div class="form-group">
                                         <label for="stock_type">Tipe Stok</label>
                                         <select id="stock_type" name="stock_type" class="form-control js-example-basic-single">
                                             <option value="out" >STOCK OUT</option>
-                                            <option value="in" >STOCK IN</option>                
+                                            @if (Auth::user()->role == 'ho')
+                                            <option value="in" >STOCK IN</option>
+                                            @endif                
+                                        </select>
+                                    </div>
+                                    
+                                    <div class="form-group" id="in_depo">
+                                        <label for="depo_name">Nama Depo</label>
+                                        <select id="depo_name" name="depo_name" class="form-control js-example-basic-single">
+                                            @foreach ($depos as $depo)
+                                                <option value="{{ $depo->id }}" >{{ $depo->name }}</option>
+                                            @endforeach
                                         </select>
                                     </div>
 
@@ -123,7 +125,7 @@
                                 </div>
                             </div>
                             <div class="modal-footer">
-                                <a href="/stock" class="btn btn-secondary">Batal</a>
+                                <a href="{{ route('stock.index') }}" class="btn btn-secondary">Batal</a>
                                 <button type="submit" class="btn btn-primary">Simpan</button>
                             </div>
                         </form>
@@ -198,6 +200,7 @@
         });  
 
         $(document).ready(function(){
+
             //Select Item
             $('.product_item_id').select2({
                 theme:'bootstrap4',
@@ -234,9 +237,11 @@
                     var stockCategoryLabel = $('#stock_category_label');
                     stockCategoryOps.empty();
                     if (element_val == 'in') {
+                        $('#in_depo').hide();
                         stockCategoryLabel.text('Kategori Stok (IN)');
                         stockCategoryOps.append('<option value="dropping">Dropping</option>');
                     } else {
+                        $('#in_depo').show();
                         stockCategoryLabel.text('Kategori Stok (OUT)');
                         stockCategoryOps.append('<option value="sales">Sales</option>');
                     }

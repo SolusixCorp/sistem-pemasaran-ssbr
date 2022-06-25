@@ -55,7 +55,7 @@
                                     <th>Tipe Stok</th>
                                     <th>Kategori</th>
                                     <th>Qty</th>
-                                    <th style="width:10%">Aksi</th>
+                                    <th style="width:13%">Aksi</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -74,6 +74,7 @@
     </div>
     <!-- end row-->
 
+    @include('pages/stock/confirm')
     @include('pages/stock/details')
 @endsection
 
@@ -95,10 +96,23 @@
         
         });
 
+        // View Confirm
+        function confirmView(date, id) {
+            url = "{{ url('/') }}" + "/stock/confirm/" + date;
+            $('#modal-confirm').modal('show');
+            var sDate = date + '';
+            $('#modal-date').text(numberToDate(sDate));
+            $('#btn-done').attr("href", url);
+        }
+
+        function numberToDate(number) {
+            return number.substring(0, 4) + '-' +  number.substring(4, 6) + '-' + number.substring(6, 8) + ' ' + number.substring(8, 10) + ':' + number.substring(10, 12) + ':' + number.substring(12, 14);
+        }
+
         // View Details
-        function detailsView(date) {
+        function detailsView(date, depo_id) {
             $.ajax({
-                url: "{{ url('/') }}" + "/stock/date/" + date,
+                url: "{{ url('/') }}" + "/stock/date/" + date + "/" + depo_id,
                 type: "GET",
                 dataType: "JSON",
                 success: function(data) {

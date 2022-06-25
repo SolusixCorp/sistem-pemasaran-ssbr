@@ -91,7 +91,7 @@
                                             <label for="validatedCustomFile">Bukti Transaksi</label>
                                             <div class="custom-file">
                                                 <input type="file" name="receipt" class="custom-file-input" id="validatedCustomFile" required>
-                                                <label class="custom-file-label" for="validatedCustomFile">Pilih
+                                                <label id="fileLabel" class="custom-file-label" for="validatedCustomFile">Pilih
                                                     file...</label>
                                             </div>
                                         </div>
@@ -113,7 +113,7 @@
                                 </div>
                             </div>
                             <div class="modal-footer">
-                                <a href="/cashflow" class="btn btn-secondary">Batal</a>
+                                <a href="{{ route('cashflow.index') }}" class="btn btn-secondary">Batal</a>
                                 <button type="submit" class="btn btn-primary">Simpan</button>
                             </div>
                         </form>
@@ -137,6 +137,11 @@
                 singleDatePicker: true,
                 showDropdowns: true
             });
+
+        $('#validatedCustomFile').on('change', function(){
+            var value = $(this).val();
+            $("#fileLabel").text(value);
+        });
 
         $(document).ready(function(){
 
@@ -176,15 +181,7 @@
                 }
             });
 
-            // //Example 2
-            // $('#validatedCustomFile').filer({
-            //     limit: 1,
-            //     maxSize: 3,
-            //     extensions: ['jpg', 'jpeg', 'png', 'gif', 'psd'],
-            //     changeInput: true,
-            //     showThumbs: true,
-            //     addMore: true
-            // });
+            
 
             //Select Cash Type
             $('#cash_type').select2({

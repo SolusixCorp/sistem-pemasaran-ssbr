@@ -72,7 +72,7 @@ class ReportController extends Controller
         $report = new Report;
         $report->depo_id = $in_depo;
         if ($in_date != null && $in_time != null) {
-            $report->payment_date = $in_date . " " . $in_time . ":00";
+            $report->payment_date = $in_date . " " . $in_time . date(":s", time());
         }
         $report->payment_type = $in_payment_type;
         $report->payment_desc = $in_notes;
@@ -171,7 +171,7 @@ class ReportController extends Controller
         $report = Report::find($id);
         $report->depo_id = $in_depo;
         if ($in_date != null && $in_time != null) {
-            $report->payment_date = $in_date . " " . $in_time . ":00";
+            $report->payment_date = $in_date . " " . $in_time . date(":s", time());
         }
         $report->payment_type = $in_payment_type;
         $report->payment_desc = $in_notes;

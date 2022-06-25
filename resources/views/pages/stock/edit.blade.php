@@ -42,12 +42,12 @@
                                     <div class="row">
                                         <div class="col-xl-3 col-lg-4">
                                             <div class="form-group">
-                                                <input type="date" class="form-control"  name="date" value="{{ $stock['input_date'] }}" />
+                                                <input type="date" class="form-control"  name="date" value="{{ $stock['input_date'] }}" readonly/>
                                             </div>
                                         </div>
                                         <div class="col-xl-2 col-lg-4">
                                             <div class="form-group">
-                                                <input type="time" class="form-control" name="time" value="{{ $stock['input_time'] }}"/>
+                                                <input type="time" class="form-control" name="time" value="{{ $stock['input_time'] }}" readonly />
                                             </div>
                                         </div>
                                     </div>
@@ -56,11 +56,6 @@
                                         <label for="depo_name">Nama Depo</label>
                                         <select id="depo_name" name="depo_name" class="form-control js-example-basic-single">
                                             <option value="{{ $stock['depo_id'] }}" >{{ $stock['depo'] }}</option>
-                                            @foreach ($depos as $depo)
-                                                @if ($depo->id != $stock['depo_id'])
-                                                    <option value="{{ $depo->id }}" >{{ $depo->name }}</option>
-                                                @endif
-                                            @endforeach
                                         </select>
                                     </div>
 
@@ -69,10 +64,8 @@
                                         <select id="stock_type" name="stock_type" class="form-control js-example-basic-single">
                                             @if ($stock['type'] == 'IN')
                                                 <option value="in" >STOCK IN</option>
-                                                <option value="out" >STOCK OUT</option>
                                             @else 
                                                 <option value="out" >STOCK OUT</option>
-                                                <option value="in" >STOCK IN</option>
                                             @endif
                                         </select>
                                     </div>
@@ -122,7 +115,7 @@
                                                             </td>  
                                                             <td width="15%">
                                                                 <label for="item">Remaining Stok</label>
-                                                                <input type="text" name="notes_item[]" id="notes_item" placeholder="0" value="{{ $b['stock_remaining'] }}" class="form-control" value="{{ $product['remaining_stock'] }}" readonly>
+                                                                <input type="text" name="remmaining_stock[]" id="remmaining_stock" placeholder="0" class="form-control" value="{{ $product['remaining_stock'] }}" readonly>
                                                             </td>  
                                                             <td width="12%">
                                                                 <label for="item">Qty</label>
@@ -153,7 +146,7 @@
                                 </div>
                             </div>
                             <div class="modal-footer">
-                                <a href="/stock" class="btn btn-secondary">Batal</a>
+                                <a href="{{ route('stock.index') }}" class="btn btn-secondary">Batal</a>
                                 <button type="submit" class="btn btn-primary">Edit Stock Flow</button>
                             </div>
                         </form>

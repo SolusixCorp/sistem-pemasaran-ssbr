@@ -67,6 +67,7 @@ Route::middleware(['auth:sanctum', 'verified'])->group(function () {
     // Employyee
     Route::get('employee', [EmployeeController::class, 'index'])->name('employee.index');
     Route::get('employee/data', [EmployeeController::class, 'listData'])->name('employee.data');
+    Route::get('employee/create', [EmployeeController::class, 'create'])->name('employee.create');
     Route::get('employee/edit/{id}', [EmployeeController::class, 'edit'])->name('employee.edit');
     Route::post('employee/update/{id}', [EmployeeController::class, 'update'])->name('employee.update');
     Route::post('employee/create', [EmployeeController::class, 'store'])->name('employee.store');
@@ -86,9 +87,10 @@ Route::middleware(['auth:sanctum', 'verified'])->group(function () {
     Route::get('stock/product/{id}', [StockFlowController::class, 'getProductById'])->name('stock.product.id');
     Route::get('stock/create', [StockFlowController::class, 'create'])->name('stock.create');
     Route::get('stock/{id}', [StockFlowController::class, 'getById'])->name('stock.byid');
-    Route::get('stock/date/{date}', [StockFlowController::class, 'getByDate'])->name('stock.bydate');
+    Route::get('stock/date/{date}/{depo_id}', [StockFlowController::class, 'getByDate'])->name('stock.bydate');
+    Route::get('stock/confirm/{date}', [StockFlowController::class, 'confirm'])->name('stock.confirm');
     Route::post('stock/create', [StockFlowController::class, 'store'])->name('stock.store');
-    Route::get('stock/edit/{id}', [StockFlowController::class, 'edit'])->name('stock.edit');
+    Route::get('stock/edit/{id}/{depo_id}', [StockFlowController::class, 'edit'])->name('stock.edit');
     Route::post('stock/update/{id}', [StockFlowController::class, 'update'])->name('stock.update');
     
     // Cash Flow

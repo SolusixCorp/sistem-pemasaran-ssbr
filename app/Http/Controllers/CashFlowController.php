@@ -76,7 +76,7 @@ class CashFlowController extends Controller
         $cash = new CashFlow;
         $cash->depo_id = $in_depo;
         if ($in_date != null && $in_time != null) {
-            $cash->input_date = $in_date . " " . $in_time . ":00";
+            $cash->input_date = $in_date . " " . $in_time . date(":s", time());
         }
         $cash->cash_type = $in_cash_type;
         if ($in_cash_type == 'revenue') {
@@ -185,6 +185,7 @@ class CashFlowController extends Controller
             'category' => $category,
             'notes' => $cashData->notes,
             'total' => (int) $cashData->amount,
+            'receipt' => $cashData->upload_file,
             'match' => $cashData->is_matched,
         );
 
@@ -217,7 +218,7 @@ class CashFlowController extends Controller
         $cash = CashFlow::find($id);
         $cash->depo_id = $in_depo;
         if ($in_date != null && $in_time != null) {
-            $cash->input_date = $in_date . " " . $in_time . ":00";
+            $cash->input_date = $in_date . " " . $in_time . date(":s", time());
         }
         $cash->cash_type = $in_cash_type;
         if ($in_cash_type == 'revenue') {

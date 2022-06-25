@@ -49,15 +49,16 @@ class StockFlowController extends Controller
         if ($user->role == 'ho') {
             $stocks =  StockFlow::leftJoin('depos', 'depo_id', '=', 'depos.id')
                     ->leftJoin('users', 'depos.user_id', '=', 'users.id')
-                    ->select('stock_flow.id as stock_id', 'stock_flow.input_date', 'name', 'stock_type', 'stockin_category', 'stockout_category', DB::raw('sum(qty) as qty'))
+                    ->select('stock_flow.id as stock_id', 'stock_flow.input_date', 'depo_id', 'is_delivered', 'name', 'stock_type', 'stockin_category', 'stockout_category', DB::raw('sum(qty) as qty'))
                     ->whereBetween('input_date', [$startDate . '%', $endDate . '%'])
                     ->groupBy('input_date')
+                    ->groupBy('depo_id')
                     ->orderBy('stock_flow.input_date', 'desc')
                     ->get(); 
         } else {
             $stocks =  StockFlow::leftJoin('depos', 'depo_id', '=', 'depos.id')
                     ->leftJoin('users', 'depos.user_id', '=', 'users.id')
-                    ->select('stock_flow.id as stock_id', 'stock_flow.input_date', 'name', 'stock_type', 'stockin_category', 'stockout_category', DB::raw('sum(qty) as qty'))
+                    ->select('stock_flow.id as stock_id', 'stock_flow.input_date', 'depo_id', 'is_delivered', 'name', 'stock_type', 'stockin_category', 'stockout_category', DB::raw('sum(qty) as qty'))
                     ->whereBetween('input_date', [$startDate . '%', $endDate . '%'])
                     ->groupBy('input_date')
                     ->where('depos.user_id', '=', $user->id)
@@ -81,8 +82,34 @@ class StockFlowController extends Controller
                 $row[] = ucfirst($stock->stockout_category);
             }
             $row[] = $stock->qty;
-            $row[] = '<a href="'. url("/") .'/stock/edit/' . dateToNumber($stock->input_date) . '" onclick="editForm(' . $stock->stock_id . ')" class="btn btn-warning btn-sm"><i class="far fa-edit"></i></a>
-            <a href="#" onclick="detailsView(' . dateToNumber($stock->input_date) . ')" class="btn btn-primary btn-sm" data-toggle="modal"><i class="far fa-eye"></i></a>';
+
+            $btnConfirm = 'btn-secondary';
+            $onClickConfirm = 'confirmView(' . dateToNumber($stock->input_date) . ', '. $stock->depo_id .')';
+            if ($stock->depo_id == $depo->id) {
+                if ($stock->stock_type == 'in') {
+                    $btnConfirm = 'btn-outline-success';
+                } else {
+                    $btnConfirm = 'btn-success';
+                    $onClickConfirm = '';
+                }
+            } else {
+                $btnConfirm = 'btn-secondary';
+                $onClickConfirm = '';
+            } 
+
+            if ($stock->is_delivered == 1) {
+                $btnConfirm = 'btn-success';
+                $onClickConfirm = '';
+            }
+
+            $confirm = '<a href="#" onclick="' . $onClickConfirm .'" class="btn ' . $btnConfirm . ' btn-sm" data-toggle="modal"><i class="fas fa-check"></i></a>'; 
+            $edit = '<a href="'. url("/") .'/stock/edit/' . dateToNumber($stock->input_date) . '/'. $stock->depo_id. '" onclick="editForm(' . $stock->stock_id . ')" class="btn btn-warning btn-sm"><i class="far fa-edit"></i></a>';
+            $details = '<a href="#" onclick="detailsView(' . dateToNumber($stock->input_date) . ', '. $stock->depo_id .')" class="btn btn-primary btn-sm" data-toggle="modal"><i class="far fa-eye"></i></a>'; 
+            if ($depo->id == $stock->depo_id) {
+                $row[] = $confirm . ' ' .$details . ' ' . $edit;
+            } else {
+                $row[] = $confirm . ' ' . $details;
+            }
             
             array_push($data, $row);
         }
@@ -104,15 +131,25 @@ class StockFlowController extends Controller
         return response()->json($stock);
     }
 
-    public function getByDate($date) {
-        $stockDatas =  StockFlow::with('depo', 'product')
+    public function getByDate($date, $depoId) {
+        $stockDatas =  StockFlow::with('depo')
                     ->where('input_date', '=', numberToDate($date))
+                    ->where('depo_id', '=', $depoId)
                     ->get();
+
+        $depo = Depo::with('user')->where('id', '=', $depoId)->first();
 
         $products = array();
         foreach($stockDatas as $stockData) { 
+            if ($depo->user->role == 'ho') {
+                $product = Product::find($stockData->product_id);
+                $productName = $product->name;
+            } else {
+                $product = ProductDepo::with('product')->find($stockData->product_id);
+                $productName = $product->product->name;
+            }
             $products[] = array(
-                'product_name' => $stockData->product->name,
+                'product_name' => $productName,
                 'qty' => $stockData->qty,
                 'remaining_stock' => $stockData->remaining_stock
             ); 
@@ -136,7 +173,26 @@ class StockFlowController extends Controller
         return response()->json($stock);
     }
     
-    
+    public function confirm($date)
+    {
+        $user = Auth::user();
+        $depo = Depo::with('user')->where('id', '=', $user->id)->first();
+        $stockDatas =  StockFlow::with('depo')
+                ->where('input_date', '=', numberToDate($date))
+                ->where('depo_id', '=', $depo->id)
+                ->get();
+
+        foreach ($stockDatas as $stock) {
+            $stock->is_delivered = 1;
+            if (!$stock->update()) {
+                return redirect()->route('stock.index')
+                    ->with('failed_message', 'Konfirmasi gagal.');
+            }   
+        }
+
+        return redirect()->route('stock.index')
+            ->with('success_message', 'Konfirmasi berhasil.');
+    }
     
     /**
      * Show the form for creating a new resource.
@@ -149,7 +205,9 @@ class StockFlowController extends Controller
 
         if ($user->role == 'ho') {
             $products = Product::orderBy('name', 'asc')->get();
-            $depos = Depo::leftJoin('users', 'user_id', '=', 'users.id')->get();
+            $depos = Depo::leftJoin('users', 'user_id', '=', 'users.id')
+                    ->where('user_id', '!=', $user->id)
+                    ->get();
         } else {
             $products = ProductDepo::leftJoin('products', 'product_id', '=', 'products.id')
                     ->leftJoin('depos', 'depo_id', '=', 'depos.id')
@@ -234,6 +292,8 @@ class StockFlowController extends Controller
     public function store(Request $request)
     {
         $user = Auth::user();
+
+        $depo = Depo::where('user_id', '=', $user->id)->first();
         
         $in_date = $request['date'];
         $in_time = $request['time'];
@@ -254,98 +314,158 @@ class StockFlowController extends Controller
                 $product = Product::where('products.id', '=', (int) $item)
                     ->select('id', 'id as product_id', 'name', 'stock')
                     ->first(); 
+
+                $productDepo = ProductDepo::leftJoin('products', 'product_id', '=', 'products.id')
+                    ->select('products_depo.id', 'products_depo.product_id', 'products.name', 'products_depo.stock', 'products_depo.depo_price')
+                    ->where('product_id', '=', (int) $item)
+                    ->first();
+                    
+                $stock = new StockFlow;
+                $stock->depo_id = (int) $depo->id;
+                $stock->product_id = (int) $product->id;
+                if ($stock->stock == null) {
+                    $stock->stock = (int) $qty_items[$index];
+                } else {
+                    $stock->stock += (int) $qty_items[$index];
+                }
+                if ($in_date != null && $in_time != null) {
+                    $stock->input_date = $in_date . " " . $in_time . date(":s", time());
+                }
+                $stock->stock_type = $in_stock_type;
+                $stock->qty = (int) $qty_items[$index];
+        
+                $position = strpos($price_items[$index], ' (');
+                $price = substr($price_items[$index], 0 , $position);
+                $stock->price_type = priceType($price_items[$index]);
+                $stock->price = (float) rupiahNumber($price_items[$index]);
+                
+                if ($in_stock_type == 'in') {
+                    $stock->stockin_category = $in_stock_category;
+                    $stock->stockout_category = '';
+                    $product->stock += (int) $qty_items[$index];
+                } else {
+                    if ($product->stock < $qty_items[$index]) {
+                        return redirect()->route('stock.create')
+                        ->with('failed_message', 'Stock '. $product->name .' tidak cukup');
+                    }
+                    
+                    $stock->stockout_category = $in_stock_category;
+                    $stock->stockin_category = '';
+                    $product->stock -= (int) $qty_items[$index];
+
+                    $stockDepo = new StockFlow;
+                    $stockDepo->depo_id = (int) $in_depo;
+                    $stockDepo->product_id = (int) $productDepo->id;
+                    if ($stockDepo->stock == null) {
+                        $stockDepo->stock = (int) $qty_items[$index];
+                    } else {
+                        $stockDepo->stock += (int) $qty_items[$index];
+                    }
+                    if ($in_date != null && $in_time != null) {
+                        $stockDepo->input_date = $in_date . " " . $in_time . date(":s", time());
+                    }
+                    $stockDepo->stock_type = 'in';
+                    $stockDepo->qty = (int) $qty_items[$index];
+            
+                    $position = strpos($price_items[$index], ' (');
+                    $price = substr($price_items[$index], 0 , $position);
+                    $stockDepo->price_type = priceType($price_items[$index]);
+                    $stockDepo->price = (float) rupiahNumber($price_items[$index]);
+                    $stockDepo->stockout_category = '';
+                    $stockDepo->stockin_category = 'dropping';
+                    
+                    $productDepo->stock += (int) $qty_items[$index];
+
+                    $stockDepo->remaining_stock = (int) $productDepo->stock;
+
+                    if (!$stockDepo->save()) {
+                        return redirect()->route('stock.create')
+                            ->with('failed_message', 'Data stock flow gagal disimpan.');
+                    }
+
+                    if (!$productDepo->update()) {
+                        return redirect()->route('stock.create')
+                            ->with('failed_message', 'Data stock flow gagal disimpan.');
+                    }
+                }
+
+                $stock->remaining_stock = (int) $product->stock;
+
+                $total_amount += (float) rupiahNumber($price_items[$index]) * (int) $qty_items[$index];
+
+                if (!$stock->save()) {
+                    return redirect()->route('stock.create')
+                        ->with('failed_message', 'Data stock flow gagal disimpan.');
+                }
+
+                if (!$product->update()) {
+                    return redirect()->route('stock.create')
+                        ->with('failed_message', 'Data stock flow gagal disimpan.');
+                }
+                    
             } else {
                 $product = ProductDepo::leftJoin('products', 'product_id', '=', 'products.id')
                     ->select('products_depo.id', 'products_depo.product_id', 'products.name', 'products_depo.stock', 'products_depo.depo_price')
                     ->where('products_depo.id', '=', (int) $item)
                     ->first(); 
 
-                $productHO = Product::where('products.id', '=',  $product->product_id)->first(); 
-            }
-
-            $stock = new StockFlow;
-            $stock->depo_id = (int) $in_depo;
-            $stock->product_id = (int) $product->id;
-            if ($stock->stock == null) {
-                $stock->stock = (int) $qty_items[$index];
-            } else {
-                $stock->stock += (int) $qty_items[$index];
-            }
-            if ($in_date != null && $in_time != null) {
-                $stock->input_date = $in_date . " " . $in_time . ":00";
-            }
-            $stock->stock_type = $in_stock_type;
-            $stock->qty = (int) $qty_items[$index];
-    
-            $position = strpos($price_items[$index], ' (');
-            $price = substr($price_items[$index], 0 , $position);
-            $stock->price_type = priceType($price_items[$index]);
-
-            $stock->price = (float) rupiahNumber($price_items[$index]);
-            if ($in_stock_type == 'in') {
-                if ($user->role == 'depo') {
-                    $productHO;
-                    if ($productHO->stock < $qty_items[$index]) {
-                        return redirect()->route('stock.create')
-                        ->with('failed_message', 'Stock '. $product->name .' Head Office tidak cukup');
-                    }
-
-                    $productHO->stock -= (int) $qty_items[$index]; 
-
-                    if (!$productHO->update()) {
-                        return redirect()->route('stock.create')
-                            ->with('failed_message', 'Data prouct HO flow gagal disimpan.');
-                    }
-                }
-
-                $stock->stockin_category = $in_stock_category;
-                $stock->stockout_category = '';
-                $product->stock += (int) $qty_items[$index];
-            } else {
                 if ($product->stock < $qty_items[$index]) {
                     return redirect()->route('stock.create')
                     ->with('failed_message', 'Stock '. $product->name .' tidak cukup');
                 }
-                
-                $stock->stockout_category = $in_stock_category;
-                $stock->stockin_category = '';
-                $product->stock -= (int) $qty_items[$index];
-            }
+
+                $stock = new StockFlow;
+                $stock->depo_id = (int) $depo->id;
+                $stock->product_id = (int) $product->id;
+                if ($stock->stock == null) {
+                    $stock->stock = (int) $qty_items[$index];
+                } else {
+                    $stock->stock += (int) $qty_items[$index];
+                }
+                if ($in_date != null && $in_time != null) {
+                    $stock->input_date = $in_date . " " . $in_time . date(":s", time());
+                }
+                $stock->stock_type = $in_stock_type;
+                $stock->qty = (int) $qty_items[$index];
         
-            $stock->remaining_stock = (int) $product->stock;
+                $position = strpos($price_items[$index], ' (');
+                $price = substr($price_items[$index], 0 , $position);
+                $stock->price_type = priceType($price_items[$index]);
+                $stock->price = (float) rupiahNumber($price_items[$index]);
 
-            $total_amount += (float) rupiahNumber($price_items[$index]) * (int) $qty_items[$index];
+                $product->stock -= (int) $qty_items[$index];
+                
+                $stock->remaining_stock = (int) $product->stock;
 
-            if (!$stock->save()) {
-                return redirect()->route('stock.create')
-                    ->with('failed_message', 'Data stock flow gagal disimpan.');
-            }
-    
-            if (!$product->update()) {
-                return redirect()->route('stock.create')
-                    ->with('failed_message', 'Data stock flow gagal disimpan.');
-            }
+                if (!$stock->save()) {
+                    return redirect()->route('stock.create')
+                        ->with('failed_message', 'Data stock flow gagal disimpan.');
+                }
 
-        }
+                if (!$product->update()) {
+                    return redirect()->route('stock.create')
+                        ->with('failed_message', 'Data prouct HO flow gagal disimpan.');
+                }
 
-
-        if ($in_stock_type == 'out') {
-            $cash = new CashFlow;
-            $cash->depo_id = $in_depo;
-            if ($in_date != null && $in_time != null) {
-                $cash->input_date = $in_date . " " . $in_time . ":00";
-            }
-            $cash->cash_type = 'revenue';
-            $cash->revenue_type_in = 'product_sales';
-            $cash->expense_type = '';
-            $cash->notes = '';
-            $cash->amount = $total_amount;
-            $cash->is_matched = 'true';
-            $cash->upload_file = '';
-
-            if (!$cash->save()) {
-                return redirect()->route('stock.create')
-                    ->with('failed_message', 'Data cash flow gagal disimpan.');
+                if ($in_stock_type == 'out') {
+                    $cash = new CashFlow;
+                    $cash->depo_id = $in_depo;
+                    if ($in_date != null && $in_time != null) {
+                        $cash->input_date = $in_date . " " . $in_time . date(":s", time());
+                    }
+                    $cash->cash_type = 'revenue';
+                    $cash->revenue_type_in = 'product_sales';
+                    $cash->expense_type = '';
+                    $cash->notes = '';
+                    $cash->amount = $total_amount;
+                    $cash->is_matched = 'true';
+                    $cash->upload_file = '';
+        
+                    if (!$cash->save()) {
+                        return redirect()->route('stock.create')
+                            ->with('failed_message', 'Data cash flow gagal disimpan.');
+                    }
+                }
             }
         }
 
@@ -388,7 +508,7 @@ class StockFlowController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function edit($id)
+    public function edit($id, $depoId)
     {
         $user = Auth::user();
 
@@ -433,15 +553,23 @@ class StockFlowController extends Controller
 
         $stocks = StockFlow::with(['depo', 'product'])
                     ->where('input_date', '=', numberToDate($id))
+                    ->where('depo_id', '=', $depoId)
                     ->get();
 
         $products = array();
         foreach($stocks as $stock) { 
+            if ($depo->user->role == 'ho') {
+                $product = Product::find($stock->product_id);
+                $productName = $product->name;
+            } else {
+                $product = ProductDepo::with('product')->find($stock->product_id);
+                $productName = $product->product->name;
+            }
             $products[] = array(
-                'product_id' => $stock->product->id,
-                'product_name' => $stock->product->name,
+                'product_id' => $stock->product_id,
+                'product_name' => $productName,
                 'qty' => $stock->qty,
-                'remaining_stock' => $stock->remaining_stock,
+                'remaining_stock' => $product->stock,
                 'price' => rupiah($stock->price, TRUE) . ' (' . priceTypeLabel($stock->price_type) . ')'
             ); 
         }
@@ -484,6 +612,8 @@ class StockFlowController extends Controller
         $date = numberToDate($id);
 
         $user = Auth::user();
+
+        $depo = Depo::where('user_id', '=', $user->id)->first();
         
         $in_date = $request['date'];
         $in_time = $request['time'];
@@ -504,113 +634,189 @@ class StockFlowController extends Controller
                 $product = Product::where('products.id', '=', (int) $item)
                     ->select('id', 'id as product_id', 'name', 'stock')
                     ->first(); 
+
+                $productDepo = ProductDepo::leftJoin('products', 'product_id', '=', 'products.id')
+                    ->select('products_depo.id', 'products_depo.product_id', 'products.name', 'products_depo.stock', 'products_depo.depo_price')
+                    ->where('product_id', '=', (int) $item)
+                    ->first();
+                    
+                $stock = StockFlow::where('input_date', '=', $date)
+                    ->where('depo_id', '=', $depo->id)->first();
+
+                $stock->depo_id = (int) $depo->id;
+                $stock->product_id = (int) $product->id;
+                if ($stock->stock == null) {
+                    $stock->stock = (int) $qty_items[$index];
+                } else {
+                    $stock->stock += (int) $qty_items[$index];
+                }
+                if ($in_date != null && $in_time != null) {
+                    $stock->input_date = $in_date . " " . $in_time . date(":s", time());
+                }
+                $stock->stock_type = $in_stock_type;
+                $stock->qty = (int) $qty_items[$index];
+        
+                $position = strpos($price_items[$index], ' (');
+                $price = substr($price_items[$index], 0 , $position);
+                $stock->price_type = priceType($price_items[$index]);
+                $stock->price = (float) rupiahNumber($price_items[$index]);
+                
+                if ($in_stock_type == 'in') {
+                    $stock->stockin_category = $in_stock_category;
+                    $stock->stockout_category = '';
+                    $product->stock += (int) $qty_items[$index];
+                } else {
+                    if ($product->stock < $qty_items[$index]) {
+                        return redirect()->route('stock.create')
+                        ->with('failed_message', 'Stock '. $product->name .' tidak cukup');
+                    }
+                    
+                    $stock->stockout_category = $in_stock_category;
+                    $stock->stockin_category = '';
+
+                    $diff = 0;
+                    if ($stock->qty > (int) $qty_items[$index]) {
+                        $diff = $stock->qty - (int) $qty_items[$index];
+                        $product->stock -= $diff;
+                    } else if ($stock->qty < (int) $qty_items[$index]) { 
+                        $diff = (int) $qty_items[$index] - $stock->qty;
+                        $product->stock += $diff;
+                    }
+
+                    $stockDepo = StockFlow::where('input_date', '=', $date)
+                        ->where('depo_id', '!=', $depo->id)->first();
+
+                    $stockDepo->depo_id = (int) $stockDepo->depo_id;
+                    $stockDepo->product_id = (int) $productDepo->id;
+                    if ($stockDepo->stock == null) {
+                        $stockDepo->stock = (int) $qty_items[$index];
+                    } else {
+                        $stockDepo->stock += (int) $qty_items[$index];
+                    }
+                    if ($in_date != null && $in_time != null) {
+                        $stockDepo->input_date = $in_date . " " . $in_time . date(":s", time());;
+                    }
+                    $stockDepo->stock_type = 'in';
+                    $stockDepo->qty = (int) $qty_items[$index];
+            
+                    $position = strpos($price_items[$index], ' (');
+                    $price = substr($price_items[$index], 0 , $position);
+                    $stockDepo->price_type = priceType($price_items[$index]);
+                    $stockDepo->price = (float) rupiahNumber($price_items[$index]);
+                    $stockDepo->stockout_category = '';
+                    $stockDepo->stockin_category = 'dropping';
+                    
+                    $diff = 0;
+                    if ($stockDepo->qty > (int) $qty_items[$index]) {
+                        $diff = $stockDepo->qty - (int) $qty_items[$index];
+                        $productDepo->stock -= $diff;
+                    } else if ($stockDepo->qty < (int) $qty_items[$index]) { 
+                        $diff = (int) $qty_items[$index] - $stockDepo->qty;
+                        $productDepo->stock += $diff;
+                    }
+
+                    $stockDepo->remaining_stock = (int) $productDepo->stock;
+
+                    if (!$stockDepo->update()) {
+                        return redirect()->route('stock.create')
+                            ->with('failed_message', 'Data stock flow gagal disimpan.');
+                    }
+
+                    if (!$productDepo->update()) {
+                        return redirect()->route('stock.create')
+                            ->with('failed_message', 'Data stock flow gagal disimpan.');
+                    }
+                }
+
+                $stock->remaining_stock = (int) $product->stock;
+
+                $total_amount += (float) rupiahNumber($price_items[$index]) * (int) $qty_items[$index];
+
+                if (!$stock->update()) {
+                    return redirect()->route('stock.create')
+                        ->with('failed_message', 'Data stock flow gagal disimpan.');
+                }
+
+                if (!$product->update()) {
+                    return redirect()->route('stock.create')
+                        ->with('failed_message', 'Data stock flow gagal disimpan.');
+                }
+                    
             } else {
                 $product = ProductDepo::leftJoin('products', 'product_id', '=', 'products.id')
                     ->select('products_depo.id', 'products_depo.product_id', 'products.name', 'products_depo.stock', 'products_depo.depo_price')
                     ->where('products_depo.id', '=', (int) $item)
                     ->first(); 
 
-                $productHO = Product::where('products.id', '=',  $product->product_id)->first(); 
-            }
-
-            $stock = StockFlow::where('input_date', '=', $date)
-                    ->first();
-
-            $stock->depo_id = (int) $in_depo;
-            $stock->product_id = (int) $product->id;
-            $stock->stock = (int) $product->stock + (int) $qty_items[$index];
-            if ($in_date != null && $in_time != null) {
-                $stock->input_date = $in_date . " " . $in_time . ":00";
-            }
-            $stock->stock_type = $in_stock_type;
-            $stock->qty = (int) $qty_items[$index];
-            $stock->remaining_stock = (int) $product->stock;
-    
-            $position = strpos($price_items[$index], ' (');
-            $price = substr($price_items[$index], 0 , $position);
-            $stock->price_type = priceType($price_items[$index]);
-
-            $stock->price = (float) rupiahNumber($price_items[$index]);
-            if ($in_stock_type == 'in') {
-                if ($user->role == 'depo') {
-                    if ($productHO->stock < $qty_items[$index]) {
-                        return redirect()->route('stock.create')
-                        ->with('failed_message', 'Stock '. $product->name .' tidak cukup');
-                    }
-
-                    $diff = 0;
-                    if ($stock->qty > (int) $qty_items[$index]) {
-                        $diff = $stock->qty - (int) $qty_items[$index];
-                        $productHO->stock -= $diff;
-                    } else if ($stock->qty < (int) $qty_items[$index]) { 
-                        $diff = (int) $qty_items[$index] - $stock->qty;
-                        $productHO->stock += $diff;
-                    }
-
-                    if (!$productHO->update()) {
-                        return redirect()->route('stock.create')
-                            ->with('failed_message', 'Data prouct HO flow gagal disimpan.');
-                    }
-                }
-
-                $stock->stockin_category = $in_stock_category;
-                $stock->stockout_category = '';
-
-            } else {
                 if ($product->stock < $qty_items[$index]) {
                     return redirect()->route('stock.create')
                     ->with('failed_message', 'Stock '. $product->name .' tidak cukup');
                 }
+
+                $stock = StockFlow::where('input_date', '=', $date)
+                    ->where('depo_id', '=', $depo->id)->first();
+                $stock->depo_id = (int) $depo->id;
+                $stock->product_id = (int) $product->id;
+                if ($stock->stock == null) {
+                    $stock->stock = (int) $qty_items[$index];
+                } else {
+                    $stock->stock += (int) $qty_items[$index];
+                }
+                if ($in_date != null && $in_time != null) {
+                    $stock->input_date = $in_date . " " . $in_time . date(":s", time());;
+                }
+                $stock->stock_type = $in_stock_type;
+                $stock->qty = (int) $qty_items[$index];
+        
+                $position = strpos($price_items[$index], ' (');
+                $price = substr($price_items[$index], 0 , $position);
+                $stock->price_type = priceType($price_items[$index]);
+                $stock->price = (float) rupiahNumber($price_items[$index]);
+
+                $diff = 0;
+                if ($stock->qty > (int) $qty_items[$index]) {
+                    $diff = $stock->qty - (int) $qty_items[$index];
+                    $product->stock -= $diff;
+                } else if ($stock->qty < (int) $qty_items[$index]) { 
+                    $diff = (int) $qty_items[$index] - $stock->qty;
+                    $product->stock += $diff;
+                }
                 
-                $stock->stockout_category = $in_stock_category;
-                $stock->stockin_category = '';
-                
-            }
+                $stock->remaining_stock = (int) $product->stock;
 
-            $diff = 0;
-            if ($stock->qty > (int) $qty_items[$index]) {
-                $diff = $stock->qty - (int) $qty_items[$index];
-                $product->stock -= $diff;
-            } else if ($stock->qty < (int) $qty_items[$index]) { 
-                $diff = (int) $qty_items[$index] - $stock->qty;
-                $product->stock += $diff;
-            }
+                if (!$stock->update()) {
+                    return redirect()->route('stock.create')
+                        ->with('failed_message', 'Data stock flow gagal disimpan.');
+                }
 
-            
-            $total_amount += (float) rupiahNumber($price_items[$index]) * (int) $qty_items[$index];
+                if (!$product->update()) {
+                    return redirect()->route('stock.create')
+                        ->with('failed_message', 'Data prouct HO flow gagal disimpan.');
+                }
 
-            if (!$stock->update()) {
-                return redirect()->route('stock.create')
-                    ->with('failed_message', 'Data stock flow gagal disimpan.');
-            }
-    
-            if (!$product->update()) {
-                return redirect()->route('stock.create')
-                    ->with('failed_message', 'Data stock flow gagal disimpan.');
-            }
+                if ($in_stock_type == 'out') {
+                    $cash = CashFlow::where('input_date', '=', $date)->first();
+                    if ($cash != null) {
+                        $cash->depo_id = $in_depo;
+                        if ($in_date != null && $in_time != null) {
+                            $cash->input_date = $in_date . " " . $in_time . date(":s", time());
+                        }
+                        $cash->cash_type = 'revenue';
+                        $cash->revenue_type_in = 'product_sales';
+                        $cash->expense_type = '';
+                        $cash->notes = '';
+                        $cash->amount = $total_amount;
+                        $cash->is_matched = 'true';
+                        $cash->upload_file = '';
 
-        }
-
-        if ($in_stock_type == 'out') {
-            $cash = CashFlow::where('input_date', '=', $date)->first();
-            $cash->depo_id = $in_depo;
-            if ($in_date != null && $in_time != null) {
-                $cash->input_date = $in_date . " " . $in_time . ":00";
-            }
-            $cash->cash_type = 'revenue';
-            $cash->revenue_type_in = 'product_sales';
-            $cash->expense_type = '';
-            $cash->notes = '';
-            $cash->amount = $total_amount;
-            $cash->is_matched = 'true';
-            $cash->upload_file = '';
-
-            if (!$cash->update()) {
-                return redirect()->route('stock.create')
-                    ->with('failed_message', 'Data cash flow gagal diperbarui.');
+                        if (!$cash->update()) {
+                            return redirect()->route('stock.create')
+                                ->with('failed_message', 'Data cash flow gagal diperbarui.');
+                        }
+                    }
+                }
             }
         }
-
         return redirect()->route('stock.index')
         ->with('success_message', 'Data berhasil diperbarui.');
     

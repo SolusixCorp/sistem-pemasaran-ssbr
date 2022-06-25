@@ -76,7 +76,7 @@
                                 </div>
                             </div>
                             <div class="modal-footer">
-                                <a href="/stock" class="btn btn-secondary">Batal</a>
+                                <a href="{{ route('employee.index') }}" class="btn btn-secondary">Batal</a>
                                 <button type="submit" class="btn btn-primary">Simpan</button>
                             </div>
                         </form>
