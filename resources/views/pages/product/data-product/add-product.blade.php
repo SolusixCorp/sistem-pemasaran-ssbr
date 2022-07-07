@@ -57,7 +57,7 @@
                             <div class="form-group col-md-12">
                                 <label for="validatedCustomFile">Foto Produk</label>
                                 <div class="custom-file">
-                                    <input type="file" name="inPhoto" class="custom-file-input" id="validatedCustomFile">
+                                    <input type="file" name="inPhoto" class="custom-file-input" id="validatedCustomFile" required>
                                     <label id="validatedCustomFileLabel" class="custom-file-label" for="validatedCustomFile">Pilih
                                         Gambar...</label>
                                 </div>

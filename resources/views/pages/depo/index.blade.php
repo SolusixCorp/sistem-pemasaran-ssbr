@@ -99,7 +99,7 @@
                     $('#modal-edit-depo').modal('show');
                     $('.modal-title').text('Edit Depo');
                     $('#formEdit').attr('action', url);
-                    $('#upUser').val(data.depo_id);
+                    $('#upUser').val(data.depo_user_id);
                     $('#upDepoType').val(data.depo_type);
                     $('#upDepoAddress').val(data.depo_address);
                     $('#upDepoCity').val(data.depo_city);

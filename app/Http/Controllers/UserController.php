@@ -43,7 +43,8 @@ class UserController extends Controller
             'name' => 'required',
             'email' => 'required',
             'password' => 'required',
-            'password_confirmation' => 'required'
+            'password_confirmation' => 'required',
+            'role' => 'required'
         ]);
 
         if ($request['password'] != $request['password_confirmation']) {
@@ -52,9 +53,15 @@ class UserController extends Controller
         }
 
         $request['password'] = Hash::make($request['password']);
-        $created = User::create($request->all());
+        // $created = User::create($request->all());
 
-        if (!$created) {
+        $created = new User;
+        $created->name = $request['name'];
+        $created->email = $request['email'];
+        $created->password = $request['password'];
+        $created->role = $request['role'];
+
+        if (!$created->save()) {
             return redirect()->route('user.index')
                 ->with('failed_message', 'Data User gagal ditambahkan !');
         }

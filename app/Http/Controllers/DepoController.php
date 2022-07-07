@@ -26,6 +26,7 @@ class DepoController extends Controller
     public function listData() {
         
         $depos = Depo::leftJoin('users', 'users.id', '=', 'user_id')
+                ->select('depos.id', 'users.name', 'type', 'address', 'users.email', 'phone', 'ar_balance')
                 ->orderBy('name', 'desc')
                 ->get();
         
@@ -109,7 +110,7 @@ class DepoController extends Controller
         //
         $depo = Depo::find($id);
         $depoData = array(
-            'depo_id' => $depo->id,
+            'depo_user_id' => $depo->user_id,
             'depo_type' => $depo->type,
             'depo_address' => $depo->address,
             'depo_city' => $depo->city,

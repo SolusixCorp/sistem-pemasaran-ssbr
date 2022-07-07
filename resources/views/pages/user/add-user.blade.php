@@ -14,6 +14,13 @@
                 <div class="modal-body">
                     <div class="card-body">
                             <div class="form-group">
+                                <label for="role">Role</label>
+                                <select id="role" name="role" class="form-control js-example-basic-single">
+                                    <option value="depo" >Depo</option>
+                                    <option value="ho" >Head Office</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
                                 <label for="name">Nama</label>
                                 <input type="text" name="name" class="form-control" id="name" required placeholder="Admin Depo">
                             </div>
