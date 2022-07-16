@@ -102,6 +102,7 @@
                                         <textarea type="text" name="notes" class="form-control" id="notes"></textarea>
                                     </div>
 
+                                    @if (Auth::user()->role == 'ho')
                                     <div class="form-group">
                                         <label for="match">Is Matched ?</label>
                                             <select id="match" name="match" class="form-control js-example-basic-single">
@@ -109,6 +110,7 @@
                                                 <option value="0" >Not Match</option>
                                             </select>
                                     </div>
+                                    @endif
                                   
                                 </div>
                             </div>

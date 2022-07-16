@@ -145,12 +145,17 @@ class DashboardController extends Controller
             ->where('revenue_type_in', '=', 'product_sales')
             ->groupBy('depo_id')
             ->get();
+            
 
         $totCashIn = $cashInCart->sum('totals');
         $cashin = array();
         $cashin_depo = array();
         foreach($cashInCart as $cashIn) {
-            $cashin[] = round(($cashIn->totals / $totCashIn) * 100, 2);
+            if ($cashIn->totals > 0 && $totCashIn > 0) {
+                $cashin[] = round(($cashIn->totals / $totCashIn) * 100, 2);
+            } else {
+                $cashin[] = 0;
+            }
             $cashin_depo[] = $cashIn->name;
         }
 
@@ -170,7 +175,11 @@ class DashboardController extends Controller
         $cashout = array();
         $cashout_depo = array();
         foreach($cashOutCart as $cashOut) {
-            $cashout[] = round(($cashOut->totals / $totCashOut) * 100, 2);
+            if ($cashOut->totals > 0 && $totCashOut > 0) {
+                $cashout[] = round(($cashOut->totals / $totCashOut) * 100, 2);
+            } else {
+                $cashout[] = 0;
+            }
             $cashout_depo[] = $cashOut->name;
         }
 
@@ -190,7 +199,11 @@ class DashboardController extends Controller
         $stockin = array();
         $stockin_depo = array();
         foreach($stockInCart as $stockIn) {
-            $stockin[] = round(($stockIn->totals / $totStockIn) * 100, 2);
+            if ($stockIn->totals > 0 && $totStockIn > 0) {
+                $stockin[] = round(($stockIn->totals / $totStockIn) * 100, 2);
+            } else {
+                $stockin[] = 0;
+            }
             $stockin_depo[] = $stockIn->name;
         }
 
@@ -210,7 +223,11 @@ class DashboardController extends Controller
         $stockout = array();
         $stockout_depo = array();
         foreach($stockOutCart as $stockOut) {
-            $stockout[] = round(($stockOut->totals / $totStockOut) * 100, 2);
+            if ($stockOut->totals > 0 && $totStockOut > 0) {
+                $stockout[] = round(($stockOut->totals / $totStockOut) * 100, 2);
+            } else {
+                $stockout[] = 0;
+            }
             $stockout_depo[] = $stockOut->name;
         }
 
@@ -310,7 +327,11 @@ class DashboardController extends Controller
         $sumCashIn = round($cashInCard->sum('amount'), 0);
         $aveCashIn = 0;
         if ($countCashIn > 0) {
-            $aveCashIn = round($sumCashIn / $countCashIn, 0);
+            if ($sumCashIn > 0 && $countCashIn > 0) {
+                $aveCashIn = round($sumCashIn / $countCashIn, 0);
+            } else {
+                $aveCashIn = 0;
+            }
         }
         
         $data = array(

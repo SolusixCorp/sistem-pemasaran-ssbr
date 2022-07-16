@@ -129,6 +129,7 @@
                                         <textarea type="text" name="notes" class="form-control" id="notes">{{ $cash['notes'] }}</textarea>
                                     </div>
 
+                                    @if (Auth::user()->role == 'ho')
                                     <div class="form-group">
                                         <label for="match">Is Matched ?</label>
                                         <select id="match" name="match" class="form-control js-example-basic-single">
@@ -141,12 +142,13 @@
                                             @endif
                                         </select>
                                     </div>
+                                    @endif
                                   
                                 </div>
                             </div>
                             <div class="modal-footer">
                                 <a href="{{ route('cashflow.index') }}" class="btn btn-secondary">Batal</a>
-                                <button type="submit" class="btn btn-primary">Edit Transaksi</button>
+                                <button type="submit" class="btn btn-primary">Edit Cash Flow</button>
                             </div>
                         </form>
 

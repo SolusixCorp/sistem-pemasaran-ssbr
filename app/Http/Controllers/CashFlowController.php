@@ -73,6 +73,10 @@ class CashFlowController extends Controller
         $in_notes = $request['notes'];
         $in_is_matched = $request['match'];
 
+        if ($in_is_matched == null) {
+            $in_is_matched = false;
+        }
+
         $cash = new CashFlow;
         $cash->depo_id = $in_depo;
         if ($in_date != null && $in_time != null) {

@@ -106,7 +106,11 @@ class StockFlowController extends Controller
             $edit = '<a href="'. url("/") .'/stock/edit/' . dateToNumber($stock->input_date) . '/'. $stock->depo_id. '" onclick="editForm(' . $stock->stock_id . ')" class="btn btn-warning btn-sm"><i class="far fa-edit"></i></a>';
             $details = '<a href="#" onclick="detailsView(' . dateToNumber($stock->input_date) . ', '. $stock->depo_id .')" class="btn btn-primary btn-sm" data-toggle="modal"><i class="far fa-eye"></i></a>'; 
             if ($depo->id == $stock->depo_id) {
-                $row[] = $confirm . ' ' .$details . ' ' . $edit;
+                if ($stock->stock_type == 'in' && $user->role == 'depo') {
+                    $row[] = $confirm . ' ' . $details;
+                } else {
+                    $row[] = $confirm . ' ' . $details . ' ' . $edit;
+                }
             } else {
                 $row[] = $confirm . ' ' . $details;
             }
@@ -425,7 +429,10 @@ class StockFlowController extends Controller
                 if ($in_date != null && $in_time != null) {
                     $stock->input_date = $in_date . " " . $in_time . date(":s", time());
                 }
+
                 $stock->stock_type = $in_stock_type;
+                $stock->stockout_category = $in_stock_category;
+                $stock->stockin_category = '';
                 $stock->qty = (int) $qty_items[$index];
         
                 $position = strpos($price_items[$index], ' (');
@@ -515,6 +522,11 @@ class StockFlowController extends Controller
         if ($user->role == 'ho') {
             $products = Product::orderBy('name', 'asc')->get();
             $depos = Depo::leftJoin('users', 'user_id', '=', 'users.id')->get();
+
+            $depo = StockFlow::with(['depo'])
+                    ->where('input_date', '=', numberToDate($id))
+                    ->where('depo_id', '!=', $depoId)
+                    ->first();
         } else {
             $products = ProductDepo::leftJoin('products', 'product_id', '=', 'products.id')
                     ->leftJoin('depos', 'depo_id', '=', 'depos.id')
@@ -525,12 +537,17 @@ class StockFlowController extends Controller
             $depos = Depo::leftJoin('users', 'user_id', '=', 'users.id')
                     ->where('user_id', '=', $user->id)
                     ->get();
+
+            $depo = StockFlow::with(['depo'])
+                    ->where('input_date', '=', numberToDate($id))
+                    ->where('depo_id', '=', $depoId)
+                    ->first();
         }
 
         $productDatas = array();
         foreach ($products as $product) {
-            $depo = Depo::where('user_id', '=', $user->id)->first();
-            if ($depo->type == 'principle') {
+            $depoProduct = Depo::where('user_id', '=', $user->id)->first();
+            if ($depoProduct->type == 'principle') {
                 $prices = array(
                     rupiah($product->consument_price, TRUE) . ' (Consument)',
                     rupiah($product->retail_price, TRUE) . ' (Retail)',
@@ -558,7 +575,7 @@ class StockFlowController extends Controller
 
         $products = array();
         foreach($stocks as $stock) { 
-            if ($depo->user->role == 'ho') {
+            if ($depoProduct->user->role == 'ho') {
                 $product = Product::find($stock->product_id);
                 $productName = $product->name;
             } else {
@@ -585,8 +602,8 @@ class StockFlowController extends Controller
             'id' => dateToNumber($stocks[0]->input_date),
             'input_date' => substr($stocks[0]->input_date, 0, 10),
             'input_time' => substr($stocks[0]->input_date, 11, 5),
-            'depo_id' => $stocks[0]->depo->id,
-            'depo' => $stocks[0]->depo->user->name,
+            'depo_id' => $depo->depo_id,
+            'depo' => $depo->depo->user->name,
             'type' => strtoupper($stocks[0]->stock_type),
             'desc' => ucfirst($desc),
             'products' => $products,
@@ -645,16 +662,10 @@ class StockFlowController extends Controller
 
                 $stock->depo_id = (int) $depo->id;
                 $stock->product_id = (int) $product->id;
-                if ($stock->stock == null) {
-                    $stock->stock = (int) $qty_items[$index];
-                } else {
-                    $stock->stock += (int) $qty_items[$index];
-                }
                 if ($in_date != null && $in_time != null) {
                     $stock->input_date = $in_date . " " . $in_time . date(":s", time());
                 }
                 $stock->stock_type = $in_stock_type;
-                $stock->qty = (int) $qty_items[$index];
         
                 $position = strpos($price_items[$index], ' (');
                 $price = substr($price_items[$index], 0 , $position);
@@ -664,16 +675,6 @@ class StockFlowController extends Controller
                 if ($in_stock_type == 'in') {
                     $stock->stockin_category = $in_stock_category;
                     $stock->stockout_category = '';
-                    $product->stock += (int) $qty_items[$index];
-                } else {
-                    if ($product->stock < $qty_items[$index]) {
-                        return redirect()->route('stock.create')
-                        ->with('failed_message', 'Stock '. $product->name .' tidak cukup');
-                    }
-                    
-                    $stock->stockout_category = $in_stock_category;
-                    $stock->stockin_category = '';
-
                     $diff = 0;
                     if ($stock->qty > (int) $qty_items[$index]) {
                         $diff = $stock->qty - (int) $qty_items[$index];
@@ -682,6 +683,28 @@ class StockFlowController extends Controller
                         $diff = (int) $qty_items[$index] - $stock->qty;
                         $product->stock += $diff;
                     }
+                } else {
+                    if ($product->stock < $qty_items[$index]) {
+                        return redirect()->route('stock.edit', ['id' => $id, 'depo_id' => $depo->id])
+                        ->with('failed_message', 'Stock '. $product->name .' tidak cukup');
+                    }
+                    
+                    $stock->stockout_category = $in_stock_category;
+                    $stock->stockin_category = '';
+                
+                    $diff = 0;
+                    // return $stock->qty . " " . (int) $qty_items[$index];
+                    if ($stock->qty > (int) $qty_items[$index]) {
+                        // return "a";
+                        $diff = $stock->qty - (int) $qty_items[$index];
+                        $product->stock += $diff;
+                    } else if ($stock->qty < (int) $qty_items[$index]) { 
+                        // return "b";
+                        $diff = (int) $qty_items[$index] - $stock->qty;
+                        $product->stock -= $diff;
+                    }
+
+                    $stock->qty = (int) $qty_items[$index];
 
                     $stockDepo = StockFlow::where('input_date', '=', $date)
                         ->where('depo_id', '!=', $depo->id)->first();
@@ -691,8 +714,16 @@ class StockFlowController extends Controller
                     if ($stockDepo->stock == null) {
                         $stockDepo->stock = (int) $qty_items[$index];
                     } else {
-                        $stockDepo->stock += (int) $qty_items[$index];
+                        $diffDepo = 0;
+                        if ($stockDepo->qty > (int) $qty_items[$index]) {
+                            $diffDepo = $stockDepo->qty - (int) $qty_items[$index];
+                            $productDepo->stock -= $diffDepo;
+                        } else if ($stockDepo->qty < (int) $qty_items[$index]) { 
+                            $diffDepo = (int) $qty_items[$index] - $stockDepo->qty;
+                            $productDepo->stock += $diffDepo;
+                        }
                     }
+
                     if ($in_date != null && $in_time != null) {
                         $stockDepo->input_date = $in_date . " " . $in_time . date(":s", time());;
                     }
@@ -706,24 +737,15 @@ class StockFlowController extends Controller
                     $stockDepo->stockout_category = '';
                     $stockDepo->stockin_category = 'dropping';
                     
-                    $diff = 0;
-                    if ($stockDepo->qty > (int) $qty_items[$index]) {
-                        $diff = $stockDepo->qty - (int) $qty_items[$index];
-                        $productDepo->stock -= $diff;
-                    } else if ($stockDepo->qty < (int) $qty_items[$index]) { 
-                        $diff = (int) $qty_items[$index] - $stockDepo->qty;
-                        $productDepo->stock += $diff;
-                    }
-
                     $stockDepo->remaining_stock = (int) $productDepo->stock;
 
                     if (!$stockDepo->update()) {
-                        return redirect()->route('stock.create')
+                        return redirect()->route('stock.edit', ['id' => $id, 'depo_id' => $depo->id])
                             ->with('failed_message', 'Data stock flow gagal disimpan.');
                     }
 
                     if (!$productDepo->update()) {
-                        return redirect()->route('stock.create')
+                        return redirect()->route('stock.edit', ['id' => $id, 'depo_id' => $depo->id])
                             ->with('failed_message', 'Data stock flow gagal disimpan.');
                     }
                 }
@@ -733,12 +755,12 @@ class StockFlowController extends Controller
                 $total_amount += (float) rupiahNumber($price_items[$index]) * (int) $qty_items[$index];
 
                 if (!$stock->update()) {
-                    return redirect()->route('stock.create')
+                    return redirect()->route('stock.update', ['id' => $id, 'depo_id' => $depo->id])
                         ->with('failed_message', 'Data stock flow gagal disimpan.');
                 }
 
                 if (!$product->update()) {
-                    return redirect()->route('stock.create')
+                    return redirect()->route('stock.update', ['id' => $id, 'depo_id' => $depo->id])
                         ->with('failed_message', 'Data stock flow gagal disimpan.');
                 }
                     
@@ -755,33 +777,38 @@ class StockFlowController extends Controller
 
                 $stock = StockFlow::where('input_date', '=', $date)
                     ->where('depo_id', '=', $depo->id)->first();
+
                 $stock->depo_id = (int) $depo->id;
                 $stock->product_id = (int) $product->id;
-                if ($stock->stock == null) {
-                    $stock->stock = (int) $qty_items[$index];
-                } else {
-                    $stock->stock += (int) $qty_items[$index];
-                }
+
                 if ($in_date != null && $in_time != null) {
                     $stock->input_date = $in_date . " " . $in_time . date(":s", time());;
                 }
+
                 $stock->stock_type = $in_stock_type;
-                $stock->qty = (int) $qty_items[$index];
-        
+                $stock->stockout_category = $in_stock_category;
+                $stock->stockin_category = '';
+                        
                 $position = strpos($price_items[$index], ' (');
                 $price = substr($price_items[$index], 0 , $position);
                 $stock->price_type = priceType($price_items[$index]);
                 $stock->price = (float) rupiahNumber($price_items[$index]);
 
-                $diff = 0;
-                if ($stock->qty > (int) $qty_items[$index]) {
-                    $diff = $stock->qty - (int) $qty_items[$index];
-                    $product->stock -= $diff;
-                } else if ($stock->qty < (int) $qty_items[$index]) { 
-                    $diff = (int) $qty_items[$index] - $stock->qty;
-                    $product->stock += $diff;
-                }
                 
+                if ($stock->stock == null) {
+                    $stock->stock = (int) $qty_items[$index];
+                } else {
+                    $diff = 0;
+                    if ($stock->qty > (int) $qty_items[$index]) {
+                        $diff = $stock->qty - (int) $qty_items[$index];
+                        $product->stock += $diff;
+                    } else if ($stock->qty < (int) $qty_items[$index]) { 
+                        $diff = (int) $qty_items[$index] - $stock->qty;
+                        $product->stock -= $diff;
+                    }
+                }
+                  
+                $stock->qty = (int) $qty_items[$index];
                 $stock->remaining_stock = (int) $product->stock;
 
                 if (!$stock->update()) {

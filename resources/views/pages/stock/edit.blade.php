@@ -51,13 +51,6 @@
                                             </div>
                                         </div>
                                     </div>
-                                    
-                                    <div class="form-group">
-                                        <label for="depo_name">Nama Depo</label>
-                                        <select id="depo_name" name="depo_name" class="form-control js-example-basic-single">
-                                            <option value="{{ $stock['depo_id'] }}" >{{ $stock['depo'] }}</option>
-                                        </select>
-                                    </div>
 
                                     <div class="form-group">
                                         <label for="stock_type">Tipe Stok</label>
@@ -67,6 +60,13 @@
                                             @else 
                                                 <option value="out" >STOCK OUT</option>
                                             @endif
+                                        </select>
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label for="depo_name">Nama Depo</label>
+                                        <select id="depo_name" name="depo_name" class="form-control js-example-basic-single">
+                                            <option value="{{ $stock['depo_id'] }}" >{{ $stock['depo'] }}</option>
                                         </select>
                                     </div>
 
