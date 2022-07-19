@@ -42,7 +42,7 @@
                                     <th>Nama</th>
                                     <th>Email</th>
                                     <th>Role</th>
-                                    <!-- <th width="15%">Aksi</th> -->
+                                    <th width="5%">Aksi</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -51,10 +51,11 @@
                                         <td>{{ $loop->index + 1 }}</td>
                                         <td>{{ $user->name }}</td>
                                         <td>{{ $user->email }}</td>
-                                        <td>Admin Depo</td>
-                                        <!-- <td>
-                                        <a href="{{ url('/') }}/user/delete/{{ $user->id }}" class="btn btn-secondary btn-sm btn-danger"><i class="far fa-trash-alt"></i> Hapus</a>
-                                        </td> -->
+                                        <td>{{ $user->role }}</td>
+                                        <td>
+                                        <a href="#" data-toggle="modal" data-target="#modal-edit-user{{ $user->id }}" class="btn btn-warning btn-sm"><i class="far fa-edit"></i></a>
+                                        </td>
+                                        @include('pages/user/edit-user')
                                     </tr>
                                 @endforeach
                             </tbody>

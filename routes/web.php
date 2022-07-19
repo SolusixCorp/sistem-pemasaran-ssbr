@@ -43,6 +43,8 @@ Route::middleware(['auth:sanctum', 'verified'])->group(function () {
     // User
     Route::resource('user', UserController::class);
     Route::get('user/delete/{id}', [UserController::class, 'delete'])->name('user.delete');
+    Route::get('user/edit/{id}', [UserController::class, 'edit'])->name('user.edit');
+    Route::post('user/update/{id}', [UserController::class, 'update'])->name('user.update');
 
     // Profile
     Route::get('profile', [UserController::class, 'profile'])->name('profile');

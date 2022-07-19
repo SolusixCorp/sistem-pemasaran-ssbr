@@ -96,12 +96,24 @@ class UserController extends Controller
      * Update the specified resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\User  $user
+     * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, User $user)
+    public function update(Request $request, $id)
     {
         //
+        $user = User::find($id);
+        $user->name = $request['name'];
+        $user->email = $request['email'];
+        $user->role = $request['role'];
+
+        if (!$user->update()) {
+            return redirect()->route('user.index')
+                ->with('failed_message', 'Data User gagal diedit !');
+        }
+
+        return redirect()->route('user.index')
+            ->with('success_message', 'Data User berhasil diedit.');
     }
 
     /**
