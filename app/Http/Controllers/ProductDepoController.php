@@ -65,7 +65,7 @@ class ProductDepoController extends Controller
                     ->where('depos.user_id', '!=', $user->id)
                     ->get();
             } else {
-                $products = ProductDepo::leftJoin('products', 'product_id', '=', 'products.id')
+                 $products = ProductDepo::leftJoin('products', 'product_id', '=', 'products.id')
                     ->leftJoin('depos', 'depo_id', '=', 'depos.id')
                     ->leftJoin('users', 'user_id', '=', 'users.id')
                     ->leftJoin('category', 'category.id', '=', 'products.category_id')
@@ -208,7 +208,7 @@ class ProductDepoController extends Controller
             if ($user->role == 'ho') {
                 $products = ProductDepo::leftJoin('products', 'product_id', '=', 'products.id')
                     ->leftJoin('depos', 'depo_id', '=', 'depos.id')
-                    ->leftJoin('users', 'depo_id', '=', 'users.id')
+                    ->leftJoin('users', 'user_id', '=', 'users.id')
                     ->leftJoin('category', 'category.id', '=', 'products.category_id')
                     ->select('category.category_name', 'products_depo.id as product_id', 'users.name as depo_name', 'products.name' , 'products.retail_price', 'products.sub_whole_price', 'products.wholesales_price', 'products_depo.depo_price' , 'products_depo.stock')
                     ->where('depos.user_id', '!=', $user->id)
@@ -216,7 +216,7 @@ class ProductDepoController extends Controller
             } else {
                 $products = ProductDepo::leftJoin('products', 'product_id', '=', 'products.id')
                     ->leftJoin('depos', 'depo_id', '=', 'depos.id')
-                    ->leftJoin('users', 'depo_id', '=', 'users.id')
+                    ->leftJoin('users', 'user_id', '=', 'users.id')
                     ->leftJoin('category', 'category.id', '=', 'products.category_id')
                     ->select('category.category_name', 'products_depo.id as product_id', 'users.name as depo_name', 'products.name' , 'products.retail_price', 'products.sub_whole_price', 'products.wholesales_price', 'products_depo.depo_price' , 'products_depo.stock')
                     ->where('depos.user_id', '=', $user->id)
