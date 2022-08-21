@@ -262,7 +262,7 @@ class StockFlowController extends Controller
             $product = Product::find($id);
         } else {
             $product = ProductDepo::leftJoin('products', 'product_id', '=', 'products.id')
-                    ->select('products_depo.id', 'products.name', 'products_depo.stock', 'products_depo.depo_price')
+                    ->select('products_depo.id', 'products.name', 'products_depo.stock', 'products_depo.depo_price', 'consument_price', 'retail_price', 'sub_whole_price', 'wholesales_price')
                     ->find($id);
         }
         $depo = Depo::where('user_id', '=', $user->id)->first();
@@ -393,8 +393,6 @@ class StockFlowController extends Controller
                     }
                 }
 
-                $stock->remaining_stock = (int) $product->stock;
-
                 $total_amount += (float) rupiahNumber($price_items[$index]) * (int) $qty_items[$index];
 
                 if (!$stock->save()) {
@@ -454,24 +452,25 @@ class StockFlowController extends Controller
                         ->with('failed_message', 'Data prouct HO flow gagal disimpan.');
                 }
 
-                if ($in_stock_type == 'out') {
-                    $cash = new CashFlow;
-                    $cash->depo_id = $in_depo;
-                    if ($in_date != null && $in_time != null) {
-                        $cash->input_date = $in_date . " " . $in_time . date(":s", time());
-                    }
-                    $cash->cash_type = 'revenue';
-                    $cash->revenue_type_in = 'product_sales';
-                    $cash->expense_type = '';
-                    $cash->notes = '';
-                    $cash->amount = $total_amount;
-                    $cash->is_matched = 'true';
-                    $cash->upload_file = '';
-        
-                    if (!$cash->save()) {
-                        return redirect()->route('stock.create')
-                            ->with('failed_message', 'Data cash flow gagal disimpan.');
-                    }
+            }
+
+            if ($in_stock_type == 'out') {
+                $cash = new CashFlow;
+                $cash->depo_id = $in_depo;
+                if ($in_date != null && $in_time != null) {
+                    $cash->input_date = $in_date . " " . $in_time . date(":s", time());
+                }
+                $cash->cash_type = 'revenue';
+                $cash->revenue_type_in = 'product_sales';
+                $cash->expense_type = '';
+                $cash->notes = '';
+                $cash->amount = $total_amount;
+                $cash->is_matched = 'true';
+                $cash->upload_file = '';
+    
+                if (!$cash->save()) {
+                    return redirect()->route('stock.create')
+                        ->with('failed_message', 'Data cash flow gagal disimpan.');
                 }
             }
         }
@@ -530,7 +529,7 @@ class StockFlowController extends Controller
         } else {
             $products = ProductDepo::leftJoin('products', 'product_id', '=', 'products.id')
                     ->leftJoin('depos', 'depo_id', '=', 'depos.id')
-                    ->select('products_depo.id', 'products.name', 'products_depo.stock', 'products_depo.depo_price')
+                    ->select('products_depo.id', 'products.name', 'products_depo.stock', 'products_depo.depo_price', 'consument_price', 'retail_price', 'sub_whole_price', 'wholesales_price')
                     ->orderBy('name', 'asc')
                     ->get();
 
