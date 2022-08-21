@@ -215,7 +215,7 @@ class StockFlowController extends Controller
         } else {
             $products = ProductDepo::leftJoin('products', 'product_id', '=', 'products.id')
                     ->leftJoin('depos', 'depo_id', '=', 'depos.id')
-                    ->select('products_depo.id', 'products.name', 'products_depo.stock', 'products_depo.depo_price')
+                    ->select('products_depo.id', 'products.name', 'products_depo.stock', 'products_depo.depo_price', 'consument_price', 'retail_price', 'sub_whole_price', 'wholesales_price')
                     ->where('user_id', '=', $user->id)
                     ->orderBy('name', 'asc')
                     ->get();
