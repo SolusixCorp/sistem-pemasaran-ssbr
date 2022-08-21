@@ -819,26 +819,27 @@ class StockFlowController extends Controller
                     return redirect()->route('stock.create')
                         ->with('failed_message', 'Data prouct HO flow gagal disimpan.');
                 }
+ 
+            }
 
-                if ($in_stock_type == 'out') {
-                    $cash = CashFlow::where('input_date', '=', $date)->first();
-                    if ($cash != null) {
-                        $cash->depo_id = $in_depo;
-                        if ($in_date != null && $in_time != null) {
-                            $cash->input_date = $in_date . " " . $in_time . date(":s", time());
-                        }
-                        $cash->cash_type = 'revenue';
-                        $cash->revenue_type_in = 'product_sales';
-                        $cash->expense_type = '';
-                        $cash->notes = '';
-                        $cash->amount = $total_amount;
-                        $cash->is_matched = 'true';
-                        $cash->upload_file = '';
+            if ($in_stock_type == 'out') {
+                $cash = CashFlow::where('input_date', '=', $date)->first();
+                if ($cash != null) {
+                    $cash->depo_id = $in_depo;
+                    if ($in_date != null && $in_time != null) {
+                        $cash->input_date = $in_date . " " . $in_time . date(":s", time());
+                    }
+                    $cash->cash_type = 'revenue';
+                    $cash->revenue_type_in = 'product_sales';
+                    $cash->expense_type = '';
+                    $cash->notes = '';
+                    $cash->amount = $total_amount;
+                    $cash->is_matched = 'true';
+                    $cash->upload_file = '';
 
-                        if (!$cash->update()) {
-                            return redirect()->route('stock.create')
-                                ->with('failed_message', 'Data cash flow gagal diperbarui.');
-                        }
+                    if (!$cash->update()) {
+                        return redirect()->route('stock.create')
+                            ->with('failed_message', 'Data cash flow gagal diperbarui.');
                     }
                 }
             }
