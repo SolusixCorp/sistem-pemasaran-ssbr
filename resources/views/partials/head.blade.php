@@ -6,7 +6,7 @@
     <meta name="author" content="Your website">
 
     <!-- Favicon -->
-    <link rel="shortcut icon" href="{{ asset('nura-admin/assets/images/favicon.ico') }}">
+    <link rel="shortcut icon" href="{{ asset('images/ssbr-icon.ico') }}">
 
     <!-- Bootstrap CSS -->
     <link href="{{ asset('nura-admin/assets/css/bootstrap.min.css') }}" rel="stylesheet" type="text/css" />
